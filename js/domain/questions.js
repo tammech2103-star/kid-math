@@ -158,29 +158,61 @@ KM.Questions = (function () {
     }
 
     var labels = [
-      { value: 'left', label: 'Nhóm A' },
-      { value: 'right', label: 'Nhóm B' },
-      { value: 'equal', label: 'Bằng nhau' }
+      {
+        value: 'left',
+        label: 'Nhóm 1',
+        icon: '1',
+        badge: true,
+        color: '#0e6d93',
+        badgeBg: '#e6f8ff'
+      },
+      {
+        value: 'right',
+        label: 'Nhóm 2',
+        icon: '2',
+        badge: true,
+        color: '#b45309',
+        badgeBg: '#fff0d6'
+      },
+      {
+        value: 'equal',
+        label: 'Bằng nhau',
+        icon: '='
+      }
     ];
 
     return {
       kind: 'compareGroups',
       text: askMore ? 'Nhóm nào có nhiều hơn?' : 'Nhóm nào có ít hơn?',
       say: (askMore ? 'Nhóm nào có nhiều hơn?' : 'Nhóm nào có ít hơn?') +
-        ' Bé nhìn hai nhóm và chọn đáp án nhé.',
+        ' Bé chọn nhóm một, nhóm hai hoặc bằng nhau.',
       visual: {
         kind: 'groups',
-        alt: 'Hai nhóm ' + object.noun + ': nhóm A và nhóm B.',
+        alt: 'Hai nhóm ' + object.noun + ': nhóm một và nhóm hai.',
         groups: [
-          { glyph: object.glyph, count: left, label: 'Nhóm A' },
-          { glyph: object.glyph, count: right, label: 'Nhóm B' }
+          {
+            glyph: object.glyph,
+            count: left,
+            label: 'Nhóm 1',
+            badge: '1',
+            color: '#0e6d93',
+            badgeBg: '#e6f8ff'
+          },
+          {
+            glyph: object.glyph,
+            count: right,
+            label: 'Nhóm 2',
+            badge: '2',
+            color: '#b45309',
+            badgeBg: '#fff0d6'
+          }
         ]
       },
       equation: null,
-      choices: labels,
+      choices: rng.shuffle(labels),
       choiceRender: 'text',
       answer: answer,
-      cheer: 'Đúng rồi! Nhóm A có ' + V.toWords(left) + ', nhóm B có ' +
+      cheer: 'Đúng rồi! Nhóm 1 có ' + V.toWords(left) + ', nhóm 2 có ' +
         V.toWords(right) + ' ' + object.noun + '.'
     };
   }
@@ -663,17 +695,24 @@ KM.Questions = (function () {
       left: 'Bên trái',
       right: 'Bên phải'
     };
+    var icons = {
+      on: '↑',
+      under: '↓',
+      left: '←',
+      right: '→'
+    };
     var choices = rng.shuffle([
-      { value: 'on', label: labels.on },
-      { value: 'under', label: labels.under },
-      { value: 'left', label: labels.left },
-      { value: 'right', label: labels.right }
+      { value: 'on', label: labels.on, icon: icons.on },
+      { value: 'under', label: labels.under, icon: icons.under },
+      { value: 'left', label: labels.left, icon: icons.left },
+      { value: 'right', label: labels.right, icon: icons.right }
     ]);
 
     return {
       kind: 'position',
       text: V.capitalize(item.name) + ' ở phía nào của ' + base.name + '?',
-      say: V.capitalize(item.name) + ' ở phía nào của ' + base.name + '?',
+      say: V.capitalize(item.name) + ' ở phía nào của ' + base.name +
+        '? Bé chọn mũi tên chỉ đúng hướng nhé.',
       visual: {
         kind: 'scene',
         alt: base.name + ' và ' + item.name + ' để bé xác định vị trí.',
@@ -682,9 +721,7 @@ KM.Questions = (function () {
         rel: relation
       },
       equation: null,
-      choices: choices.map(function (choice) {
-        return { value: choice.value, label: choice.label };
-      }),
+      choices: choices,
       choiceRender: 'text',
       answer: relation,
       cheer: 'Đúng rồi! ' + V.capitalize(item.name) + ' ở ' +
