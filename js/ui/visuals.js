@@ -105,8 +105,21 @@ KM.Visuals = (function () {
     var list = groups || [];
     list.forEach(function (group, index) {
       var panel = el('div', { class: 'group-panel' });
+      panel.style.setProperty('--panel-color', group.color || '#e1f1fc');
       if (group.label) {
-        panel.appendChild(el('span', { class: 'group-label', text: group.label }));
+        var labelNode = el('span', { class: 'group-label' });
+        if (group.badge) {
+          var badgeNode = el('span', { class: 'group-badge', text: group.badge });
+          if (group.badgeBg) {
+            badgeNode.style.setProperty('--badge-bg', group.badgeBg);
+          }
+          if (group.color) {
+            badgeNode.style.setProperty('--badge-ink', group.color);
+          }
+          labelNode.appendChild(badgeNode);
+        }
+        labelNode.appendChild(el('span', { text: group.label }));
+        panel.appendChild(labelNode);
       }
       if (group.masked) {
         panel.appendChild(el('div', { class: 'mask-box', text: '?' }));
