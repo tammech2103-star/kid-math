@@ -47,6 +47,10 @@ Bàn phím: phím `1`–`4` chọn đáp án, `R` nghe lại, `Esc` về nhà.
 Đáp án tối thiểu 64 px (86 px trên mobile); nút điều hướng 64 px (56 px trên máy nhỏ);
 nút "Nghe lại" 56 px. Game tôn trọng `prefers-reduced-motion`.
 
+**Dành cho bé chưa đọc tốt:** câu vị trí hiển thị **mũi tên lớn** `↑ ↓ ← →`;
+câu so sánh nhóm dùng **badge số 1/2 kèm màu** và dấu `=`. Bé có thể chọn bằng mắt,
+không cần đọc hết chữ. Giọng đọc vẫn đọc đề và lời khen khi máy có giọng Việt.
+
 ## Khu vực phụ huynh
 
 Vào bằng nút **Phụ huynh** ở góc phải. Cổng bảo vệ là một phép nhân (ví dụ `9 × 9`),
@@ -82,7 +86,7 @@ lưu tiến độ sau khi tải lại, khu phụ huynh, giao diện 8 dạng bà
 Nếu chưa có Playwright: `python -m pip install -r tools/requirements-test.txt`
 (script dùng Chrome cài sẵn, không cần tải Chromium).
 
-**Bản deploy tĩnh:** chạy `python tools/build_public.py` để tạo `public/` (chỉ 216 KB),
+**Bản deploy tĩnh:** chạy `python tools/build_public.py` để tạo `public/` (khoảng 218 KB),
 rồi mở `public/index.html` hoặc serve thư mục đó. Bản này đã được kiểm tra 21 bài,
 ảnh xe, localStorage, không lỗi console.
 
