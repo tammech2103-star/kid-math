@@ -4,6 +4,8 @@ Game web tĩnh dạy **Toán lớp 1 – Tập 1 (Kết nối tri thức với c
 Bé trả lời đúng để nhận **xe đua, sao và confetti**; sai thì được nhắc nhẹ và thử lại,
 không bị trừ sao, không có màn thua, không có đồng hồ đếm ngược.
 
+**Link cho tablet:** **https://be-vui-hoc-toan-1.onrender.com**
+
 ![Trang chủ](production/qa/screenshots/02-home.png)
 
 ## Chạy game
@@ -92,11 +94,13 @@ rồi mở `public/index.html` hoặc serve thư mục đó. Bản này đã đ�
 
 ## Chia sẻ lên tablet
 
-Xem [`DEPLOY-RENDER.md`](DEPLOY-RENDER.md). Gói upload nằm ở
-`deploy/kid-math-render.zip` trên máy (tạo lại bằng `python tools/pack_deploy.py`;
-file ZIP không commit vào repo). Cấu hình Render đã có trong `render.yaml`: build
-`public/`, publish `public`, HTTPS, không backend, không thu dữ liệu. Sau khi deploy,
-mở link bằng Safari/Chrome trên tablet và “Thêm vào màn hình chính”.
+**Đã deploy:** https://be-vui-hoc-toan-1.onrender.com (Render static site, commit `ffebecd`).
+Mở link bằng Safari/Chrome trên tablet và “Thêm vào màn hình chính”.
+
+Hướng dẫn cập nhật/deploy lại: xem [`DEPLOY-RENDER.md`](DEPLOY-RENDER.md). Gói upload
+nằm ở `deploy/kid-math-render.zip` trên máy (tạo lại bằng `python tools/pack_deploy.py`;
+file ZIP không commit vào repo). Cấu hình Render ở `render.yaml`: build `public/`,
+publish `public`, HTTPS, không backend, không thu dữ liệu.
 
 ## Cấu trúc
 
