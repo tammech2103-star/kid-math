@@ -1,8 +1,9 @@
 # Session State — Bé Vui Học Toán 1
 
-**Cập nhật**: 2026-11-20 19:12
-**Trạng thái**: MVP hoàn chỉnh; review + smoke + Lighthouse PASS; đã đóng gói deploy Render
-(`render.yaml`, `public/`, ZIP hướng dẫn); chờ tài khoản GitHub + Render để bấm deploy.
+**Cập nhật**: 2026-11-20 20:00
+**Trạng thái**: **Đã deploy Render** tại https://be-vui-hoc-toan-1.onrender.com
+(commit `ffebecd`, static site Live). Repo: https://github.com/tammech2103-star/kid-math.
+Game 21 màn, 11 dạng bài; đã có mũi tên/badge cho trẻ chưa đọc tốt.
 
 ## Việc đang làm
 
