@@ -1,6 +1,6 @@
 # Smoke Report — Bé Vui Học Toán 1
 
-**Ngày**: 2026-11-20 17:38
+**Ngày**: 2026-11-20 19:12
 **Phiên bản**: 1.0.0
 **Môi trường**: Windows · Chrome 157.0.8103.80 · Python 3.12.10 · Playwright 1.65.2
 **Server kiểm thử**: `python -m http.server 8765 --bind 127.0.0.1`
@@ -14,8 +14,9 @@
 | Smoke E2E desktop 1280×900 | **PASS** |
 | Smoke E2E mobile 390×844 | **PASS** |
 | Mở offline `file://` | **PASS** (21 bài, xe tải, localStorage hoạt động) |
-| Bản build tĩnh `public/` | **PASS** (29 mục, 215.7 KB, 0 tài nguyên lỗi) |
+| Bản build tĩnh `public/` | **PASS** (29 mục, 218.2 KB, 0 tài nguyên lỗi) |
 | Lighthouse trang chủ | **100 Accessibility / 100 Best Practices / 100 SEO** |
+| Lighthouse bài vị trí (b15) | **100 / 100 / 100** — `production/qa/lighthouse/lesson-position.html` |
 | Lỗi console | 0 |
 | Tài nguyên HTTP ≥ 400 | 0 |
 
@@ -42,7 +43,6 @@
 | SM-17 | PASS | `prefers-reduced-motion`: animation ảnh xe tắt, confetti `display:none` |
 | SM-18 | PASS | Focus: câu hỏi, tiêu đề kết quả, công tắc phụ huynh, h1 trang chủ/cổng |
 | SM-19 | PASS | `python tools/build_public.py`: 21 bài, ảnh xe, localStorage, 0 lỗi/404 |
-
 ## 3. Ảnh chụp bằng chứng
 
 | Tệp | Nội dung |
@@ -89,6 +89,11 @@
 15. Chuẩn bị deploy Render → thêm `render.yaml`, `tools/build_public.py`,
     `tools/pack_deploy.py`, `deploy/kid-math-render.zip`; bản `public/` 215.7 KB
     đã được kiểm tra 21 bài/ảnh/localStorage, không 404.
+16. Trẻ lớp 1 chưa đọc được "Bên trái/Bên phải" → đổi lựa chọn vị trí sang
+    **mũi tên lớn**, nhóm so sánh sang **badge 1/2 + màu**, dấu `=`; nhãn chữ nhỏ
+    phía dưới. Ảnh `08-type-position.png`, `08-type-compare-groups.png`.
+17. Bản deploy sau thay đổi đọc-bằng-mắt → build lại `public/` 218.2 KB, kiểm tra
+    21 bài/ảnh/localStorage/0 404; ảnh `14-render-build.png` chụp bài vị trí.
 
 ## 5. Rủi ro còn lại
 
