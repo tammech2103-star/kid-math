@@ -1,6 +1,6 @@
 # Session State — Bé Vui Học Toán 1
 
-**Cập nhật**: 2026-11-20 17:45
+**Cập nhật**: 2026-11-20 19:12
 **Trạng thái**: MVP hoàn chỉnh; review + smoke + Lighthouse PASS; đã đóng gói deploy Render
 (`render.yaml`, `public/`, ZIP hướng dẫn); chờ tài khoản GitHub + Render để bấm deploy.
 
@@ -26,6 +26,7 @@ Bàn giao game web dạy Toán lớp 1 Tập 1 (Kết nối tri thức), chạy 
 - [x] Cập nhật báo cáo QA cuối cùng
 - [x] Đóng gói deploy Render: `render.yaml`, `tools/build_public.py`, `public/`,
       `tools/pack_deploy.py`, `deploy/kid-math-render.zip`, `DEPLOY-RENDER.md`
+- [x] Hỗ trợ trẻ chưa đọc tốt: mũi tên lớn cho vị trí, badge 1/2 + màu cho so sánh nhóm
 - [ ] Tạo GitHub repo + Render Blueprint (cần tài khoản người dùng)
 
 ## Quyết định quan trọng
