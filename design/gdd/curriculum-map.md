@@ -53,6 +53,9 @@ Nguồn: PDF *Toán lớp 1 tập 1 — Kết nối tri thức với cuộc số
 
 - Mỗi câu có **một đáp án đúng duy nhất** trong 2–4 lựa chọn: mặc định 3 lựa chọn,
   câu vị trí có 4, câu nhận dạng khối có 2 (chỉ có hai loại khối trong Tập 1).
+- **Trẻ chưa đọc tốt**: câu vị trí dùng mũi tên lớn `↑ ↓ ← →`; câu so sánh nhóm
+  dùng badge số **1/2** kèm màu (xanh teal / cam) và dấu `=`; bé chọn bằng mắt,
+  không cần đọc chữ. Nhãn chữ vẫn còn nhỏ bên dưới cho phụ huynh/giáo viên.
 - Số trong mọi câu nằm trong **0–10** (đúng phạm vi Tập 1).
 - Câu cộng/trừ luôn kèm hình minh hoạ đồ vật để trẻ đếm được, trừ `factFamily`
   (tính nhẩm theo bảng cộng trừ như Bài 12).
