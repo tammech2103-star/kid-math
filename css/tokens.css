@@ -1,0 +1,40 @@
+/* Bảng màu, chữ, bóng đổ dùng chung. */
+:root {
+  --sky: #7ed3f7;
+  --sky-deep: #2fa9dc;
+  --sky-soft: #e6f8ff;
+  --sun: #ffd84d;
+  --sun-deep: #e79b00;
+  --sun-soft: #fff6d6;
+  --coral: #ff6b5b;
+  --coral-deep: #d94132;
+  --coral-ink: #a3241a;
+  --coral-soft: #ffe9e6;
+  --mint: #6fe3b8;
+  --mint-deep: #149a71;
+  --mint-ink: #0f6b50;
+  --mint-soft: #e3fff5;
+  --grape: #9c7bf5;
+  --grape-deep: #6b45d6;
+  --grape-ink: #5533b8;
+  --grape-soft: #f0eaff;
+  --sky-ink: #0e6d93;
+  --sun-ink: #7a5200;
+  --cream: #fff9ee;
+  --paper: #ffffff;
+  --ink: #23344d;
+  --ink-soft: #54678a;
+  --line: #e2ecf8;
+  --radius-xl: 36px;
+  --radius-lg: 28px;
+  --radius-md: 20px;
+  --radius-sm: 14px;
+  --shadow-card: 0 18px 40px rgba(35, 52, 77, 0.1);
+  --shadow-soft: 0 10px 24px rgba(35, 52, 77, 0.08);
+  --shadow-pop: 0 6px 0 rgba(35, 52, 77, 0.12);
+  --font: "Segoe UI Rounded", "Segoe UI Variable Display", "Segoe UI", system-ui,
+    -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --ease-bounce: cubic-bezier(0.2, 1.4, 0.4, 1);
+  --chapter: var(--sky-deep);
+  --chapter-soft: var(--sky-soft);
+}
