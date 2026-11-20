@@ -17,6 +17,8 @@
 | Bản build tĩnh `public/` | **PASS** (29 mục, 218.2 KB, 0 tài nguyên lỗi) |
 | Lighthouse trang chủ | **100 Accessibility / 100 Best Practices / 100 SEO** |
 | Lighthouse bài vị trí (b15) | **100 / 100 / 100** — `production/qa/lighthouse/lesson-position.html` |
+| **Live Render** | **PASS** — https://be-vui-hoc-toan-1.onrender.com (commit `ffebecd`) |
+| Trên live | 21 bài, mũi tên ↑↓←→, badge 1/2, xe + confetti khi đúng |
 | Lỗi console | 0 |
 | Tài nguyên HTTP ≥ 400 | 0 |
 
