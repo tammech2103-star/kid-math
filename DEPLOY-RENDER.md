@@ -1,5 +1,8 @@
 # Deploy lên Render — Bé Vui Học Toán 1
 
+**Trạng thái:** đã deploy tại **https://be-vui-hoc-toan-1.onrender.com**
+(static site, commit `ffebecd`, deploy 2026-11-20 19:56 GMT+7).
+
 Mục tiêu: có một link HTTPS dạng `https://be-vui-hoc-toan-1.onrender.com` để mở trên tablet.
 Đây là **static site** — không backend, không database, không thu dữ liệu trẻ em.
 
