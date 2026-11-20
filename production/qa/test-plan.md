@@ -75,6 +75,8 @@ qua DOM. Mapping đáp án ↔ lựa chọn được unit test kiểm tra.
   giọng tiếng Anh?
 - [ ] Tiếng "ting", tiếng xe, âm báo sai có dễ chịu, không quá to?
 - [ ] Trẻ có tự bấm "Nghe lại" được không?
+- [ ] Trẻ chưa đọc tốt có chọn được câu vị trí bằng mũi tên và câu so sánh nhóm
+  bằng badge 1/2 + màu không?
 - [ ] Trẻ có hiểu vì sao câu trả lời đúng/sai không? (nhìn hình + đọc lời khen)
 - [ ] Chơi trên tablet/điện thoại: nút có dễ chạm, không bị che?
 - [ ] Bật "giảm chuyển động" của hệ điều hành: animation có dừng?
