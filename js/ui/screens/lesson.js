@@ -171,7 +171,20 @@ KM.Screens.lesson = (function () {
       if (question.choiceRender === 'sign') {
         return [el('span', { class: 'choice-sign', text: choice.label })];
       }
-      return [el('span', { class: 'choice-label', text: choice.label })];
+      var styleVars = {};
+      if (choice.badgeBg) {
+        styleVars['--badge-bg'] = choice.badgeBg;
+      }
+      if (choice.color) {
+        styleVars['--badge-ink'] = choice.color;
+      }
+      return [el('span', {
+        class: 'choice-text-stack' + (choice.badge ? ' is-badge' : ''),
+        'data-icon': choice.icon || '',
+        style: Object.keys(styleVars).length ? styleVars : null
+      }, [
+        el('span', { class: 'choice-label', text: choice.label })
+      ])];
     }
 
     function renderChoices(question) {
