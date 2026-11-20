@@ -120,6 +120,17 @@
         var expected = left === right ? 'equal'
           : (more ? (left > right ? 'left' : 'right') : (left < right ? 'left' : 'right'));
         T.eq(question.answer, expected, 'so sánh ' + left + ' và ' + right);
+        var labels = question.choices.map(function (choice) {
+          return choice.label;
+        }).sort();
+        T.deepEq(labels, ['Bằng nhau', 'Nhóm 1', 'Nhóm 2'].sort(), 'nhãn nhóm');
+        question.choices.forEach(function (choice) {
+          T.ok(choice.icon, 'thiếu biểu tượng cho ' + choice.label);
+        });
+        T.eq(question.visual.groups[0].label, 'Nhóm 1');
+        T.eq(question.visual.groups[1].label, 'Nhóm 2');
+        T.eq(question.visual.groups[0].badge, '1');
+        T.eq(question.visual.groups[1].badge, '2');
       }
     });
 
@@ -321,6 +332,15 @@
         T.eq(question.choices.length, 4);
         T.eq(question.visual.rel, question.answer);
         T.ok(['on', 'under', 'left', 'right'].indexOf(question.answer) !== -1);
+        var icons = {};
+        question.choices.forEach(function (choice) {
+          T.ok(choice.icon, 'thiếu mũi tên cho ' + choice.label);
+          icons[choice.value] = choice.icon;
+        });
+        T.eq(icons.on, '↑');
+        T.eq(icons.under, '↓');
+        T.eq(icons.left, '←');
+        T.eq(icons.right, '→');
       }
     });
 
