@@ -56,10 +56,11 @@ Nguồn: PDF *Toán lớp 1 tập 1 — Kết nối tri thức với cuộc số
 - **Trẻ chưa đọc tốt**: câu vị trí dùng mũi tên lớn `↑ ↓ ← →`; câu so sánh nhóm
   dùng badge số **1/2** kèm màu (xanh teal / cam) và dấu `=`; bé chọn bằng mắt,
   không cần đọc chữ. Nhãn chữ vẫn còn nhỏ bên dưới cho phụ huynh/giáo viên.
-- **Cuộc đua**: mỗi màn là 1 cuộc đua 4 tay đua — McQueen (xe của bé) + 3 đối thủ
-  lấy từ 28 nhân vật trong `Asset/`, luân phiên để tất cả đều xuất hiện. Mở bài có
-  màn xuất phát kiểu `Feature.webp` (các xe đứng cạnh nhau ở vạch ca-rô). HUD 4 làn
-  cho biết ai đang dẫn; kết quả có hạng 1–4 và podium. Không có trạng thái thua.
+- **Cuộc đua**: mỗi màn là cuộc đua **1 đối 1** — McQueen (xe của bé) với 1 đối thủ
+  lấy từ 28 nhân vật trong `Asset/`. Đối thủ đổi theo bài và theo lần chơi lại nên cả
+  28 nhân vật đều xuất hiện. Mở bài có màn xuất phát kiểu `Feature.webp` (hai xe đứng
+  cạnh nhau ở vạch ca-rô, badge VS ở giữa). HUD 2 làn cho biết ai đang dẫn; kết quả có
+  hạng 1–2 và podium. Không có trạng thái thua.
 - Số trong mọi câu nằm trong **0–10** (đúng phạm vi Tập 1).
 - Câu cộng/trừ luôn kèm hình minh hoạ đồ vật để trẻ đếm được, trừ `factFamily`
   (tính nhẩm theo bảng cộng trừ như Bài 12).
