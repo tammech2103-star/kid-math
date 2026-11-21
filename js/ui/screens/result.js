@@ -104,18 +104,17 @@ KM.Screens.result = (function () {
 
     var podium = null;
     if (race) {
-      var podiumRow = el('div', {
-        class: 'podium-row',
-        style: { '--podium-count': String(race.racers.length) }
-      }, race.racers.map(function (racer) {
-        return el('div', {
-          class: 'podium-card' + (racer.isPlayer ? ' is-player' : '') +
-            (racer.place === 1 ? ' is-winner' : '')
+      var ordered = race.racers.slice().sort(function (a, b) {
+        return a.place - b.place;
+      });
+      var stage = el('div', { class: 'podium-stage' }, ordered.map(function (racer) {
+        var step = el('div', {
+          class: 'podium-step' + (racer.place === 1 ? ' is-first' : ' is-second') +
+            (racer.isPlayer ? ' is-player' : '')
         }, [
-          el('span', {
-            class: 'podium-place',
-            text: '#' + racer.place
-          }),
+          racer.place === 1
+            ? el('span', { class: 'podium-crown', text: '🏆', 'aria-hidden': 'true' })
+            : null,
           el('img', {
             class: 'podium-thumb',
             src: racer.src,
@@ -123,12 +122,20 @@ KM.Screens.result = (function () {
             loading: 'eager',
             draggable: 'false'
           }),
+          el('div', { class: 'podium-block' }, [
+            racer.isPlayer
+              ? el('span', { class: 'podium-you', text: 'BÉ', 'aria-hidden': 'true' })
+              : null,
+            el('span', { class: 'podium-place', text: String(racer.place) })
+          ]),
           el('span', { class: 'podium-name', text: racer.name })
         ]);
+        step.setAttribute('aria-label', racer.name + ', hạng ' + racer.place);
+        return step;
       }));
       podium = el('div', { class: 'result-podium' }, [
-        el('span', { class: 'result-podium-title', text: 'Kết quả cuộc đua' }),
-        podiumRow
+        el('span', { class: 'result-podium-title', text: 'Bục trao thưởng' }),
+        stage
       ]);
     }
 
