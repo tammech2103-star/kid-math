@@ -1819,20 +1819,20 @@ p {
 
 .race-lanes {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 8px;
+  grid-template-columns: repeat(var(--race-count, 2), minmax(0, 1fr));
+  gap: 10px;
 }
 
 .race-lane {
   position: relative;
   display: flex;
-  flex-direction: column;
-  gap: 3px;
+  align-items: center;
+  gap: 10px;
   min-width: 0;
-  padding: 5px 6px;
+  padding: 8px 10px;
   border: 2px solid #e1f1fc;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.85);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.9);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -1846,32 +1846,39 @@ p {
   border-color: var(--sun-deep);
 }
 
+.race-lane-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
 .race-lane-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 4px;
+  gap: 8px;
 }
 
 .race-thumb {
-  flex: 1;
-  min-width: 0;
-  height: 30px;
-  width: auto;
+  flex: none;
+  width: 64px;
+  height: 48px;
   object-fit: contain;
-  filter: drop-shadow(0 3px 3px rgba(35, 52, 77, 0.18));
+  filter: drop-shadow(0 4px 4px rgba(35, 52, 77, 0.2));
 }
 
 .race-rank {
   flex: none;
   display: grid;
   place-items: center;
-  width: 20px;
-  height: 20px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   background: var(--ink);
   color: #fff;
-  font-size: 0.68rem;
+  font-size: 0.78rem;
   font-weight: 900;
 }
 
@@ -1889,15 +1896,16 @@ p {
   text-overflow: ellipsis;
   white-space: nowrap;
   color: var(--ink);
-  font-size: 0.68rem;
+  font-size: 0.86rem;
   font-weight: 800;
 }
 
 .race-bar {
-  height: 7px;
+  height: 11px;
   overflow: hidden;
   border-radius: 999px;
   background: #e8f1fa;
+  box-shadow: inset 0 1px 2px rgba(35, 52, 77, 0.12);
 }
 
 .race-fill {
@@ -2009,9 +2017,14 @@ p {
   bottom: 15%;
   z-index: 3;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(var(--race-count, 2), minmax(0, 1fr));
   align-items: end;
   gap: clamp(4px, 1.5vw, 18px);
+}
+
+.race-start-grid.is-duel {
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: clamp(6px, 2.2vw, 26px);
 }
 
 .race-start-slot {
@@ -2031,9 +2044,13 @@ p {
 .race-start-car {
   display: block;
   width: 100%;
-  height: clamp(54px, 10.5vw, 112px);
+  height: clamp(84px, 16vw, 168px);
   object-fit: contain;
   filter: drop-shadow(0 8px 8px rgba(0, 0, 0, 0.3));
+}
+
+.race-start-grid.is-duel .race-start-car {
+  height: clamp(96px, 20vw, 200px);
 }
 
 .race-start-name {
@@ -2041,11 +2058,25 @@ p {
   margin-top: 6px;
   overflow: hidden;
   color: #fff;
-  font-size: clamp(0.55rem, 1.2vw, 0.78rem);
+  font-size: clamp(0.7rem, 1.6vw, 1rem);
   font-weight: 800;
   text-overflow: ellipsis;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
   white-space: nowrap;
+}
+
+.race-vs {
+  align-self: center;
+  padding: 6px 14px;
+  border: 3px solid #fff;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #ff8a75, #d94132);
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.18);
+  color: #fff;
+  font-size: clamp(0.95rem, 2.4vw, 1.5rem);
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.18);
 }
 
 .race-start-you {
@@ -2113,9 +2144,9 @@ p {
 
 .podium-row {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 8px;
-  margin-top: 8px;
+  grid-template-columns: repeat(var(--podium-count, 2), minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 10px;
 }
 
 .podium-card {
@@ -2123,11 +2154,11 @@ p {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: 4px;
   min-width: 0;
-  padding: 6px;
+  padding: 10px;
   border: 2px solid #e1f1fc;
-  border-radius: 14px;
+  border-radius: 18px;
   background: #fff;
 }
 
@@ -2138,17 +2169,17 @@ p {
 
 .podium-place {
   position: absolute;
-  top: -6px;
-  left: -6px;
+  top: -8px;
+  left: -8px;
   display: grid;
   place-items: center;
-  width: 22px;
-  height: 22px;
+  width: 28px;
+  height: 28px;
   border: 2px solid #fff;
   border-radius: 50%;
   background: var(--ink);
   color: #fff;
-  font-size: 0.64rem;
+  font-size: 0.76rem;
   font-weight: 900;
 }
 
@@ -2158,16 +2189,16 @@ p {
 
 .podium-thumb {
   width: 100%;
-  height: 34px;
+  height: 68px;
   object-fit: contain;
-  filter: drop-shadow(0 2px 3px rgba(35, 52, 77, 0.18));
+  filter: drop-shadow(0 3px 4px rgba(35, 52, 77, 0.2));
 }
 
 .podium-name {
   max-width: 100%;
   overflow: hidden;
   color: var(--ink);
-  font-size: 0.64rem;
+  font-size: 0.86rem;
   font-weight: 800;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -2275,36 +2306,41 @@ p {
   }
 
   .race-lanes {
-    gap: 5px;
+    gap: 6px;
   }
 
   .race-hud {
-    padding: 6px 6px 7px;
+    padding: 6px;
     border-radius: 18px;
   }
 
   .race-lane {
-    padding: 3px;
-    gap: 2px;
-    border-radius: 11px;
+    padding: 5px 6px;
+    gap: 6px;
+    border-radius: 13px;
   }
 
   .race-thumb {
-    height: 22px;
+    width: 42px;
+    height: 32px;
+  }
+
+  .race-lane-body {
+    gap: 3px;
   }
 
   .race-rank {
-    width: 16px;
-    height: 16px;
-    font-size: 0.54rem;
+    width: 20px;
+    height: 20px;
+    font-size: 0.62rem;
   }
 
   .race-name {
-    display: none;
+    font-size: 0.7rem;
   }
 
   .race-bar {
-    height: 6px;
+    height: 8px;
   }
 
   .race-status {
@@ -2335,7 +2371,7 @@ p {
   }
 
   .race-intro-card {
-    min-height: 58vh;
+    min-height: 52vh;
   }
 
   .race-intro-title {
@@ -2349,17 +2385,38 @@ p {
   }
 
   .race-start-grid {
-    bottom: 16%;
+    bottom: 18%;
+    gap: 4px;
+  }
+
+  .race-start-line {
+    bottom: 7%;
+  }
+
+  .race-start-grid.is-duel {
+    left: 2%;
+    right: 2%;
     gap: 4px;
   }
 
   .race-start-car {
-    height: clamp(48px, 12vw, 78px);
+    height: clamp(64px, 15vw, 96px);
+  }
+
+  .race-start-grid.is-duel .race-start-car {
+    height: clamp(84px, 24vw, 132px);
   }
 
   .race-start-name {
-    font-size: 0.55rem;
+    font-size: 0.62rem;
     margin-top: 3px;
+  }
+
+  .race-vs {
+    padding: 4px 9px;
+    border-width: 2px;
+    font-size: 0.82rem;
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.18);
   }
 
   .race-skip {
@@ -2370,15 +2427,15 @@ p {
   }
 
   .podium-thumb {
-    height: 28px;
+    height: 52px;
   }
 
   .podium-name {
-    font-size: 0.58rem;
+    font-size: 0.74rem;
   }
 
   .podium-row {
-    gap: 5px;
+    gap: 8px;
   }
 
   .visual-group {
