@@ -1,6 +1,6 @@
 /**
- * Giao diện cuộc đua 1 đối 1: starting grid kiểu Feature.webp và HUD 2 làn.
- * Xe và thanh tiến độ được phóng to để nhìn rõ trên tablet.
+ * Giao diện cuộc đua 1 đối 1: sân xuất phát kiểu Feature.webp và đường đua 2 làn
+ * có xe cỡ lớn chạy bám đuổi nhau trong lúc bé trả lời câu hỏi.
  * @namespace KM.RaceUI
  */
 window.KM = window.KM || {};
@@ -9,6 +9,7 @@ KM.RaceUI = (function () {
   'use strict';
 
   var el = KM.Components.el;
+  var MOVE_MS = 700;
 
   function prefersReducedMotion() {
     return !!(window.matchMedia &&
@@ -30,80 +31,84 @@ KM.RaceUI = (function () {
 
     var hud = el('div', {
       class: 'race-hud',
-      'aria-label': 'Cuộc đua'
+      'aria-label': 'Đường đua'
     });
-    var laneWrap = el('div', { class: 'race-lanes' });
-    hud.appendChild(laneWrap);
+    var track = el('div', { class: 'race-track' });
+    hud.appendChild(track);
     hud.appendChild(el('span', {
-      class: 'race-finish-flag',
+      class: 'race-finish',
       text: '🏁',
       'aria-hidden': 'true'
     }));
 
     var initialRows = race.liveRows();
-    laneWrap.style.setProperty('--race-count', String(initialRows.length));
 
     initialRows.forEach(function (row) {
-      var fill = el('span', { class: 'race-fill' });
-      fill.style.width = row.progress + '%';
-      fill.style.background = row.color;
-      var bar = el('div', {
-        class: 'race-bar',
-        role: 'progressbar',
-        'aria-label': row.name,
-        'aria-valuemin': '0',
-        'aria-valuemax': '100',
-        'aria-valuenow': String(Math.round(row.progress))
-      }, [fill]);
-      var lane = el('div', {
-        class: 'race-lane' + (row.isPlayer ? ' is-player' : ''),
-        'data-racer': row.id,
-        role: 'group'
-      }, [
+      var racer = el('div', { class: 'race-racer' }, [
+        el('span', { class: 'race-trail', 'aria-hidden': 'true' }),
         el('img', {
-          class: 'race-thumb',
+          class: 'race-car',
           src: row.src,
           alt: '',
           loading: 'eager',
           draggable: 'false'
         }),
-        el('div', { class: 'race-lane-body' }, [
-          el('div', { class: 'race-lane-top' }, [
-            el('span', { class: 'race-name', text: row.name }),
-            el('span', {
-              class: 'race-rank',
-              text: String(row.rank),
-              'aria-hidden': 'true'
-            })
-          ]),
-          bar
-        ])
+        el('span', {
+          class: 'race-rank',
+          text: String(row.rank),
+          'aria-hidden': 'true'
+        })
       ]);
+      var lane = el('div', {
+        class: 'race-lane' + (row.isPlayer ? ' is-player' : ''),
+        'data-racer': row.id,
+        'data-progress': '0',
+        role: 'group'
+      }, [racer]);
       lane.setAttribute('aria-label', row.name + ', hạng ' + row.rank);
       laneElements[row.id] = {
         lane: lane,
-        fill: fill,
-        bar: bar,
-        rank: lane.querySelector('.race-rank')
+        racer: racer,
+        rank: racer.querySelector('.race-rank'),
+        progress: 0,
+        timer: null
       };
-      laneWrap.appendChild(lane);
+      track.appendChild(lane);
     });
 
-    /** Cập nhật vị trí các tay đua. */
+    /** Cập nhật vị trí các tay đua trên đường đua. */
     function update(state) {
       var opts = state || {};
-      race.liveRows().forEach(function (row) {
+      var rows = race.liveRows();
+      rows.forEach(function (row) {
         var entry = laneElements[row.id];
         if (!entry) {
           return;
         }
-        entry.fill.style.width = row.progress + '%';
-        entry.rank.textContent = String(row.rank);
-        entry.bar.setAttribute('aria-valuenow', String(Math.round(row.progress)));
+        entry.racer.style.setProperty('--p', String(Math.max(0, Math.min(1, row.progress / 100))));
+        entry.lane.setAttribute('data-progress', String(Math.round(row.progress)));
         entry.lane.setAttribute('aria-label',
           row.name + ', hạng ' + row.rank + ', ' + Math.round(row.progress) + ' phần trăm');
+        entry.rank.textContent = String(row.rank);
         entry.lane.classList.toggle('is-ahead', row.rank === 1);
+        if (row.progress > entry.progress + 0.4) {
+          entry.lane.classList.remove('is-move');
+          void entry.lane.offsetWidth;
+          entry.lane.classList.add('is-move');
+          if (entry.timer) {
+            window.clearTimeout(entry.timer);
+          }
+          entry.timer = window.setTimeout(function () {
+            entry.lane.classList.remove('is-move');
+            entry.timer = null;
+          }, MOVE_MS);
+        }
+        entry.progress = row.progress;
       });
+      if (rows.length > 1) {
+        var gap = Math.abs(rows[0].progress - rows[1].progress);
+        hud.classList.toggle('is-close', gap > 0 && gap < 10);
+      }
       if (opts.final) {
         hud.classList.add('is-finished');
       }
@@ -241,6 +246,13 @@ KM.RaceUI = (function () {
 
     function destroy() {
       clearIntroTimers();
+      Object.keys(laneElements).forEach(function (id) {
+        var entry = laneElements[id];
+        if (entry.timer) {
+          window.clearTimeout(entry.timer);
+          entry.timer = null;
+        }
+      });
       if (introOverlay && introOverlay.parentNode) {
         introOverlay.parentNode.removeChild(introOverlay);
       }
