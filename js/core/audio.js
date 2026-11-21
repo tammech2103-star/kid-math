@@ -130,6 +130,12 @@ KM.Audio = (function () {
       tone(1318.5, 0.52, 0.45, 'triangle', 0.24);
     }
 
+    /** Về nhì: hai nốt đi xuống nhẹ nhàng, không chói tai. */
+    function lose() {
+      tone(392, 0, 0.22, 'sine', 0.2);
+      tone(311.13, 0.2, 0.36, 'sine', 0.16);
+    }
+
     /** @param {boolean} value */
     function setEnabled(value) {
       enabled = value !== false;
@@ -148,6 +154,7 @@ KM.Audio = (function () {
       engine: engine,
       startRace: startRace,
       win: win,
+      lose: lose,
       setEnabled: setEnabled,
       isEnabled: function () { return enabled; }
     };
