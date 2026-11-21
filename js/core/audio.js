@@ -114,6 +114,14 @@ KM.Audio = (function () {
       tone(320, 0.1, 0.08, 'square', 0.05);
     }
 
+    /** Ba tiếng đếm và tiếng xuất phát. */
+    function startRace() {
+      tone(440, 0.55, 0.09, 'square', 0.14);
+      tone(440, 1.05, 0.09, 'square', 0.14);
+      tone(440, 1.55, 0.09, 'square', 0.14);
+      tone(880, 2.05, 0.28, 'triangle', 0.28);
+    }
+
     function win() {
       var notes = [523.25, 659.25, 783.99, 1046.5];
       notes.forEach(function (freq, index) {
@@ -138,6 +146,7 @@ KM.Audio = (function () {
       wrong: wrong,
       star: star,
       engine: engine,
+      startRace: startRace,
       win: win,
       setEnabled: setEnabled,
       isEnabled: function () { return enabled; }
