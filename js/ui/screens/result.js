@@ -98,23 +98,30 @@ KM.Screens.result = (function () {
 
     var podium = null;
     if (race) {
+      var podiumRow = el('div', {
+        class: 'podium-row',
+        style: { '--podium-count': String(race.racers.length) }
+      }, race.racers.map(function (racer) {
+        return el('div', {
+          class: 'podium-card' + (racer.isPlayer ? ' is-player' : '')
+        }, [
+          el('span', {
+            class: 'podium-place',
+            text: '#' + racer.place
+          }),
+          el('img', {
+            class: 'podium-thumb',
+            src: racer.src,
+            alt: '',
+            loading: 'eager',
+            draggable: 'false'
+          }),
+          el('span', { class: 'podium-name', text: racer.name })
+        ]);
+      }));
       podium = el('div', { class: 'result-podium' }, [
         el('span', { class: 'result-podium-title', text: 'Kết quả cuộc đua' }),
-        el('div', { class: 'podium-row' }, race.racers.map(function (racer) {
-          return el('div', {
-            class: 'podium-card' + (racer.isPlayer ? ' is-player' : '')
-          }, [
-            el('span', { class: 'podium-place', text: '#' + racer.place }),
-            el('img', {
-              class: 'podium-thumb',
-              src: racer.src,
-              alt: '',
-              loading: 'eager',
-              draggable: 'false'
-            }),
-            el('span', { class: 'podium-name', text: racer.name })
-          ]);
-        }))
+        podiumRow
       ]);
     }
 

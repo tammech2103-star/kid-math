@@ -41,10 +41,13 @@ KM.Screens.lesson = (function () {
     var questionSpeakTimer = null;
 
     var screen = el('div', { class: 'screen lesson' });
+    var attempt = ctx.progress.entryFor(lesson.id).plays;
+    var opponents = ctx.racers.opponentsForLesson(lesson.id, attempt);
+    var rival = opponents[0] || null;
     var race = ctx.race.create({
       total: questions.length,
       player: ctx.racers.player,
-      opponents: ctx.racers.opponentsForLesson(lesson.id)
+      opponents: opponents
     });
     var raceUI = ctx.raceUI.create({ race: race, ctx: ctx, screen: screen });
 
@@ -107,7 +110,8 @@ KM.Screens.lesson = (function () {
 
     var raceStatus = el('span', {
       class: 'race-status',
-      text: '🏁 Cuộc đua · Câu 1/' + questions.length
+      text: '🏁 ' + (rival ? 'Đua với ' + rival.name + ' · ' : '') +
+        'Câu 1/' + questions.length
     });
     var meterValue = el('span', { class: 'star-meter-value', text: '0' });
     var meter = el('div', {
@@ -266,8 +270,8 @@ KM.Screens.lesson = (function () {
 
       renderChoices(question);
 
-      raceStatus.textContent = '🏁 Cuộc đua · Câu ' +
-        (session.progress().index + 1) + '/' + session.progress().total;
+      raceStatus.textContent = '🏁 ' + (rival ? 'Đua với ' + rival.name + ' · ' : '') +
+        'Câu ' + (session.progress().index + 1) + '/' + session.progress().total;
       raceUI.update();
       foot.textContent = 'Chạm vào đáp án đúng';
 

@@ -62,7 +62,7 @@ KM.Screens.home = (function () {
         el('span', { class: 'eyebrow', text: 'Học mà chơi · Chơi mà học' }),
         el('h2', { text: 'Học toán cùng xe đua!' }),
         el('p', {
-          text: 'Mỗi bài là một cuộc đua cùng 3 đối thủ. Trả lời đúng để McQueen ' +
+          text: 'Mỗi bài là một cuộc đua 1 đối 1. Trả lời đúng để McQueen ' +
             'tăng tốc về đích và nhận sao!'
         }),
         el('span', {
