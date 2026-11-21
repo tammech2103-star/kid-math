@@ -49,12 +49,13 @@ Bàn phím: phím `1`–`4` chọn đáp án, `R` nghe lại, `Esc` về nhà.
 Đáp án tối thiểu 64 px (86 px trên mobile); nút điều hướng 64 px (56 px trên máy nhỏ);
 nút "Nghe lại" 56 px. Game tôn trọng `prefers-reduced-motion`.
 
-**Cuộc đua:** mỗi bài có 4 tay đua — McQueen và **3 đối thủ** lấy từ 28 nhân vật
-trong `Asset` (luân phiên để tất cả đều xuất hiện). Mở bài có màn xuất phát kiểu
-`Feature.webp`: các xe đứng cạnh nhau ở vạch kẻ ca-rô, McQueen bên phải. Trong bài,
-HUD 4 làn cho thấy ai đang dẫn; đúng ngay lần đầu McQueen tiến 1 bước, đúng sau khi
-thử lại tiến 0,55 bước, sai thì đối thủ nhích nhẹ. Cuối bài có xếp hạng 1–4 và
-podium; **không có màn thua**, sao vẫn theo số câu đúng ngay lần đầu.
+**Cuộc đua:** mỗi bài là **1 đối 1** — McQueen với **một đối thủ** lấy từ 28 nhân vật
+trong `Asset`. Đối thủ đổi theo bài và theo số lần chơi lại, nên cả 28 nhân vật đều
+xuất hiện. Mở bài có màn xuất phát kiểu `Feature.webp`: hai xe đứng cạnh nhau ở vạch
+kẻ ca-rô, badge **VS** ở giữa, McQueen bên phải. Trong bài, HUD 2 làn cho thấy ai đang
+dẫn; đúng ngay lần đầu McQueen tiến 1 bước, đúng sau khi thử lại tiến 0,55 bước, sai
+thì đối thủ nhích nhẹ. Cuối bài có xếp hạng 1–2 và podium; **không có màn thua**, sao
+vẫn theo số câu đúng ngay lần đầu.
 
 **Dành cho bé chưa đọc tốt:** câu vị trí hiển thị **mũi tên lớn** `↑ ↓ ← →`;
 câu so sánh nhóm dùng **badge số 1/2 kèm màu** và dấu `=`. Bé có thể chọn bằng mắt,
@@ -78,9 +79,9 @@ màn Phụ huynh sẽ báo và hướng dẫn cài giọng trong cài đặt h�
 ## Kiểm thử
 
 **Test logic (không cần Node):** mở `tests/test-runner.html` trong trình duyệt.
-Bộ test kiểm tra 65 mục: đọc số tiếng Việt, RNG tất định, cấu trúc 21 bài,
+Bộ test kiểm tra 67 mục: đọc số tiếng Việt, RNG tất định, cấu trúc 21 bài,
 sinh hàng nghìn câu hỏi cho 11 dạng hoạt động, đáp án/phạm vi 0–10, tính sao,
-mở khoá và lưu tiến độ.
+mở khoá, lưu tiến độ và luật đua 1 đối 1.
 
 ```powershell
 # Chạy smoke test tự động (Playwright dùng Chrome có sẵn)
@@ -118,12 +119,12 @@ css/app.css                # toàn bộ giao diện + animation + responsive
 js/core/                   # rng, số tiếng Việt, audio, speech, storage
 js/data/tuning.js          # mọi thông số gameplay
 js/data/curriculum.js      # 21 màn + đồ vật + hình học
-js/data/racers.js          # McQueen + 28 nhân vật đối thủ, chọn 3 mỗi màn
+js/data/racers.js          # McQueen + 28 nhân vật, chọn 1 đối thủ mỗi màn
 js/domain/questions.js     # 11 dạng sinh đề (thuần hàm, không DOM)
 js/domain/lesson-session.js# phiên học, tính sao
-js/domain/race.js          # điểm đua, xếp hạng 1–4, không có trạng thái thua
+js/domain/race.js          # điểm đua, xếp hạng 1–2, không có trạng thái thua
 js/domain/progress.js      # tiến độ, mở khoá, cài đặt
-js/ui/race.js              # màn xuất phát kiểu Feature + HUD 4 làn
+js/ui/race.js              # màn xuất phát kiểu Feature + HUD 2 làn
 js/ui/visuals.js           # vẽ nhóm đồ vật, hình, phương trình, vị trí
 js/ui/components.js        # sao, confetti, xe thưởng, toast
 js/ui/screens/             # home, lesson, result, parent
