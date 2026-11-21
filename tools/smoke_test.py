@@ -440,6 +440,30 @@ def main() -> int:
         )
         page.screenshot(path=str(OUT / "26-result-loss.png"))
 
+        win_race = """() => KMApp.navigate('result', {
+          lessonId: 'intro',
+          summary: { stars: 3, firstTryCorrect: 5, total: 5, bestStreak: 5 },
+          record: { stars: 3, isNewBest: false, nextLessonId: 'b1' },
+          race: {
+            playerPlace: 1,
+            racers: [
+              { id: 'mcqueen', name: 'McQueen', src: 'Asset/Mc_Queen.webp', color: '#d94132',
+                isPlayer: true, place: 1, score: 5, finalProgress: 100 },
+              { id: 'flo', name: 'Flo', src: 'Asset/Flo.webp', color: '#38b6e6',
+                isPlayer: false, place: 2, score: 4.4, finalProgress: 88 }
+            ]
+          }
+        })"""
+        page.evaluate(win_race)
+        page.wait_for_selector(".result-card:not(.is-loss)")
+        page.wait_for_timeout(200)
+        check(
+            page.evaluate(
+                "() => document.querySelectorAll('.result-actions .btn').length"
+            ) == 2,
+            "Tắt chơi lại nhưng màn thắng vẫn còn nút Chơi lại",
+        )
+
         page.evaluate("() => KMApp.ctx.progress.setSetting('allowRetry', true)")
         page.evaluate(loss_race)
         page.wait_for_selector(".result-card.is-loss")
@@ -449,6 +473,15 @@ def main() -> int:
                 "() => document.querySelectorAll('.result-actions .btn').length"
             ) == 3,
             "Bật cho chơi lại nhưng thiếu nút Chơi lại",
+        )
+        page.evaluate(win_race)
+        page.wait_for_selector(".result-card:not(.is-loss)")
+        page.wait_for_timeout(200)
+        check(
+            page.evaluate(
+                "() => document.querySelectorAll('.result-actions .btn').length"
+            ) == 3,
+            "Màn thắng thiếu nút Chơi lại khi đang bật",
         )
 
         # Bàn phím: chọn đáp án bằng phím số.
