@@ -19,7 +19,7 @@
 | Bản build tĩnh `public/` | **PASS** (61 mục, 1.6 MB, 0 tài nguyên lỗi) |
 | Lighthouse trang chủ | **100 Accessibility / 100 Best Practices / 100 SEO** |
 | Lighthouse bài vị trí (b15) | **100 / 100 / 100** — `production/qa/lighthouse/lesson-position.html` |
-| **Live Render** | **PASS** — https://be-vui-hoc-toan-1.onrender.com (commit `9091759`) |
+| **Live Render** | **PASS** — https://be-vui-hoc-toan-1.onrender.com (commit `245b283`) |
 | Trên live | Mũi tên ↑↓←→, badge 1/2, xe + confetti khi đúng |
 | Lỗi console | 0 |
 | Tài nguyên HTTP ≥ 400 | 0 |
@@ -57,6 +57,7 @@
 | SM-28 | PASS | Live (commit `8c021af`): chơi thật 3 câu sai lần đầu → hạng hai, màn thua đúng hiệu ứng, 0 lỗi console/404 |
 | SM-29 | PASS | Live (commit `9091759`): tắt công tắc qua UI → cả màn thắng và màn thua đều không còn nút “Chơi lại”; bật lại có đủ |
 | SM-30 | PASS | Bục trao thưởng: `.podium-step` = 2, có `.is-first`, bậc nhất cao hơn bậc nhì; hành động cuối vẫn thấy ở desktop/tablet/mobile |
+| SM-31 | PASS | Live (commit `245b283`): chơi thua thật → bục 2 bậc (72 px / 58 px), Flo nhất có cúp, McQueen nhì có badge BÉ, nút cuối vẫn thấy, 0 lỗi |
 ## 3. Ảnh chụp bằng chứng
 
 | Tệp | Nội dung |
@@ -87,6 +88,7 @@
 | `29-live-win-retry-off.png` | Màn thắng trên live khi đã tắt chơi lại (không còn nút) |
 | `30-desktop-podium.png` | Bục trao thưởng 2 bậc trên desktop |
 | `30-tablet-portrait-podium.png` | Bục trao thưởng 2 bậc trên tablet |
+| `31-live-podium.png` | Bục trao thưởng trên bản live (bé về nhì) |
 | `17-live-race-intro.png` | Intro 1 đối 1 trên bản Live |
 | `18-live-race-hud.png` | HUD 2 làn trên bản Live |
 | `19-live-race-result.png` | Podium 2 tay đua + xe + sao trên bản Live |
