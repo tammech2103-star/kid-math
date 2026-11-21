@@ -201,6 +201,11 @@ KM.Screens.parent = (function () {
         settingRow('Đọc đề bằng giọng tiếng Việt', speechDescription(), 'speech'),
         settingRow('Hiệu ứng âm thanh', 'Tiếng đúng, tiếng xe và âm báo nhẹ khi chọn sai.', 'sfx'),
         settingRow('Mở khoá tất cả bài', 'Cho phép vào bất kỳ bài nào mà không cần hoàn thành bài trước.', 'unlockAll'),
+        settingRow(
+          'Cho bé chơi lại khi thua',
+          'Bật: khi về đích thứ hai, bé vẫn thấy nút "Chơi lại". Tắt: bé chấp nhận kết quả và học tiếp bài mới.',
+          'allowRetry'
+        ),
         el('button', {
           class: 'btn btn-soft btn-small setting-test',
           type: 'button',
