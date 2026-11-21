@@ -41,7 +41,7 @@ kết quả có xe cỡ lớn, sao, confetti. Tiến độ lưu bằng `localSto
    vô địch. Sao vẫn theo số câu đúng ngay lần đầu và **không khoá bài vì thua**.
 10. **Phụ huynh**: khu vực riêng có cổng kiểm tra bằng phép nhân đơn giản; xem sao
    từng bài, tổng sao, bật/tắt giọng đọc – hiệu ứng, mở khoá tất cả, **cho bé chơi
-   lại khi thua** (bật/tắt), đặt lại tiến độ.
+   lại bài** (tắt là mất nút “Chơi lại” ở mọi màn kết quả), đặt lại tiến độ.
 11. **Không phạt**: không trừ sao, không khoá bài vì sai, không âm thanh chói, không
    hiệu ứng nhấp nháy nhanh. Tôn trọng `prefers-reduced-motion`.
 
