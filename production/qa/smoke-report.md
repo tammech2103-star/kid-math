@@ -19,7 +19,7 @@
 | Bản build tĩnh `public/` | **PASS** (61 mục, 1.6 MB, 0 tài nguyên lỗi) |
 | Lighthouse trang chủ | **100 Accessibility / 100 Best Practices / 100 SEO** |
 | Lighthouse bài vị trí (b15) | **100 / 100 / 100** — `production/qa/lighthouse/lesson-position.html` |
-| **Live Render** | **PASS** — https://be-vui-hoc-toan-1.onrender.com |
+| **Live Render** | **PASS** — https://be-vui-hoc-toan-1.onrender.com (commit `3f4df08`) |
 | Trên live | Mũi tên ↑↓←→, badge 1/2, xe + confetti khi đúng |
 | Lỗi console | 0 |
 | Tài nguyên HTTP ≥ 400 | 0 |
@@ -49,7 +49,7 @@
 | SM-20 | PASS | Màn xuất phát 2 xe kiểu Feature; badge VS giữa, McQueen bên phải, badge BÉ; xe cao 200 px trên desktop |
 | SM-21 | PASS | HUD 2 làn, ảnh tay đua 48 px; tên hiển thị cả trên mobile; McQueen tiến sau câu đúng |
 | SM-22 | PASS | Kết quả có hạng 1–2, podium 2 tay đua, xe + confetti |
-| SM-23 | PASS | Live Render: 21 bài, intro/HUD/podium, 30 ảnh Asset 200, 0 lỗi console/404 |
+| SM-23 | PASS | Live Render (commit `3f4df08`): 21 bài, intro 2 xe, HUD 2 làn, podium 2, 30 ảnh Asset 200, 0 lỗi console/404 |
 | SM-24 | PASS | Tablet 768×1024 và 1024×768: intro 2 xe cao 154/200 px, HUD 2 làn, không tràn ngang |
 ## 3. Ảnh chụp bằng chứng
 
