@@ -123,8 +123,8 @@ def play_lesson(page, *, wrong_first: bool = False, shot_prefix: str | None = No
     lesson = page.evaluate("() => KMApp.current() && document.body.dataset.screen")
     check(lesson == "result", "Không chuyển sang màn kết quả")
     check(
-        page.locator(".podium-card").count() == 4,
-        "Màn kết quả thiếu podium 4 tay đua",
+        page.locator(".podium-card").count() == 2,
+        "Màn kết quả thiếu podium 2 tay đua",
     )
     page.wait_for_function(
         "() => { const i = document.querySelector('.result-car');"
@@ -196,10 +196,32 @@ def main() -> int:
         page.wait_for_selector(".race-intro")
         page.wait_for_timeout(350)
         page.screenshot(path=str(OUT / "03b-race-intro.png"))
+        check(
+            page.locator(".race-start-car").count() == 2,
+            "Màn xuất phát không đúng 2 xe (1 đối 1)",
+        )
+        check(
+            page.locator(".race-vs").count() == 1,
+            "Màn xuất phát thiếu badge VS",
+        )
+        check(
+            page.evaluate(
+                "() => { const i = document.querySelector('.race-start-car');"
+                " return i ? i.getBoundingClientRect().height : 0; }"
+            ) >= 120,
+            "Xe xuất phát quá nhỏ trên desktop",
+        )
         skip_race_intro(page)
         check(
-            page.locator(".race-lane").count() == 4,
-            "Race HUD không đủ 4 tay đua",
+            page.locator(".race-lane").count() == 2,
+            "Race HUD không đúng 2 tay đua (1 đối 1)",
+        )
+        check(
+            page.evaluate(
+                "() => { const i = document.querySelector('.race-thumb');"
+                " return i ? i.getBoundingClientRect().height : 0; }"
+            ) >= 40,
+            "Ảnh tay đua trong HUD quá nhỏ trên desktop",
         )
         check(
             page.evaluate(
@@ -405,6 +427,35 @@ def main() -> int:
             "Trang chủ mobile bị tràn ngang",
         )
         mobile.screenshot(path=str(OUT / "11-mobile-home.png"), full_page=True)
+        mobile.evaluate(
+            "() => KMApp.navigate('lesson', { lessonId: 'b1', preview: true })"
+        )
+        mobile.wait_for_selector(".race-intro")
+        mobile.wait_for_timeout(350)
+        mobile.screenshot(path=str(OUT / "11b-mobile-race-intro.png"))
+        check(
+            mobile.locator(".race-start-car").count() == 2,
+            "Mobile: màn xuất phát không đúng 2 xe",
+        )
+        check(
+            mobile.evaluate(
+                "() => { const i = document.querySelector('.race-start-car');"
+                " return i ? i.getBoundingClientRect().height : 0; }"
+            ) >= 60,
+            "Mobile: xe xuất phát quá nhỏ",
+        )
+        skip_race_intro(mobile)
+        check(
+            mobile.locator(".race-lane").count() == 2,
+            "Mobile: HUD không đúng 2 tay đua",
+        )
+        check(
+            mobile.evaluate(
+                "() => { const n = document.querySelector('.race-name');"
+                " return !!n && getComputedStyle(n).display !== 'none'; }"
+            ),
+            "Mobile: HUD ẩn tên tay đua",
+        )
         for lesson_id in lesson_ids:
             mobile.evaluate(
                 "(id) => KMApp.navigate('lesson', { lessonId: id, preview: true })", lesson_id
