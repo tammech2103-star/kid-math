@@ -55,14 +55,15 @@ xuất hiện. Mở bài có màn xuất phát kiểu `Feature.webp`: hai xe đ�
 kẻ ca-rô, badge **VS** ở giữa, McQueen bên phải. Trong bài, **đường đua 2 làn** có hai
 xe cỡ lớn chạy bám đuổi nhau: đúng ngay lần đầu McQueen tiến 1 bước, đúng sau khi thử
 lại tiến 0,55 bước, sai thì đối thủ nhích nhẹ. Mỗi lần một xe chạy lên có khói tốc độ
-và cú rướn máy; cờ đích vẫy khi về đích. Cuối bài có xếp hạng 1–2 và podium; **không khoá bài vì thua**, sao vẫn theo số câu
-đúng ngay lần đầu.
+và cú rướn máy; cờ đích vẫy khi về đích. Cuối bài có **bục trao thưởng 2 bậc** —
+xe nhất đứng bậc cao có cúp, xe nhì đứng bậc thấp — kèm tên từng xe; **không khoá bài
+vì thua**, sao vẫn theo số câu đúng ngay lần đầu.
 
 **Về đích thứ hai:** bé **thua** cuộc đua nhưng vẫn được động viên — màn kết quả đổi
 sang tông xanh lạnh, không bắn confetti, xe xì khói và lắc nhẹ, âm báo đi xuống nhẹ
-nhàng, kèm câu “Cố lên nhé! Bé bấm Chơi lại để đua lại nào.” Podium khoanh vàng xe
-vô địch. Phụ huynh có thể tắt hẳn nút “Chơi lại” trên mọi màn kết quả trong khu vực
-Phụ huynh.
+nhàng, kèm câu “Cố lên nhé! Bé bấm Chơi lại để đua lại nào.” Bục trao thưởng đặt xe
+vô địch ở bậc cao nhất (có cúp), xe của bé ở bậc nhì. Phụ huynh có thể tắt hẳn nút
+“Chơi lại” trên mọi màn kết quả trong khu vực Phụ huynh.
 
 **Dành cho bé chưa đọc tốt:** câu vị trí hiển thị **mũi tên lớn** `↑ ↓ ← →`;
 câu so sánh nhóm dùng **badge số 1/2 kèm màu** và dấu `=`. Bé có thể chọn bằng mắt,
