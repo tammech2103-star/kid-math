@@ -52,10 +52,11 @@ nút "Nghe lại" 56 px. Game tôn trọng `prefers-reduced-motion`.
 **Cuộc đua:** mỗi bài là **1 đối 1** — McQueen với **một đối thủ** lấy từ 28 nhân vật
 trong `Asset`. Đối thủ đổi theo bài và theo số lần chơi lại, nên cả 28 nhân vật đều
 xuất hiện. Mở bài có màn xuất phát kiểu `Feature.webp`: hai xe đứng cạnh nhau ở vạch
-kẻ ca-rô, badge **VS** ở giữa, McQueen bên phải. Trong bài, HUD 2 làn cho thấy ai đang
-dẫn; đúng ngay lần đầu McQueen tiến 1 bước, đúng sau khi thử lại tiến 0,55 bước, sai
-thì đối thủ nhích nhẹ. Cuối bài có xếp hạng 1–2 và podium; **không có màn thua**, sao
-vẫn theo số câu đúng ngay lần đầu.
+kẻ ca-rô, badge **VS** ở giữa, McQueen bên phải. Trong bài, **đường đua 2 làn** có hai
+xe cỡ lớn chạy bám đuổi nhau: đúng ngay lần đầu McQueen tiến 1 bước, đúng sau khi thử
+lại tiến 0,55 bước, sai thì đối thủ nhích nhẹ. Mỗi lần một xe chạy lên có khói tốc độ
+và cú rướn máy; cờ đích vẫy khi về đích. Cuối bài có xếp hạng 1–2 và podium;
+**không có màn thua**, sao vẫn theo số câu đúng ngay lần đầu.
 
 **Dành cho bé chưa đọc tốt:** câu vị trí hiển thị **mũi tên lớn** `↑ ↓ ← →`;
 câu so sánh nhóm dùng **badge số 1/2 kèm màu** và dấu `=`. Bé có thể chọn bằng mắt,
@@ -124,7 +125,7 @@ js/domain/questions.js     # 11 dạng sinh đề (thuần hàm, không DOM)
 js/domain/lesson-session.js# phiên học, tính sao
 js/domain/race.js          # điểm đua, xếp hạng 1–2, không có trạng thái thua
 js/domain/progress.js      # tiến độ, mở khoá, cài đặt
-js/ui/race.js              # màn xuất phát kiểu Feature + HUD 2 làn
+js/ui/race.js              # màn xuất phát kiểu Feature + đường đua 2 làn có xe chạy
 js/ui/visuals.js           # vẽ nhóm đồ vật, hình, phương trình, vị trí
 js/ui/components.js        # sao, confetti, xe thưởng, toast
 js/ui/screens/             # home, lesson, result, parent
