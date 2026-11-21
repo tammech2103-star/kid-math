@@ -129,8 +129,20 @@ def play_lesson(page, *, wrong_first: bool = False, shot_prefix: str | None = No
     lesson = page.evaluate("() => KMApp.current() && document.body.dataset.screen")
     check(lesson == "result", "Không chuyển sang màn kết quả")
     check(
-        page.locator(".podium-card").count() == 2,
-        "Màn kết quả thiếu podium 2 tay đua",
+        page.locator(".podium-step").count() == 2,
+        "Màn kết quả thiếu bục trao thưởng 2 tay đua",
+    )
+    check(
+        page.evaluate("() => !!document.querySelector('.podium-step.is-first')"),
+        "Bục trao thưởng thiếu bậc nhất",
+    )
+    check(
+        page.evaluate(
+            "() => { const a = document.querySelector('.podium-step.is-first .podium-block');"
+            " const b = document.querySelector('.podium-step.is-second .podium-block');"
+            " return !!a && !!b && a.getBoundingClientRect().top < b.getBoundingClientRect().top; }"
+        ),
+        "Bậc nhất phải cao hơn bậc nhì",
     )
     page.wait_for_function(
         "() => { const i = document.querySelector('.result-car');"
@@ -434,9 +446,9 @@ def main() -> int:
         )
         check(
             page.evaluate(
-                "() => !!document.querySelector('.podium-card.is-winner')"
+                "() => !!document.querySelector('.podium-step.is-first .podium-crown')"
             ),
-            "Màn thua không đánh dấu người thắng trên podium",
+            "Màn thua không đánh dấu người thắng trên bục",
         )
         page.screenshot(path=str(OUT / "26-result-loss.png"))
 
