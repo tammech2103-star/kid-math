@@ -59,8 +59,12 @@ Nguồn: PDF *Toán lớp 1 tập 1 — Kết nối tri thức với cuộc số
 - **Cuộc đua**: mỗi màn là cuộc đua **1 đối 1** — McQueen (xe của bé) với 1 đối thủ
   lấy từ 28 nhân vật trong `Asset/`. Đối thủ đổi theo bài và theo lần chơi lại nên cả
   28 nhân vật đều xuất hiện. Mở bài có màn xuất phát kiểu `Feature.webp` (hai xe đứng
-  cạnh nhau ở vạch ca-rô, badge VS ở giữa). HUD 2 làn cho biết ai đang dẫn; kết quả có
-  hạng 1–2 và podium. Không có trạng thái thua.
+  cạnh nhau ở vạch ca-rô, badge VS ở giữa). Trong bài có đường đua 2 làn, hai xe chạy
+  bám đuổi; kết quả có hạng 1–2 và podium.
+- **Thua (hạng hai)**: vẫn được động viên nhưng có hiệu ứng thua rõ ràng — màn kết quả
+  tông lạnh, không confetti, xe xì khói, âm báo đi xuống; podium khoanh vàng xe vô địch.
+  Sao vẫn theo số câu đúng ngay lần đầu và không khoá bài. Phụ huynh có thể tắt nút
+  “Chơi lại” sau khi thua.
 - Số trong mọi câu nằm trong **0–10** (đúng phạm vi Tập 1).
 - Câu cộng/trừ luôn kèm hình minh hoạ đồ vật để trẻ đếm được, trừ `factFamily`
   (tính nhẩm theo bảng cộng trừ như Bài 12).
