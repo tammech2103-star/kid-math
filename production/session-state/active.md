@@ -7,13 +7,15 @@ smoke PASS trên desktop, mobile, tablet; có hiệu ứng thua và tuỳ chọn
 
 ## Việc đang làm
 
-Bàn giao bản **1 đối 1** có **đường đua sống động** và **xử lý thua rõ ràng**: mỗi
-màn là một cuộc đua McQueen với 1 đối thủ, starting grid kiểu `Feature.webp` (hai xe +
-badge VS), đường đua 2 làn với xe cỡ lớn chạy bám đuổi trong lúc trả lời (khói tốc độ,
-rú máy, cờ đích vẫy). Về đích thứ hai là **thua**: màn kết quả tông lạnh, không confetti,
-xe xì khói, âm báo nhẹ, vẫn có lời động viên; phụ huynh bật/tắt được nút "Chơi lại"
-sau khi thua. Đối thủ đổi theo bài và theo lần chơi lại nên cả 28 nhân vật đều xuất
-hiện. Không khoá bài vì thua; sao vẫn theo số câu đúng ngay lần đầu.
+Bàn giao bản **1 đối 1** có **đường đua sống động**, **bục trao thưởng 2 bậc** và
+**xử lý thua rõ ràng**: mỗi màn là một cuộc đua McQueen với 1 đối thủ, starting grid
+kiểu `Feature.webp` (hai xe + badge VS), đường đua 2 làn với xe cỡ lớn chạy bám đuổi
+trong lúc trả lời (khói tốc độ, rú máy, cờ đích vẫy). Kết quả có bục trao thưởng:
+xe nhất bậc cao có cúp, xe nhì bậc thấp, tên từng xe. Về đích thứ hai là **thua**:
+màn kết quả tông lạnh, không confetti, xe xì khói, âm báo nhẹ, vẫn có lời động viên;
+phụ huynh bật/tắt được nút "Chơi lại" trên mọi màn kết quả. Đối thủ đổi theo bài và
+theo lần chơi lại nên cả 28 nhân vật đều xuất hiện. Không khoá bài vì thua; sao vẫn
+theo số câu đúng ngay lần đầu.
 
 ## Tiến độ
 
