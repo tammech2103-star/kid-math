@@ -1,17 +1,19 @@
 # Session State — Bé Vui Học Toán 1
 
-**Cập nhật**: 2026-11-21 11:35
+**Cập nhật**: 2026-11-21 12:20
 **Trạng thái**: **Bản 1 đối 1 đã Live** tại https://be-vui-hoc-toan-1.onrender.com
-(21 màn, mỗi màn McQueen đua với 1 trong 28 nhân vật `Asset/`; 67/67 unit test PASS;
-smoke PASS trên desktop 1280×900, mobile 390×844, tablet 768×1024 và 1024×768).
+(21 màn, mỗi màn McQueen đua với 1 trong 28 nhân vật `Asset/`; 69/69 unit test PASS;
+smoke PASS trên desktop, mobile, tablet; có hiệu ứng thua và tuỳ chọn của phụ huynh).
 
 ## Việc đang làm
 
-Bàn giao bản **1 đối 1** có **đường đua sống động**: mỗi màn là một cuộc đua McQueen
-với 1 đối thủ, starting grid kiểu `Feature.webp` (hai xe + badge VS), đường đua 2 làn
-với xe cỡ lớn chạy bám đuổi trong lúc trả lời (khói tốc độ, rú máy, cờ đích vẫy),
-kết quả có hạng 1–2 và podium 2 xe. Đối thủ đổi theo bài và theo lần chơi lại nên cả
-28 nhân vật đều xuất hiện. Không có màn thua; sao vẫn theo số câu đúng ngay lần đầu.
+Bàn giao bản **1 đối 1** có **đường đua sống động** và **xử lý thua rõ ràng**: mỗi
+màn là một cuộc đua McQueen với 1 đối thủ, starting grid kiểu `Feature.webp` (hai xe +
+badge VS), đường đua 2 làn với xe cỡ lớn chạy bám đuổi trong lúc trả lời (khói tốc độ,
+rú máy, cờ đích vẫy). Về đích thứ hai là **thua**: màn kết quả tông lạnh, không confetti,
+xe xì khói, âm báo nhẹ, vẫn có lời động viên; phụ huynh bật/tắt được nút "Chơi lại"
+sau khi thua. Đối thủ đổi theo bài và theo lần chơi lại nên cả 28 nhân vật đều xuất
+hiện. Không khoá bài vì thua; sao vẫn theo số câu đúng ngay lần đầu.
 
 ## Tiến độ
 
@@ -24,7 +26,7 @@ kết quả có hạng 1–2 và podium 2 xe. Đối thủ đổi theo bài và 
 - [x] UI: home, lesson, result, parent; visual cho đồ vật/hình/scene/phương trình
 - [x] Cuộc đua **1 đối 1**: 28 đối thủ xoay vòng theo bài + lần chơi lại; intro
       starting grid; HUD 2 làn; điểm đua, xếp hạng 1–2, podium; không có trạng thái thua
-- [x] 67 unit test trong trình duyệt — PASS 67/67 (QuickJS + Chromium)
+- [x] 69 unit test trong trình duyệt — PASS 69/69 (QuickJS + Chromium)
 - [x] Smoke Playwright — PASS: 21 màn desktop + mobile, tablet, race intro/HUD/podium
 - [x] Lighthouse trang chủ + bài vị trí — 100/100/100
 - [x] Review độc lập (CONCERNS) — đã sửa HIGH/MEDIUM chính; ghi chú trade-off
@@ -64,7 +66,7 @@ kết quả có hạng 1–2 và podium 2 xe. Đối thủ đổi theo bài và 
 
 | Hạng mục | Kết quả | Bằng chứng |
 |----------|---------|------------|
-| Unit test (67 test) | PASS 67/67 | `tests/test-runner.html` |
+| Unit test (69 test) | PASS 69/69 | `tests/test-runner.html` |
 | Smoke test Playwright | PASS | `production/qa/smoke-report.md` |
 | Cuộc đua 1 đối 1 | 28 đối thủ, 1/màn, đường đua 2 làn, intro/podium | `js/data/racers.js`, `js/domain/race.js`, `js/ui/race.js` |
 | Phạm vi smoke | 21 màn desktop + mobile + tablet, bàn phím, reduced-motion, focus | `tools/smoke_test.py` |
@@ -74,6 +76,7 @@ kết quả có hạng 1–2 và podium 2 xe. Đối thủ đổi theo bài và 
 | Lighthouse (trang chủ) | 100/100/100 | `production/qa/lighthouse/lighthouse.html` |
 | Review độc lập | CONCERNS → đã sửa HIGH/MEDIUM chính | `production/qa/code-review.md` |
 | Giọng tiếng Việt | Không có trên Chrome headless | game không đọc giọng sai; màn Phụ huynh hướng dẫn cài |
+| Thua (hạng hai) | Hiệu ứng thua + động viên; tuỳ chọn phụ huynh bật/tắt "Chơi lại" | `production/qa/screenshots/26-result-loss.png` |
 
 ## Câu hỏi mở
 
