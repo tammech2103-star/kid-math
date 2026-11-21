@@ -7,7 +7,7 @@ window.KM = window.KM || {};
 KM.Components = (function () {
   'use strict';
 
-  var CAR_SRC = 'Asset/car1.webp';
+  var CAR_SRC = 'Asset/Mc_Queen.webp';
   var CONFETTI_COLORS = ['#FFD84D', '#FF6B5B', '#6FE3B8', '#7ED3F7', '#9C7BF5', '#FF9F1C'];
   var SVG_NS = 'http://www.w3.org/2000/svg';
 
