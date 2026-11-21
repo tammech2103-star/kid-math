@@ -27,8 +27,8 @@ KM.Tuning = (function () {
       two: 0.6
     },
     race: {
-      opponentsPerRace: 3,
-      rivalPaces: [0.68, 0.76, 0.84],
+      opponentsPerRace: 1,
+      rivalPaces: [0.86],
       wrongPenalty: 0.04,
       retryScore: 0.55
     },

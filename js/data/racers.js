@@ -1,6 +1,7 @@
 /**
  * Danh sách nhân vật đua xe lấy từ thư mục Asset.
- * Mỗi màn chọn 3 đối thủ, luân phiên để toàn bộ 28 nhân vật đều xuất hiện.
+ * Mỗi màn đua 1 đối 1: McQueen với một nhân vật. Đối thủ đổi theo màn và theo
+ * số lần chơi lại, nên toàn bộ 28 nhân vật đều xuất hiện.
  * @namespace KM.Racers
  */
 window.KM = window.KM || {};
@@ -80,17 +81,20 @@ KM.Racers = (function () {
   }
 
   /**
-   * 3 đối thủ của một màn. Dùng vòng xoay cố định để tất cả nhân vật đều góp mặt.
+   * Đối thủ của một màn. Vòng xoay cố định theo bài và số lần chơi lại, nhờ đó
+   * mỗi bài có một đối thủ ổn định và cả 28 nhân vật đều góp mặt khi bé chơi lại.
    * @param {string} lessonId
+   * @param {number} [attempt] số lần đã chơi bài này trước đó (0 = lần đầu).
    * @returns {Array<object>}
    */
-  function opponentsForLesson(lessonId) {
+  function opponentsForLesson(lessonId, attempt) {
     var index = lessonIndex(lessonId);
-    var count = KM.Tuning.race.opponentsPerRace || 3;
+    var count = Math.max(1, Number(KM.Tuning.race.opponentsPerRace) || 1);
+    var offset = Math.max(0, Math.floor(Number(attempt) || 0));
     var out = [];
     var i;
     for (i = 0; i < count; i += 1) {
-      out.push(order[(index * count + i) % order.length]);
+      out.push(order[(index + offset + i) % order.length]);
     }
     return out;
   }
