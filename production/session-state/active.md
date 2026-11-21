@@ -1,14 +1,15 @@
 # Session State — Bé Vui Học Toán 1
 
-**Cập nhật**: 2026-11-20 20:00
-**Trạng thái**: **Đã deploy Render** tại https://be-vui-hoc-toan-1.onrender.com
-(commit `ffebecd`, static site Live). Repo: https://github.com/tammech2103-star/kid-math.
-Game 21 màn, 11 dạng bài; đã có mũi tên/badge cho trẻ chưa đọc tốt.
+**Cập nhật**: 2026-11-21 07:30
+**Trạng thái**: **Cuộc đua 4 tay đua đã hoàn thành** (McQueen + 3 đối thủ/28 nhân vật),
+màn xuất phát kiểu Feature.webp, HUD 4 làn, podium kết quả. Đang build lại `public/`
+và deploy Render bản mới. Bản live cũ vẫn ở https://be-vui-hoc-toan-1.onrender.com.
 
 ## Việc đang làm
 
-Bàn giao game web dạy Toán lớp 1 Tập 1 (Kết nối tri thức), chạy offline bằng
-`index.html`, thưởng bằng `Asset/car1.webp`, 21 màn và 11 dạng hoạt động.
+Biến mỗi màn thành một cuộc đua, dùng toàn bộ nhân vật trong `Asset/` và bố cục
+starting grid tham khảo `Feature.webp`. Giữ nguyên 21 màn, 11 dạng bài, không có
+màn thua: bé vẫn nhận sao theo số câu đúng ngay lần đầu, kết quả thêm hạng 1–4.
 
 ## Tiến độ
 
@@ -19,16 +20,14 @@ Bàn giao game web dạy Toán lớp 1 Tập 1 (Kết nối tri thức), chạy 
 - [x] Core: RNG có seed, số tiếng Việt, WebAudio, Web Speech, storage có fallback
 - [x] Domain: 11 generator, phiên học, tính sao, mở khoá, lưu tiến độ
 - [x] UI: home, lesson, result, parent; visual cho đồ vật/hình/scene/phương trình
-- [x] 56 unit test trong trình duyệt — PASS 56/56 (QuickJS + Chromium)
-- [x] Smoke Playwright cuối — PASS: 21 màn desktop + mobile, `file://`, bàn phím,
-      reduced-motion, focus, cổng sai, 8 dạng bài
-- [x] Lighthouse trang chủ — 100/100/100, không failure
+- [x] Cuộc đua: 28 đối thủ, chọn 3/màn luân phiên; intro starting grid; HUD 4 làn;
+      điểm đua, xếp hạng 1–4, podium; không có trạng thái thua
+- [x] 65 unit test trong trình duyệt — PASS 65/65 (QuickJS + Chromium)
+- [x] Smoke Playwright — PASS: 21 màn desktop + mobile, 56→65 test, race intro/HUD/podium
+- [x] Lighthouse trang chủ + bài vị trí — 100/100/100
 - [x] Review độc lập (CONCERNS) — đã sửa HIGH/MEDIUM chính; ghi chú trade-off
-- [x] Cập nhật báo cáo QA cuối cùng
-- [x] Đóng gói deploy Render: `render.yaml`, `tools/build_public.py`, `public/`,
-      `tools/pack_deploy.py`, `deploy/kid-math-render.zip`, `DEPLOY-RENDER.md`
-- [x] Hỗ trợ trẻ chưa đọc tốt: mũi tên lớn cho vị trí, badge 1/2 + màu cho so sánh nhóm
-- [ ] Tạo GitHub repo + Render Blueprint (cần tài khoản người dùng)
+- [ ] Build lại `public/`, cập nhật GitHub và deploy Render bản cuộc đua
+- [ ] Kiểm tra live: 21 màn, ảnh 28 nhân vật, HUD, podium, xe/confetti
 
 ## Quyết định quan trọng
 
@@ -60,8 +59,9 @@ Bàn giao game web dạy Toán lớp 1 Tập 1 (Kết nối tri thức), chạy 
 
 | Hạng mục | Kết quả | Bằng chứng |
 |----------|---------|------------|
-| Unit test (56 test) | PASS 56/56 | `tests/test-runner.html` |
+| Unit test (65 test) | PASS 65/65 | `tests/test-runner.html` |
 | Smoke test Playwright | PASS | `production/qa/smoke-report.md` |
+| Cuộc đua | 28 đối thủ, 3/màn, intro/HUD/podium | `js/data/racers.js`, `js/domain/race.js`, `js/ui/race.js` |
 | Phạm vi smoke | 21 màn desktop + mobile, bàn phím, reduced-motion, focus, cổng sai | `tools/smoke_test.py` |
 | Offline `file://` | PASS | tự động trong smoke, localStorage + ảnh xe, không lỗi console |
 | Mobile 390×844 | PASS | không tràn ngang, nút đáp án ≥ 64 px |
