@@ -49,6 +49,13 @@ Bàn phím: phím `1`–`4` chọn đáp án, `R` nghe lại, `Esc` về nhà.
 Đáp án tối thiểu 64 px (86 px trên mobile); nút điều hướng 64 px (56 px trên máy nhỏ);
 nút "Nghe lại" 56 px. Game tôn trọng `prefers-reduced-motion`.
 
+**Cuộc đua:** mỗi bài có 4 tay đua — McQueen và **3 đối thủ** lấy từ 28 nhân vật
+trong `Asset` (luân phiên để tất cả đều xuất hiện). Mở bài có màn xuất phát kiểu
+`Feature.webp`: các xe đứng cạnh nhau ở vạch kẻ ca-rô, McQueen bên phải. Trong bài,
+HUD 4 làn cho thấy ai đang dẫn; đúng ngay lần đầu McQueen tiến 1 bước, đúng sau khi
+thử lại tiến 0,55 bước, sai thì đối thủ nhích nhẹ. Cuối bài có xếp hạng 1–4 và
+podium; **không có màn thua**, sao vẫn theo số câu đúng ngay lần đầu.
+
 **Dành cho bé chưa đọc tốt:** câu vị trí hiển thị **mũi tên lớn** `↑ ↓ ← →`;
 câu so sánh nhóm dùng **badge số 1/2 kèm màu** và dấu `=`. Bé có thể chọn bằng mắt,
 không cần đọc hết chữ. Giọng đọc vẫn đọc đề và lời khen khi máy có giọng Việt.
@@ -71,7 +78,7 @@ màn Phụ huynh sẽ báo và hướng dẫn cài giọng trong cài đặt h�
 ## Kiểm thử
 
 **Test logic (không cần Node):** mở `tests/test-runner.html` trong trình duyệt.
-Bộ test kiểm tra 56 mục: đọc số tiếng Việt, RNG tất định, cấu trúc 21 bài,
+Bộ test kiểm tra 65 mục: đọc số tiếng Việt, RNG tất định, cấu trúc 21 bài,
 sinh hàng nghìn câu hỏi cho 11 dạng hoạt động, đáp án/phạm vi 0–10, tính sao,
 mở khoá và lưu tiến độ.
 
@@ -111,9 +118,12 @@ css/app.css                # toàn bộ giao diện + animation + responsive
 js/core/                   # rng, số tiếng Việt, audio, speech, storage
 js/data/tuning.js          # mọi thông số gameplay
 js/data/curriculum.js      # 21 màn + đồ vật + hình học
+js/data/racers.js          # McQueen + 28 nhân vật đối thủ, chọn 3 mỗi màn
 js/domain/questions.js     # 11 dạng sinh đề (thuần hàm, không DOM)
 js/domain/lesson-session.js# phiên học, tính sao
+js/domain/race.js          # điểm đua, xếp hạng 1–4, không có trạng thái thua
 js/domain/progress.js      # tiến độ, mở khoá, cài đặt
+js/ui/race.js              # màn xuất phát kiểu Feature + HUD 4 làn
 js/ui/visuals.js           # vẽ nhóm đồ vật, hình, phương trình, vị trí
 js/ui/components.js        # sao, confetti, xe thưởng, toast
 js/ui/screens/             # home, lesson, result, parent
@@ -130,7 +140,8 @@ production/                # QA, ảnh chụp, session state
 - **Web tĩnh, không build**: xem [`docs/architecture/ADR-0001-static-offline-web-game.md`](docs/architecture/ADR-0001-static-offline-web-game.md).
 - **Đồ vật minh hoạ bằng emoji**, hình/khối vẽ SVG cách điệu. Sách giấy không cho
   phép tái sử dụng tranh minh hoạ; sản phẩm chỉ dùng sách làm nguồn nội dung.
-- **Ảnh xe** do người dùng cung cấp (`Asset/car1.webp`), đã có nền trong suốt.
+- **Ảnh xe & nhân vật** do người dùng cung cấp trong `Asset/`: `Mc_Queen.webp` là xe
+  của bé, 28 nhân vật còn lại là đối thủ; tất cả đã có nền trong suốt.
 - **Bài 15** dùng trên/dưới/trái/phải; "trước/sau" lược bỏ vì khó biểu diễn rõ trên 2D.
 - **Mỗi bài 8 câu** (mở đầu 5, ôn tập chung 10), không phải toàn bộ bài tập trong sách.
 - **Tiến độ** nằm trên máy, không đồng bộ đám mây, không thu thập dữ liệu trẻ em.
