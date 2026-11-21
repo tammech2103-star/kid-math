@@ -103,11 +103,17 @@ def play_lesson(page, *, wrong_first: bool = False, shot_prefix: str | None = No
         )
         check(page.locator(".confetti").count() > 0, "Thiếu confetti khi trả lời đúng")
         if i == 0:
-            player_bar = page.evaluate(
-                "() => document.querySelector('.race-lane.is-player .race-bar')"
-                ".getAttribute('aria-valuenow')"
+            player_progress = page.evaluate(
+                "() => document.querySelector('.race-lane.is-player')"
+                ".getAttribute('data-progress')"
             )
-            check(float(player_bar) > 0, "McQueen không tiến trên đường đua")
+            check(float(player_progress) > 0, "McQueen không tiến trên đường đua")
+            check(
+                page.evaluate(
+                    "() => document.querySelectorAll('.race-lane.is-move').length > 0"
+                ),
+                "Xe không chạy khi trả lời đúng",
+            )
         if shot_prefix and i == 0:
             page.wait_for_timeout(500)
             page.screenshot(path=str(OUT / f"{shot_prefix}-reward.png"))
@@ -218,17 +224,17 @@ def main() -> int:
         )
         check(
             page.evaluate(
-                "() => { const i = document.querySelector('.race-thumb');"
+                "() => { const i = document.querySelector('.race-car');"
                 " return i ? i.getBoundingClientRect().height : 0; }"
-            ) >= 40,
-            "Ảnh tay đua trong HUD quá nhỏ trên desktop",
+            ) >= 56,
+            "Xe trên đường đua quá nhỏ trên desktop",
         )
         check(
             page.evaluate(
-                "() => Array.from(document.querySelectorAll('.race-thumb'))"
+                "() => Array.from(document.querySelectorAll('.race-car'))"
                 ".every((img) => img.complete && img.naturalWidth > 0)"
             ),
-            "Ảnh tay đua trong HUD không tải được",
+            "Ảnh xe trên đường đua không tải được",
         )
         check(
             page.evaluate("() => KMApp.current().debugState().lesson.id") == "intro",
@@ -451,10 +457,10 @@ def main() -> int:
         )
         check(
             mobile.evaluate(
-                "() => { const n = document.querySelector('.race-name');"
-                " return !!n && getComputedStyle(n).display !== 'none'; }"
-            ),
-            "Mobile: HUD ẩn tên tay đua",
+                "() => { const i = document.querySelector('.race-car');"
+                " return i ? i.getBoundingClientRect().height : 0; }"
+            ) >= 40,
+            "Mobile: xe trên đường đua quá nhỏ",
         )
         for lesson_id in lesson_ids:
             mobile.evaluate(
