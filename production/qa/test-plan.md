@@ -18,13 +18,13 @@ lưu tiến độ, offline `file://`, desktop và mobile.
 
 | Mức | Công cụ | Phạm vi | Bằng chứng |
 |-----|---------|---------|------------|
-| Unit / property | `tests/test-runner.html` (67 test) | RNG, số tiếng Việt, curriculum, 11 generator, race 1 đối 1 (28 đối thủ, xếp hạng), session, progress | ảnh chụp runner + `window.__TEST_RESULTS__` |
+| Unit / property | `tests/test-runner.html` (69 test) | RNG, số tiếng Việt, curriculum, 11 generator, race 1 đối 1 (28 đối thủ, xếp hạng), session, progress (kể cả cài đặt chơi lại) | ảnh chụp runner + `window.__TEST_RESULTS__` |
 | Smoke E2E | `tools/smoke_test.py` (Playwright + Chrome) | splash → home → chơi 2 bài → kết quả → 8 dạng bài → phụ huynh → reload → mobile | `production/qa/screenshots/` |
 | Offline | Playwright `file:///.../index.html` | tải script/CSS/ảnh, localStorage, mở bài | `13-file-offline.png` |
 | Bản deploy | `python tools/build_public.py` + Chrome | 21 bài, ảnh xe, localStorage, 0 lỗi/404 | `14-render-build.png` |
 | Thủ công | Người dùng | giọng đọc thật, âm thanh, cảm giác chơi | checklist dưới |
 
-## 3. Unit test — 67 mục
+## 3. Unit test — 69 mục
 
 - **Core**: đọc số 0–10, capitalize, countNoun; đọc số 0 là "số không" trong câu
   so sánh; RNG cùng seed, biên `int`, `shuffle` không sửa mảng gốc; lọc emoji cho TTS.
