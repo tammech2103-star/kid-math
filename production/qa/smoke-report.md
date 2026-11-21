@@ -53,7 +53,7 @@
 | SM-24 | PASS | Tablet 768×1024 và 1024×768: intro 2 xe cao 154/200 px, đường đua không tràn, đáp án nằm trong màn hình |
 | SM-25 | PASS | Không tràn dọc: desktop 1280×900, laptop 1366×768, tablet 768×1024 / 1024×768, mobile 390×844 — nút đáp án cuối đều thấy được |
 | SM-26 | PASS | Hạng hai: màn kết quả `is-loss`, tiêu đề “Bé về đích thứ hai!”, không confetti, 2 vệt khói, lời động viên, podium khoanh vàng xe vô địch |
-| SM-27 | PASS | Phụ huynh tắt “Cho bé chơi lại khi thua” → màn thua chỉ còn 2 nút; bật lại → có nút “Chơi lại” (3 nút) |
+| SM-27 | PASS | Phụ huynh tắt “Cho bé chơi lại bài” → màn thua **và** màn thắng đều chỉ còn 2 nút; bật lại → 3 nút ở cả hai |
 | SM-28 | PASS | Live (commit `8c021af`): chơi thật 3 câu sai lần đầu → hạng hai, màn thua đúng hiệu ứng, 0 lỗi console/404 |
 ## 3. Ảnh chụp bằng chứng
 
@@ -81,6 +81,7 @@
 | `22-race-moving.png` | Hai xe đang chạy bám đuổi trên desktop |
 | `23-tablet-race-moving.png` | Hai xe đang chạy bám đuổi trên tablet |
 | `26-result-loss.png` | Màn kết quả khi bé về đích thứ hai (hiệu ứng thua) |
+| `28-retry-off.png` | Màn thua khi phụ huynh đã tắt “Cho bé chơi lại bài” |
 | `17-live-race-intro.png` | Intro 1 đối 1 trên bản Live |
 | `18-live-race-hud.png` | HUD 2 làn trên bản Live |
 | `19-live-race-result.png` | Podium 2 tay đua + xe + sao trên bản Live |
