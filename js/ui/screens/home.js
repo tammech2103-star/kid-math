@@ -62,8 +62,12 @@ KM.Screens.home = (function () {
         el('span', { class: 'eyebrow', text: 'Học mà chơi · Chơi mà học' }),
         el('h2', { text: 'Học toán cùng xe đua!' }),
         el('p', {
-          text: 'Trả lời đúng, chiếc xe sẽ xuất hiện và tặng bé những ngôi sao. ' +
-            'Bé sẵn sàng chưa nào?'
+          text: 'Mỗi bài là một cuộc đua cùng 3 đối thủ. Trả lời đúng để McQueen ' +
+            'tăng tốc về đích và nhận sao!'
+        }),
+        el('span', {
+          class: 'race-pill',
+          text: '🏁 21 cuộc đua · 28 đối thủ'
         }),
         el('div', { class: 'hero-actions' }, [
           el('button', {
@@ -175,7 +179,7 @@ KM.Screens.home = (function () {
           el('span', { class: 'lesson-name', text: lesson.title }),
           el('span', { class: 'lesson-foot' }, [
             Components.stars(stars, { small: true }),
-            el('span', { class: 'lesson-page', text: 'Trang ' + lesson.page })
+            el('span', { class: 'lesson-page', text: '🏁 Trang ' + lesson.page })
           ])
         ]),
         unlocked ? null : el('span', { class: 'sr-only', text: 'Chưa mở khoá.' })

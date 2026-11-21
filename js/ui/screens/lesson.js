@@ -41,6 +41,12 @@ KM.Screens.lesson = (function () {
     var questionSpeakTimer = null;
 
     var screen = el('div', { class: 'screen lesson' });
+    var race = ctx.race.create({
+      total: questions.length,
+      player: ctx.racers.player,
+      opponents: ctx.racers.opponentsForLesson(lesson.id)
+    });
+    var raceUI = ctx.raceUI.create({ race: race, ctx: ctx, screen: screen });
 
     function later(callback, delay) {
       var id = window.setTimeout(callback, delay);
@@ -99,7 +105,10 @@ KM.Screens.lesson = (function () {
       el('div', { class: 'lesson-tools' }, [speechButton, sfxButton])
     ]);
 
-    var dotsSlot = el('div', { class: 'dots-slot' });
+    var raceStatus = el('span', {
+      class: 'race-status',
+      text: '🏁 Cuộc đua · Câu 1/' + questions.length
+    });
     var meterValue = el('span', { class: 'star-meter-value', text: '0' });
     var meter = el('div', {
       class: 'star-meter',
@@ -110,7 +119,8 @@ KM.Screens.lesson = (function () {
       meterValue
     ]);
 
-    var progressRow = el('div', { class: 'progress-row' }, [dotsSlot, meter]);
+    var progressRow = el('div', { class: 'progress-row' }, [raceStatus, meter]);
+    var raceSlot = el('div', { class: 'race-slot' });
 
     var questionText = el('p', {
       class: 'question-text',
@@ -143,8 +153,10 @@ KM.Screens.lesson = (function () {
 
     screen.appendChild(header);
     screen.appendChild(progressRow);
+    screen.appendChild(raceSlot);
     screen.appendChild(questionCard);
     screen.appendChild(foot);
+    raceSlot.appendChild(raceUI.hud);
     ctx.root.appendChild(screen);
 
     function speakCurrent() {
@@ -254,10 +266,10 @@ KM.Screens.lesson = (function () {
 
       renderChoices(question);
 
-      Components.clear(dotsSlot);
-      dotsSlot.appendChild(Components.progressDots(session.progress().total, session.progress().index));
-      foot.textContent = 'Câu ' + (session.progress().index + 1) + '/' + session.progress().total +
-        ' · Chạm vào đáp án đúng';
+      raceStatus.textContent = '🏁 Cuộc đua · Câu ' +
+        (session.progress().index + 1) + '/' + session.progress().total;
+      raceUI.update();
+      foot.textContent = 'Chạm vào đáp án đúng';
 
       if (questionSpeakTimer) {
         window.clearTimeout(questionSpeakTimer);
@@ -287,6 +299,8 @@ KM.Screens.lesson = (function () {
       }
 
       if (!result.correct) {
+        race.wrong();
+        raceUI.update();
         ctx.audio.wrong();
         button.classList.add('is-wrong');
         Components.shake(button);
@@ -305,6 +319,9 @@ KM.Screens.lesson = (function () {
         item.classList.remove('is-wrong');
       });
       button.classList.add('is-correct');
+      race.correct(result.firstTry);
+      race.completeQuestion();
+      raceUI.update();
       ctx.audio.correct();
       ctx.audio.star();
       ctx.audio.engine();
@@ -345,12 +362,18 @@ KM.Screens.lesson = (function () {
       }
       finished = true;
       var summary = session.summary();
+      var raceSummary = race.settle();
+      raceUI.update({ final: true });
+      raceStatus.textContent = '🏁 Về đích!';
       var record = ctx.progress.recordResult(lesson.id, summary);
-      ctx.navigate('result', {
-        lessonId: lesson.id,
-        summary: summary,
-        record: record
-      });
+      later(function () {
+        ctx.navigate('result', {
+          lessonId: lesson.id,
+          summary: summary,
+          record: record,
+          race: raceSummary
+        });
+      }, 900);
     }
 
     function onKeyDown(event) {
@@ -370,7 +393,9 @@ KM.Screens.lesson = (function () {
     }
 
     document.addEventListener('keydown', onKeyDown);
-    renderQuestion();
+    raceUI.showIntro(function () {
+      renderQuestion();
+    });
 
     return {
       destroy: function () {
@@ -378,6 +403,7 @@ KM.Screens.lesson = (function () {
           window.clearTimeout(id);
         });
         document.removeEventListener('keydown', onKeyDown);
+        raceUI.destroy();
         ctx.speech.stop();
       },
       debugState: function () {

@@ -31,9 +31,13 @@ KM.Screens.result = (function () {
     }
     var stars = Math.max(1, Math.min(3, record.stars || summary.stars || 1));
     var runStars = Math.max(1, Math.min(3, summary.stars || 1));
-    var title = stars === 3
-      ? 'Tuyệt vời! Bé giỏi quá!'
-      : (stars === 2 ? 'Giỏi lắm! Bé cố thêm chút nữa nhé!' : 'Bé đã hoàn thành bài!');
+    var race = params.race || null;
+    var place = race ? race.playerPlace : 0;
+    var title = race
+      ? (place === 1 ? 'Vô địch! Bé giỏi quá!' : 'Bé về đích hạng ' + place + '!')
+      : (stars === 3
+        ? 'Tuyệt vời! Bé giỏi quá!'
+        : (stars === 2 ? 'Giỏi lắm! Bé cố thêm chút nữa nhé!' : 'Bé đã hoàn thành bài!'));
 
     var screen = el('div', { class: 'screen result' });
     var nextLesson = record.nextLessonId ? ctx.curriculum.getLesson(record.nextLessonId) : null;
@@ -92,8 +96,36 @@ KM.Screens.result = (function () {
       text: title
     });
 
+    var podium = null;
+    if (race) {
+      podium = el('div', { class: 'result-podium' }, [
+        el('span', { class: 'result-podium-title', text: 'Kết quả cuộc đua' }),
+        el('div', { class: 'podium-row' }, race.racers.map(function (racer) {
+          return el('div', {
+            class: 'podium-card' + (racer.isPlayer ? ' is-player' : '')
+          }, [
+            el('span', { class: 'podium-place', text: '#' + racer.place }),
+            el('img', {
+              class: 'podium-thumb',
+              src: racer.src,
+              alt: '',
+              loading: 'eager',
+              draggable: 'false'
+            }),
+            el('span', { class: 'podium-name', text: racer.name })
+          ]);
+        }))
+      ]);
+    }
+
     var card = el('div', { class: 'result-card' }, [
       el('span', { class: 'result-eyebrow', text: lesson.label + ' · Trang ' + lesson.page }),
+      race
+        ? el('span', {
+          class: 'result-place',
+          text: place === 1 ? '🏆 Hạng nhất' : '🏁 Hạng ' + place
+        })
+        : null,
       titleNode,
       el('p', { class: 'result-lesson', text: lesson.title }),
       el('div', { class: 'result-car-wrap' }, [
@@ -124,6 +156,7 @@ KM.Screens.result = (function () {
       record.isNewBest
         ? el('span', { class: 'result-record', text: '🏆 Kỷ lục mới của bé!' })
         : null,
+      podium,
       el('div', { class: 'result-actions' }, actions),
       el('p', {
         class: 'result-total',
@@ -138,13 +171,21 @@ KM.Screens.result = (function () {
     ctx.audio.win();
     Components.confetti(screen, Math.min(ctx.tuning.confetti.maxCount, Math.round(ctx.tuning.confetti.count * 1.3)), 3200);
 
-    var message = runStars === stars
-      ? (stars === 3
-        ? 'Tuyệt vời! Bé đạt ba sao. Bé giỏi quá!'
-        : (stars === 2
-          ? 'Giỏi lắm! Bé đạt hai sao. Cố thêm chút nữa nhé!'
-          : 'Bé đã hoàn thành bài học. Giỏi lắm!'))
-      : 'Bé đã hoàn thành bài. Kỷ lục của bé là ' + stars + ' sao. Cố thêm nhé!';
+    var message;
+    if (race) {
+      var placeWord = place === 1 ? 'nhất' : (place === 2 ? 'hai' : (place === 3 ? 'ba' : 'tư'));
+      message = place === 1
+        ? 'Vô địch! Bé về đích hạng nhất. Giỏi quá!'
+        : 'Bé về đích hạng ' + placeWord + '. Giỏi lắm!';
+    } else {
+      message = runStars === stars
+        ? (stars === 3
+          ? 'Tuyệt vời! Bé đạt ba sao. Bé giỏi quá!'
+          : (stars === 2
+            ? 'Giỏi lắm! Bé đạt hai sao. Cố thêm chút nữa nhé!'
+            : 'Bé đã hoàn thành bài học. Giỏi lắm!'))
+        : 'Bé đã hoàn thành bài. Kỷ lục của bé là ' + stars + ' sao. Cố thêm nhé!';
+    }
     var speechTimer = window.setTimeout(function () {
       ctx.speech.speak(message);
     }, ctx.tuning.timing.resultSpeakDelayMs);
