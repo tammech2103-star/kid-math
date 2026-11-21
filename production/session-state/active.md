@@ -7,10 +7,11 @@ smoke PASS trên desktop 1280×900, mobile 390×844, tablet 768×1024 và 1024×
 
 ## Việc đang làm
 
-Bàn giao bản **1 đối 1**: mỗi màn là một cuộc đua McQueen với 1 đối thủ, starting
-grid kiểu `Feature.webp` (hai xe + badge VS), HUD 2 làn phóng to, kết quả có hạng 1–2
-và podium 2 xe. Đối thủ đổi theo bài và theo lần chơi lại nên cả 28 nhân vật đều xuất
-hiện. Không có màn thua; sao vẫn theo số câu đúng ngay lần đầu.
+Bàn giao bản **1 đối 1** có **đường đua sống động**: mỗi màn là một cuộc đua McQueen
+với 1 đối thủ, starting grid kiểu `Feature.webp` (hai xe + badge VS), đường đua 2 làn
+với xe cỡ lớn chạy bám đuổi trong lúc trả lời (khói tốc độ, rú máy, cờ đích vẫy),
+kết quả có hạng 1–2 và podium 2 xe. Đối thủ đổi theo bài và theo lần chơi lại nên cả
+28 nhân vật đều xuất hiện. Không có màn thua; sao vẫn theo số câu đúng ngay lần đầu.
 
 ## Tiến độ
 
@@ -65,7 +66,7 @@ hiện. Không có màn thua; sao vẫn theo số câu đúng ngay lần đầu.
 |----------|---------|------------|
 | Unit test (67 test) | PASS 67/67 | `tests/test-runner.html` |
 | Smoke test Playwright | PASS | `production/qa/smoke-report.md` |
-| Cuộc đua 1 đối 1 | 28 đối thủ, 1/màn, intro/HUD/podium | `js/data/racers.js`, `js/domain/race.js`, `js/ui/race.js` |
+| Cuộc đua 1 đối 1 | 28 đối thủ, 1/màn, đường đua 2 làn, intro/podium | `js/data/racers.js`, `js/domain/race.js`, `js/ui/race.js` |
 | Phạm vi smoke | 21 màn desktop + mobile + tablet, bàn phím, reduced-motion, focus | `tools/smoke_test.py` |
 | Offline `file://` | PASS | tự động trong smoke, localStorage + ảnh xe, không lỗi console |
 | Mobile 390×844 | PASS | không tràn ngang, nút đáp án ≥ 64 px, HUD còn tên tay đua |
