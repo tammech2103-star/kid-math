@@ -61,7 +61,8 @@ và cú rướn máy; cờ đích vẫy khi về đích. Cuối bài có xếp h
 **Về đích thứ hai:** bé **thua** cuộc đua nhưng vẫn được động viên — màn kết quả đổi
 sang tông xanh lạnh, không bắn confetti, xe xì khói và lắc nhẹ, âm báo đi xuống nhẹ
 nhàng, kèm câu “Cố lên nhé! Bé bấm Chơi lại để đua lại nào.” Podium khoanh vàng xe
-vô địch. Phụ huynh có thể tắt nút “Chơi lại” sau khi thua trong khu vực Phụ huynh.
+vô địch. Phụ huynh có thể tắt hẳn nút “Chơi lại” trên mọi màn kết quả trong khu vực
+Phụ huynh.
 
 **Dành cho bé chưa đọc tốt:** câu vị trí hiển thị **mũi tên lớn** `↑ ↓ ← →`;
 câu so sánh nhóm dùng **badge số 1/2 kèm màu** và dấu `=`. Bé có thể chọn bằng mắt,
@@ -76,8 +77,8 @@ Vào bằng nút **Phụ huynh** ở góc phải. Cổng bảo vệ là một ph
 - Bảng sao từng bài theo 5 chủ đề.
 - Bật/tắt giọng đọc tiếng Việt và hiệu ứng âm thanh.
 - Mở khoá tất cả bài (hữu ích khi ôn tập).
-- **Cho bé chơi lại khi thua**: bật (mặc định) thì màn kết quả hạng hai vẫn có nút
-  “Chơi lại”; tắt thì bé chỉ thấy “Bài tiếp” và “Chọn bài khác”.
+- **Cho bé chơi lại bài**: bật (mặc định) thì màn kết quả có nút “Chơi lại”; tắt thì
+  màn kết quả chỉ còn “Bài tiếp” và “Chọn bài khác” (áp dụng cả khi thắng lẫn khi thua).
 - Đặt lại tiến độ (hai bước xác nhận).
 
 Lưu ý: giọng đọc dùng Web Speech API của trình duyệt. Nếu máy chưa có giọng
