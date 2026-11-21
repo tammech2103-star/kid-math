@@ -14,7 +14,7 @@
 | Smoke E2E desktop 1280×900 | **PASS** |
 | Smoke E2E mobile 390×844 | **PASS** |
 | Smoke E2E tablet 768×1024 và 1024×768 | **PASS** (xe intro 154/200 px, không tràn) |
-| Cuộc đua | 1 đối 1/màn, 28 đối thủ xoay vòng, intro/HUD/podium |
+| Cuộc đua | 1 đối 1/màn, 28 đối thủ xoay vòng, đường đua 2 làn có xe chạy, intro/podium |
 | Mở offline `file://` | **PASS** (21 bài, xe tải, localStorage hoạt động) |
 | Bản build tĩnh `public/` | **PASS** (61 mục, 1.6 MB, 0 tài nguyên lỗi) |
 | Lighthouse trang chủ | **100 Accessibility / 100 Best Practices / 100 SEO** |
@@ -47,10 +47,11 @@
 | SM-18 | PASS | Focus: câu hỏi, tiêu đề kết quả, công tắc phụ huynh, h1 trang chủ/cổng |
 | SM-19 | PASS | `python tools/build_public.py`: 21 bài, ảnh xe, localStorage, 0 lỗi/404 |
 | SM-20 | PASS | Màn xuất phát 2 xe kiểu Feature; badge VS giữa, McQueen bên phải, badge BÉ; xe cao 200 px trên desktop |
-| SM-21 | PASS | HUD 2 làn, ảnh tay đua 48 px; tên hiển thị cả trên mobile; McQueen tiến sau câu đúng |
+| SM-21 | PASS | Đường đua 2 làn: xe 75 px (desktop) / 89 px (tablet dọc) / 51 px (mobile); xe chạy khi trả lời, có khói tốc độ, huy hiệu hạng, cờ đích |
 | SM-22 | PASS | Kết quả có hạng 1–2, podium 2 tay đua, xe + confetti |
-| SM-23 | PASS | Live Render (commit `3f4df08`): 21 bài, intro 2 xe, HUD 2 làn, podium 2, 30 ảnh Asset 200, 0 lỗi console/404 |
-| SM-24 | PASS | Tablet 768×1024 và 1024×768: intro 2 xe cao 154/200 px, HUD 2 làn, không tràn ngang |
+| SM-23 | PASS | Live Render: 21 bài, intro 2 xe, đường đua 2 làn, podium 2, 30 ảnh Asset 200, 0 lỗi console/404 |
+| SM-24 | PASS | Tablet 768×1024 và 1024×768: intro 2 xe cao 154/200 px, đường đua không tràn, đáp án nằm trong màn hình |
+| SM-25 | PASS | Không tràn dọc: desktop 1280×900, laptop 1366×768, tablet 768×1024 / 1024×768, mobile 390×844 — nút đáp án cuối đều thấy được |
 ## 3. Ảnh chụp bằng chứng
 
 | Tệp | Nội dung |
@@ -73,7 +74,9 @@
 | `11b-mobile-race-intro.png` | Màn xuất phát 1 đối 1 trên mobile |
 | `12-mobile-lesson.png` | Bài học + HUD 2 làn trên mobile |
 | `20-tablet-*-race-intro.png` | Màn xuất phát trên tablet (dọc/ngang) |
-| `21-tablet-*-race-hud.png` | HUD 2 làn trên tablet (dọc/ngang) |
+| `21-tablet-*-race-hud.png` | Đường đua 2 làn trên tablet (dọc/ngang) |
+| `22-race-moving.png` | Hai xe đang chạy bám đuổi trên desktop |
+| `23-tablet-race-moving.png` | Hai xe đang chạy bám đuổi trên tablet |
 | `17-live-race-intro.png` | Intro 1 đối 1 trên bản Live |
 | `18-live-race-hud.png` | HUD 2 làn trên bản Live |
 | `19-live-race-result.png` | Podium 2 tay đua + xe + sao trên bản Live |
