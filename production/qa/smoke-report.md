@@ -10,9 +10,10 @@
 
 | Hạng mục | Kết quả |
 |----------|---------|
-| Unit test trình duyệt | **56/56 PASS** |
+| Unit test trình duyệt | **65/65 PASS** |
 | Smoke E2E desktop 1280×900 | **PASS** |
 | Smoke E2E mobile 390×844 | **PASS** |
+| Cuộc đua | 4 tay đua/màn, 28 đối thủ luân phiên, intro/HUD/podium |
 | Mở offline `file://` | **PASS** (21 bài, xe tải, localStorage hoạt động) |
 | Bản build tĩnh `public/` | **PASS** (29 mục, 218.2 KB, 0 tài nguyên lỗi) |
 | Lighthouse trang chủ | **100 Accessibility / 100 Best Practices / 100 SEO** |
@@ -33,8 +34,7 @@
 | SM-05 | PASS | Đúng sau sai: xe + confetti, không cộng sao lần đầu |
 | SM-06 | PASS | Kết quả 2 sao, mở Bài 1, lưu tiến độ |
 | SM-07 | PASS | Bài 1 toàn đúng: 3 sao, mở Bài 2, tổng 5 sao |
-| SM-08 | PASS | Mở đủ **21/21 màn**, mỗi màn có lựa chọn + hình, không tràn |
-| SM-09 | PASS | Cổng phụ huynh: trả lời sai vẫn ở cổng + có nhắc; đúng mới mở dashboard |
+| SM-08 | PASS | Mở đủ **21/21 màn**, mỗi màn có lựa chọn + hình, không tràn || SM-09 | PASS | Cổng phụ huynh: trả lời sai vẫn ở cổng + có nhắc; đúng mới mở dashboard |
 | SM-10 | PASS | Dashboard 21 dòng, tổng sao đúng, công tắc giọng đọc đổi trạng thái và giữ focus |
 | SM-11 | PASS | Tải lại giữ 5 sao và Bài 2 đã mở |
 | SM-12 | PASS | 21/21 màn trên mobile: không tràn, mọi nút đáp án ≥ 64 px |

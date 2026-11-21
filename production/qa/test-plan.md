@@ -18,16 +18,19 @@ lưu tiến độ, offline `file://`, desktop và mobile.
 
 | Mức | Công cụ | Phạm vi | Bằng chứng |
 |-----|---------|---------|------------|
-| Unit / property | `tests/test-runner.html` (56 test) | RNG, số tiếng Việt, curriculum, 11 generator, session, progress | ảnh chụp runner + `window.__TEST_RESULTS__` |
+| Unit / property | `tests/test-runner.html` (65 test) | RNG, số tiếng Việt, curriculum, 11 generator, race (28 đối thủ, xếp hạng), session, progress | ảnh chụp runner + `window.__TEST_RESULTS__` |
 | Smoke E2E | `tools/smoke_test.py` (Playwright + Chrome) | splash → home → chơi 2 bài → kết quả → 8 dạng bài → phụ huynh → reload → mobile | `production/qa/screenshots/` |
 | Offline | Playwright `file:///.../index.html` | tải script/CSS/ảnh, localStorage, mở bài | `13-file-offline.png` |
 | Bản deploy | `python tools/build_public.py` + Chrome | 21 bài, ảnh xe, localStorage, 0 lỗi/404 | `14-render-build.png` |
 | Thủ công | Người dùng | giọng đọc thật, âm thanh, cảm giác chơi | checklist dưới |
 
-## 3. Unit test — 56 mục
+## 3. Unit test — 65 mục
 
 - **Core**: đọc số 0–10, capitalize, countNoun; đọc số 0 là "số không" trong câu
   so sánh; RNG cùng seed, biên `int`, `shuffle` không sửa mảng gốc; lọc emoji cho TTS.
+- **Race**: 28 đối thủ, chọn 3/màn không trùng, toàn bộ xuất hiện ≥2 lần; điểm
+  McQueen (1 / 0,55 khi thử lại), đối thủ nhích khi sai; xếp hạng 1–4, podium,
+  không có trạng thái thua; `settle` lặp lại không đổi.
 - **Curriculum**: 5 chủ đề, 21 màn, id/nhãn không trùng, trang tăng dần,
   tham chiếu đồ vật/hình hợp lệ, 5–12 câu mỗi màn.
 - **Questions**: 11 generator × 250 câu; schema; không trùng lựa chọn;
@@ -47,11 +50,11 @@ lưu tiến độ, offline `file://`, desktop và mobile.
 |----|------|---------|
 | SM-01 | Mở lần đầu | Splash có xe, nút bắt đầu, không lỗi console |
 | SM-02 | Bắt đầu | Home có 21 thẻ bài, ảnh xe tải được, không tràn ngang |
-| SM-03 | Vào bài mở đầu | 5 câu, có hình đồ vật, 3 lựa chọn |
+| SM-03 | Vào bài mở đầu | Màn xuất phát 4 xe kiểu Feature; sau đó 5 câu, hình đồ vật, 3 lựa chọn |
 | SM-04 | Cố ý chọn sai | Không có xe/confetti, có toast thử lại, vẫn ở câu đó |
-| SM-05 | Chọn đúng | Xe + confetti + xe tải được; sao không tăng nếu đã sai trước đó |
-| SM-06 | Hoàn thành bài mở đầu | Kết quả 2 sao (4/5 đúng lần đầu), lưu tiến độ, mở Bài 1 |
-| SM-07 | Chơi Bài 1 toàn đúng | Kết quả 3 sao, mở Bài 2, tổng 5 sao |
+| SM-05 | Chọn đúng | Xe + confetti + xe tải được; sao không tăng nếu đã sai trước đó; McQueen tiến trên HUD |
+| SM-06 | Hoàn thành bài mở đầu | Kết quả 2 sao (4/5 đúng lần đầu), podium 4 tay đua, mở Bài 1 |
+| SM-07 | Chơi Bài 1 toàn đúng | Kết quả 3 sao, hạng nhất, mở Bài 2, tổng 5 sao |
 | SM-08 | Mở đủ 21 màn | Mỗi màn có lựa chọn + hình/equation, không tràn ngang |
 | SM-09 | Cổng phụ huynh | Sai vẫn ở cổng + có nhắc; đúng mở dashboard |
 | SM-10 | Dashboard | 21 dòng tiến độ, tổng sao đúng, công tắc đổi trạng thái và giữ focus |
