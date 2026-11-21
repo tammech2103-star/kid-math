@@ -18,8 +18,9 @@
 | Bản build tĩnh `public/` | **PASS** (29 mục, 218.2 KB, 0 tài nguyên lỗi) |
 | Lighthouse trang chủ | **100 Accessibility / 100 Best Practices / 100 SEO** |
 | Lighthouse bài vị trí (b15) | **100 / 100 / 100** — `production/qa/lighthouse/lesson-position.html` |
-| **Live Render** | **PASS** — https://be-vui-hoc-toan-1.onrender.com (commit `ffebecd`) |
-| Trên live | 21 bài, mũi tên ↑↓←→, badge 1/2, xe + confetti khi đúng |
+| **Live Render** | **PASS** — https://be-vui-hoc-toan-1.onrender.com (commit `d22ef01`) |
+| Live race | 21 bài, intro 4 xe, HUD 4 làn, podium 4; 30 ảnh Asset HTTP 200; 0 lỗi |
+| Trên live | Mũi tên ↑↓←→, badge 1/2, xe + confetti khi đúng |
 | Lỗi console | 0 |
 | Tài nguyên HTTP ≥ 400 | 0 |
 
@@ -45,6 +46,10 @@
 | SM-17 | PASS | `prefers-reduced-motion`: animation ảnh xe tắt, confetti `display:none` |
 | SM-18 | PASS | Focus: câu hỏi, tiêu đề kết quả, công tắc phụ huynh, h1 trang chủ/cổng |
 | SM-19 | PASS | `python tools/build_public.py`: 21 bài, ảnh xe, localStorage, 0 lỗi/404 |
+| SM-20 | PASS | Màn xuất phát 4 xe kiểu Feature; McQueen bên phải, badge BÉ |
+| SM-21 | PASS | HUD 4 làn; ảnh Flo/Carla/Shu/McQueen tải; McQueen tiến sau câu đúng |
+| SM-22 | PASS | Kết quả có hạng 1–4, podium 4 tay đua, xe + confetti |
+| SM-23 | PASS | Live Render: 21 bài, intro/HUD/podium, 30 ảnh Asset 200, 0 lỗi console/404 |
 ## 3. Ảnh chụp bằng chứng
 
 | Tệp | Nội dung |
@@ -63,6 +68,11 @@
 | `11-mobile-home.png`, `12-mobile-lesson.png` | Giao diện 390×844 |
 | `13-file-offline.png` | Mở trực tiếp file, không server |
 | `14-render-build.png` | Bản build tĩnh `public/` dùng để deploy Render |
+| `03b-race-intro.png` | Màn xuất phát 4 xe kiểu Feature |
+| `12-mobile-lesson.png` | Bài học + HUD race trên mobile |
+| `17-live-race-intro.png` | Intro 4 xe trên bản Live |
+| `18-live-race-hud.png` | HUD 4 làn trên bản Live |
+| `19-live-race-result.png` | Podium + xe + sao trên bản Live |
 
 ## 4. Lỗi phát hiện trong QA và đã sửa
 
