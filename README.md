@@ -55,8 +55,13 @@ xuất hiện. Mở bài có màn xuất phát kiểu `Feature.webp`: hai xe đ�
 kẻ ca-rô, badge **VS** ở giữa, McQueen bên phải. Trong bài, **đường đua 2 làn** có hai
 xe cỡ lớn chạy bám đuổi nhau: đúng ngay lần đầu McQueen tiến 1 bước, đúng sau khi thử
 lại tiến 0,55 bước, sai thì đối thủ nhích nhẹ. Mỗi lần một xe chạy lên có khói tốc độ
-và cú rướn máy; cờ đích vẫy khi về đích. Cuối bài có xếp hạng 1–2 và podium;
-**không có màn thua**, sao vẫn theo số câu đúng ngay lần đầu.
+và cú rướn máy; cờ đích vẫy khi về đích. Cuối bài có xếp hạng 1–2 và podium; **không khoá bài vì thua**, sao vẫn theo số câu
+đúng ngay lần đầu.
+
+**Về đích thứ hai:** bé **thua** cuộc đua nhưng vẫn được động viên — màn kết quả đổi
+sang tông xanh lạnh, không bắn confetti, xe xì khói và lắc nhẹ, âm báo đi xuống nhẹ
+nhàng, kèm câu “Cố lên nhé! Bé bấm Chơi lại để đua lại nào.” Podium khoanh vàng xe
+vô địch. Phụ huynh có thể tắt nút “Chơi lại” sau khi thua trong khu vực Phụ huynh.
 
 **Dành cho bé chưa đọc tốt:** câu vị trí hiển thị **mũi tên lớn** `↑ ↓ ← →`;
 câu so sánh nhóm dùng **badge số 1/2 kèm màu** và dấu `=`. Bé có thể chọn bằng mắt,
@@ -71,6 +76,8 @@ Vào bằng nút **Phụ huynh** ở góc phải. Cổng bảo vệ là một ph
 - Bảng sao từng bài theo 5 chủ đề.
 - Bật/tắt giọng đọc tiếng Việt và hiệu ứng âm thanh.
 - Mở khoá tất cả bài (hữu ích khi ôn tập).
+- **Cho bé chơi lại khi thua**: bật (mặc định) thì màn kết quả hạng hai vẫn có nút
+  “Chơi lại”; tắt thì bé chỉ thấy “Bài tiếp” và “Chọn bài khác”.
 - Đặt lại tiến độ (hai bước xác nhận).
 
 Lưu ý: giọng đọc dùng Web Speech API của trình duyệt. Nếu máy chưa có giọng
@@ -80,7 +87,7 @@ màn Phụ huynh sẽ báo và hướng dẫn cài giọng trong cài đặt h�
 ## Kiểm thử
 
 **Test logic (không cần Node):** mở `tests/test-runner.html` trong trình duyệt.
-Bộ test kiểm tra 67 mục: đọc số tiếng Việt, RNG tất định, cấu trúc 21 bài,
+Bộ test kiểm tra 69 mục: đọc số tiếng Việt, RNG tất định, cấu trúc 21 bài,
 sinh hàng nghìn câu hỏi cho 11 dạng hoạt động, đáp án/phạm vi 0–10, tính sao,
 mở khoá, lưu tiến độ và luật đua 1 đối 1.
 
