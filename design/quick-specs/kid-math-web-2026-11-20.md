@@ -32,9 +32,10 @@ kết quả có xe cỡ lớn, sao, confetti. Tiến độ lưu bằng `localSto
 7. **Âm thanh**: giọng đọc tiếng Việt qua Web Speech API (có nút nghe lại), hiệu ứng
    tổng hợp bằng WebAudio (không cần file âm thanh). Có công tắc riêng cho giọng đọc
    và hiệu ứng, lưu vào cài đặt.
-8. **Cuộc đua**: mỗi màn là cuộc đua 4 tay đua — McQueen + 3 đối thủ lấy từ 28 nhân
-   vật trong `Asset/`, luân phiên để tất cả đều xuất hiện. Mở bài có màn xuất phát
-   kiểu `Feature.webp`; HUD 4 làn; kết quả có hạng 1–4 và podium. Không có màn thua.
+8. **Cuộc đua**: mỗi màn là cuộc đua **1 đối 1** — McQueen với 1 đối thủ lấy từ 28
+   nhân vật trong `Asset/`. Đối thủ đổi theo bài và theo lần chơi lại nên cả 28 nhân
+   vật đều xuất hiện. Mở bài có màn xuất phát kiểu `Feature.webp`; HUD 2 làn; kết quả
+   có hạng 1–2 và podium. Không có màn thua.
 9. **Phụ huynh**: khu vực riêng có cổng kiểm tra bằng phép nhân đơn giản; xem sao
    từng bài, tổng sao, bật/tắt giọng đọc – hiệu ứng, mở khoá tất cả, đặt lại tiến độ.
 10. **Không phạt**: không trừ sao, không khoá bài vì sai, không âm thanh chói, không
