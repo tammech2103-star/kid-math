@@ -15,7 +15,8 @@ KM.Progress = (function () {
       settings: {
         speech: true,
         sfx: true,
-        unlockAll: false
+        unlockAll: false,
+        allowRetry: true
       },
       lessons: {}
     };
@@ -34,6 +35,7 @@ KM.Progress = (function () {
       state.settings.speech = raw.settings.speech !== false;
       state.settings.sfx = raw.settings.sfx !== false;
       state.settings.unlockAll = raw.settings.unlockAll === true;
+      state.settings.allowRetry = raw.settings.allowRetry !== false;
     }
     if (raw.lessons && typeof raw.lessons === 'object') {
       Object.keys(raw.lessons).forEach(function (id) {
@@ -71,7 +73,8 @@ KM.Progress = (function () {
       return {
         speech: state.settings.speech,
         sfx: state.settings.sfx,
-        unlockAll: state.settings.unlockAll
+        unlockAll: state.settings.unlockAll,
+        allowRetry: state.settings.allowRetry
       };
     }
 
@@ -81,7 +84,7 @@ KM.Progress = (function () {
      * @returns {boolean} giá trị sau khi đổi.
      */
     function setSetting(key, value) {
-      var allowed = ['speech', 'sfx', 'unlockAll'];
+      var allowed = ['speech', 'sfx', 'unlockAll', 'allowRetry'];
       if (allowed.indexOf(key) === -1) {
         return false;
       }
