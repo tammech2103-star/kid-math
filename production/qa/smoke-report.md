@@ -48,14 +48,15 @@
 | SM-19 | PASS | `python tools/build_public.py`: 21 bài, ảnh xe, localStorage, 0 lỗi/404 |
 | SM-20 | PASS | Màn xuất phát 2 xe kiểu Feature; badge VS giữa, McQueen bên phải, badge BÉ; xe cao 200 px trên desktop |
 | SM-21 | PASS | Đường đua 2 làn: xe 75 px (desktop) / 89 px (tablet dọc) / 51 px (mobile); xe chạy khi trả lời, có khói tốc độ, huy hiệu hạng, cờ đích |
-| SM-22 | PASS | Kết quả có hạng 1–2, podium 2 tay đua, xe + confetti |
-| SM-23 | PASS | Live Render (commit `9f05df2`): 21 bài, intro 2 xe, đường đua 2 làn có xe chạy, podium 2, 30 ảnh Asset 200, 0 lỗi console/404 |
+| SM-22 | PASS | Kết quả có hạng 1–2 và **bục trao thưởng 2 bậc** (xe nhất bậc cao hơn xe nhì), xe + confetti |
+| SM-23 | PASS | Live Render (commit `9091759`): 21 bài, intro 2 xe, đường đua 2 làn có xe chạy, bục trao thưởng, 30 ảnh Asset 200, 0 lỗi console/404 |
 | SM-24 | PASS | Tablet 768×1024 và 1024×768: intro 2 xe cao 154/200 px, đường đua không tràn, đáp án nằm trong màn hình |
 | SM-25 | PASS | Không tràn dọc: desktop 1280×900, laptop 1366×768, tablet 768×1024 / 1024×768, mobile 390×844 — nút đáp án cuối đều thấy được |
-| SM-26 | PASS | Hạng hai: màn kết quả `is-loss`, tiêu đề “Bé về đích thứ hai!”, không confetti, 2 vệt khói, lời động viên, podium khoanh vàng xe vô địch |
+| SM-26 | PASS | Hạng hai: màn kết quả `is-loss`, tiêu đề “Bé về đích thứ hai!”, không confetti, 2 vệt khói, lời động viên, bục trao thưởng có cúp cho xe nhất |
 | SM-27 | PASS | Phụ huynh tắt “Cho bé chơi lại bài” → màn thua **và** màn thắng đều chỉ còn 2 nút; bật lại → 3 nút ở cả hai |
 | SM-28 | PASS | Live (commit `8c021af`): chơi thật 3 câu sai lần đầu → hạng hai, màn thua đúng hiệu ứng, 0 lỗi console/404 |
 | SM-29 | PASS | Live (commit `9091759`): tắt công tắc qua UI → cả màn thắng và màn thua đều không còn nút “Chơi lại”; bật lại có đủ |
+| SM-30 | PASS | Bục trao thưởng: `.podium-step` = 2, có `.is-first`, bậc nhất cao hơn bậc nhì; hành động cuối vẫn thấy ở desktop/tablet/mobile |
 ## 3. Ảnh chụp bằng chứng
 
 | Tệp | Nội dung |
@@ -84,6 +85,8 @@
 | `26-result-loss.png` | Màn kết quả khi bé về đích thứ hai (hiệu ứng thua) |
 | `28-retry-off.png` | Màn thua khi phụ huynh đã tắt “Cho bé chơi lại bài” |
 | `29-live-win-retry-off.png` | Màn thắng trên live khi đã tắt chơi lại (không còn nút) |
+| `30-desktop-podium.png` | Bục trao thưởng 2 bậc trên desktop |
+| `30-tablet-portrait-podium.png` | Bục trao thưởng 2 bậc trên tablet |
 | `17-live-race-intro.png` | Intro 1 đối 1 trên bản Live |
 | `18-live-race-hud.png` | HUD 2 làn trên bản Live |
 | `19-live-race-result.png` | Podium 2 tay đua + xe + sao trên bản Live |
