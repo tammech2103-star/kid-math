@@ -34,11 +34,15 @@ kết quả có xe cỡ lớn, sao, confetti. Tiến độ lưu bằng `localSto
    và hiệu ứng, lưu vào cài đặt.
 8. **Cuộc đua**: mỗi màn là cuộc đua **1 đối 1** — McQueen với 1 đối thủ lấy từ 28
    nhân vật trong `Asset/`. Đối thủ đổi theo bài và theo lần chơi lại nên cả 28 nhân
-   vật đều xuất hiện. Mở bài có màn xuất phát kiểu `Feature.webp`; HUD 2 làn; kết quả
-   có hạng 1–2 và podium. Không có màn thua.
-9. **Phụ huynh**: khu vực riêng có cổng kiểm tra bằng phép nhân đơn giản; xem sao
-   từng bài, tổng sao, bật/tắt giọng đọc – hiệu ứng, mở khoá tất cả, đặt lại tiến độ.
-10. **Không phạt**: không trừ sao, không khoá bài vì sai, không âm thanh chói, không
+   vật đều xuất hiện. Mở bài có màn xuất phát kiểu `Feature.webp`; trong bài có đường
+   đua 2 làn với hai xe chạy bám đuổi; kết quả có hạng 1–2 và podium.
+9. **Thua (hạng hai)**: bé thua nhưng vẫn được động viên — màn kết quả đổi tông lạnh,
+   không confetti, xe xì khói và lắc nhẹ, âm báo đi xuống nhẹ; podium khoanh vàng xe
+   vô địch. Sao vẫn theo số câu đúng ngay lần đầu và **không khoá bài vì thua**.
+10. **Phụ huynh**: khu vực riêng có cổng kiểm tra bằng phép nhân đơn giản; xem sao
+   từng bài, tổng sao, bật/tắt giọng đọc – hiệu ứng, mở khoá tất cả, **cho bé chơi
+   lại khi thua** (bật/tắt), đặt lại tiến độ.
+11. **Không phạt**: không trừ sao, không khoá bài vì sai, không âm thanh chói, không
    hiệu ứng nhấp nháy nhanh. Tôn trọng `prefers-reduced-motion`.
 
 ## Tuning Knobs
