@@ -1,9 +1,10 @@
 # Deploy lên Render — Bé Vui Học Toán 1
 
 **Trạng thái:** đã deploy tại **https://be-vui-hoc-toan-1.onrender.com**
-(static site, commit `8c021af`, deploy 2026-11-21 12:27 GMT+7). Bản này là
+(static site, commit `9091759`, deploy 2026-11-21 12:40 GMT+7). Bản này là
 **cuộc đua 1 đối 1** với đường đua 2 làn có hai xe cỡ lớn chạy bám đuổi, có
-hiệu ứng thua khi về đích thứ hai và tuỳ chọn "cho bé chơi lại khi thua".
+hiệu ứng thua khi về đích thứ hai và công tắc **“Cho bé chơi lại bài”** (tắt là
+mất nút “Chơi lại” ở mọi màn kết quả).
 
 Mục tiêu: có một link HTTPS dạng `https://be-vui-hoc-toan-1.onrender.com` để mở trên tablet.
 Đây là **static site** — không backend, không database, không thu dữ liệu trẻ em.
