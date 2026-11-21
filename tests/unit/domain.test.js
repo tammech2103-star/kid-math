@@ -565,6 +565,23 @@
       T.eq(p.settings().unlockAll, true);
     });
 
+    T.test('cho chơi lại khi thua: mặc định bật, tắt được', function () {
+      var p = makeProgress();
+      T.eq(p.settings().allowRetry, true);
+      p.setSetting('allowRetry', false);
+      T.eq(p.settings().allowRetry, false);
+      p.setSetting('allowRetry', true);
+      T.eq(p.settings().allowRetry, true);
+    });
+
+    T.test('lưu lựa chọn chơi lại và tương thích dữ liệu cũ', function () {
+      var storage = fakeStorage();
+      storage.save({ v: 1, settings: { speech: true, sfx: true, unlockAll: false }, lessons: {} });
+      T.eq(makeProgress(storage).settings().allowRetry, true, 'dữ liệu cũ phải mặc định bật');
+      makeProgress(storage).setSetting('allowRetry', false);
+      T.eq(makeProgress(storage).settings().allowRetry, false);
+    });
+
     T.test('lưu và đọc lại tiến độ', function () {
       var storage = fakeStorage();
       var first = makeProgress(storage);
