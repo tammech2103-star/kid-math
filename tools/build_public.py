@@ -26,7 +26,7 @@ REQUIRED = [
     "css/tokens.css",
     "css/app.css",
     "js/app.js",
-    "Asset/car1.webp",
+    "Asset/Mc_Queen.webp",
 ]
 
 

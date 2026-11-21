@@ -64,7 +64,17 @@ def wait_for_advance(page, previous_index: int, total: int) -> None:
         page.wait_for_selector(".result-card", timeout=8000)
 
 
+def skip_race_intro(page) -> None:
+    if page.locator(".race-intro").count():
+        if page.locator(".race-skip").count():
+            page.click(".race-skip")
+        page.wait_for_selector(".race-intro", state="detached", timeout=5000)
+    if page.locator(".choice").count() == 0:
+        page.wait_for_selector(".choice", timeout=5000)
+
+
 def play_lesson(page, *, wrong_first: bool = False, shot_prefix: str | None = None) -> None:
+    skip_race_intro(page)
     first = current_question(page)
     total = first["total"]
     for i in range(total):
@@ -92,6 +102,12 @@ def play_lesson(page, *, wrong_first: bool = False, shot_prefix: str | None = No
             timeout=5000,
         )
         check(page.locator(".confetti").count() > 0, "Thiếu confetti khi trả lời đúng")
+        if i == 0:
+            player_bar = page.evaluate(
+                "() => document.querySelector('.race-lane.is-player .race-bar')"
+                ".getAttribute('aria-valuenow')"
+            )
+            check(float(player_bar) > 0, "McQueen không tiến trên đường đua")
         if shot_prefix and i == 0:
             page.wait_for_timeout(500)
             page.screenshot(path=str(OUT / f"{shot_prefix}-reward.png"))
@@ -106,6 +122,10 @@ def play_lesson(page, *, wrong_first: bool = False, shot_prefix: str | None = No
     check("result-title" in focus, f"Focus không ở tiêu đề kết quả: {focus}")
     lesson = page.evaluate("() => KMApp.current() && document.body.dataset.screen")
     check(lesson == "result", "Không chuyển sang màn kết quả")
+    check(
+        page.locator(".podium-card").count() == 4,
+        "Màn kết quả thiếu podium 4 tay đua",
+    )
     page.wait_for_function(
         "() => { const i = document.querySelector('.result-car');"
         " return !!(i && i.complete && i.naturalWidth > 0); }",
@@ -159,7 +179,10 @@ def main() -> int:
         )
         check(page.locator(".lesson-card").count() == 21, "Không đủ 21 bài")
         check(
-            page.evaluate("() => document.querySelector('.hero-car').complete"),
+            page.evaluate(
+                "() => { const i = document.querySelector('.hero-car');"
+                " return !!(i && i.complete && i.naturalWidth > 0); }"
+            ),
             "Ảnh xe ở trang chủ không tải được",
         )
         check(
@@ -170,6 +193,21 @@ def main() -> int:
 
         page.click(".hero-actions .btn-primary")
         page.wait_for_selector(".question-card")
+        page.wait_for_selector(".race-intro")
+        page.wait_for_timeout(350)
+        page.screenshot(path=str(OUT / "03b-race-intro.png"))
+        skip_race_intro(page)
+        check(
+            page.locator(".race-lane").count() == 4,
+            "Race HUD không đủ 4 tay đua",
+        )
+        check(
+            page.evaluate(
+                "() => Array.from(document.querySelectorAll('.race-thumb'))"
+                ".every((img) => img.complete && img.naturalWidth > 0)"
+            ),
+            "Ảnh tay đua trong HUD không tải được",
+        )
         check(
             page.evaluate("() => KMApp.current().debugState().lesson.id") == "intro",
             "Không mở đúng bài mở đầu",
@@ -191,6 +229,7 @@ def main() -> int:
             page.evaluate("() => KMApp.current().debugState().lesson.id") == "b1",
             "Không chuyển sang Bài 1",
         )
+        skip_race_intro(page)
         page.screenshot(path=str(OUT / "05-b1-question.png"))
         b1_stars = play_lesson(page, shot_prefix="06-b1")
         check(b1_stars == 3, f"Bài 1 phải 3 sao, nhận {b1_stars}")
@@ -228,6 +267,7 @@ def main() -> int:
                 "(id) => KMApp.navigate('lesson', { lessonId: id, preview: true })", lesson_id
             )
             page.wait_for_selector(".question-card")
+            skip_race_intro(page)
             page.wait_for_timeout(100)
             info = page.evaluate(
                 "() => ({ total: document.querySelectorAll('.choice').length,"
@@ -332,6 +372,7 @@ def main() -> int:
             "() => KMApp.navigate('lesson', { lessonId: 'b10', preview: true })"
         )
         page.wait_for_selector(".question-card")
+        skip_race_intro(page)
         keyboard_q = current_question(page)
         keyboard_values = page.evaluate(
             "() => Array.from(document.querySelectorAll('.choice')).map((c) => c.dataset.value)"
@@ -369,6 +410,7 @@ def main() -> int:
                 "(id) => KMApp.navigate('lesson', { lessonId: id, preview: true })", lesson_id
             )
             mobile.wait_for_selector(".question-card")
+            skip_race_intro(mobile)
             mobile.wait_for_timeout(60)
             info = mobile.evaluate(
                 "() => ({ total: document.querySelectorAll('.choice').length,"
@@ -381,6 +423,7 @@ def main() -> int:
             check(info["minChoice"] >= 64, f"{lesson_id} có nút < 64px trên mobile")
         mobile.evaluate("() => KMApp.navigate('lesson', { lessonId: 'b10', preview: true })")
         mobile.wait_for_selector(".question-card")
+        skip_race_intro(mobile)
         mobile.wait_for_timeout(650)
         mobile.screenshot(path=str(OUT / "12-mobile-lesson.png"))
         mobile.close()
@@ -415,6 +458,7 @@ def main() -> int:
             "() => KMApp.navigate('lesson', { lessonId: 'b10', preview: true })"
         )
         reduced_page.wait_for_selector(".question-card")
+        skip_race_intro(reduced_page)
         reduced_q = current_question(reduced_page)
         click_choice(reduced_page, reduced_q["answer"])
         reduced_page.wait_for_selector(".confetti", state="attached", timeout=5000)
