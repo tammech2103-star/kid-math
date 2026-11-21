@@ -26,6 +26,12 @@ KM.Tuning = (function () {
       three: 0.9,
       two: 0.6
     },
+    race: {
+      opponentsPerRace: 3,
+      rivalPaces: [0.68, 0.76, 0.84],
+      wrongPenalty: 0.04,
+      retryScore: 0.55
+    },
     generation: {
       optionCount: 3,
       zeroReroll: 0.55,
