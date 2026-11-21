@@ -34,8 +34,7 @@ KM.Screens.result = (function () {
     var race = params.race || null;
     var place = race ? race.playerPlace : 0;
     var lost = place > 1;
-    var allowRetry = ctx.progress.settings().allowRetry !== false;
-    var canReplay = !lost || allowRetry;
+    var canReplay = ctx.progress.settings().allowRetry !== false;
     var title = race
       ? (lost
         ? 'Bé về đích thứ hai!'
