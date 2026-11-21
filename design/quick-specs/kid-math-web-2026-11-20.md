@@ -9,7 +9,7 @@
 
 Trẻ chọn một bài trong sách (21 màn: Tiết học đầu tiên + Bài 1–20), nghe đề đọc bằng
 tiếng Việt, quan sát hình minh hoạ và chạm vào đáp án. Trả lời đúng thì xe đua
-(`Asset/car1.webp`) xuất hiện kèm sao và confetti; trả lời sai thì chỉ rung nhẹ và
+(`Asset/Mc_Queen.webp`) xuất hiện kèm sao và confetti; trả lời sai thì chỉ rung nhẹ và
 cho chọn lại, không mất sao, không có màn thua. Hết bài, trẻ nhận 1–3 sao và màn
 kết quả có xe cỡ lớn, sao, confetti. Tiến độ lưu bằng `localStorage` trên máy.
 
@@ -32,9 +32,12 @@ kết quả có xe cỡ lớn, sao, confetti. Tiến độ lưu bằng `localSto
 7. **Âm thanh**: giọng đọc tiếng Việt qua Web Speech API (có nút nghe lại), hiệu ứng
    tổng hợp bằng WebAudio (không cần file âm thanh). Có công tắc riêng cho giọng đọc
    và hiệu ứng, lưu vào cài đặt.
-8. **Phụ huynh**: khu vực riêng có cổng kiểm tra bằng phép nhân đơn giản; xem sao
+8. **Cuộc đua**: mỗi màn là cuộc đua 4 tay đua — McQueen + 3 đối thủ lấy từ 28 nhân
+   vật trong `Asset/`, luân phiên để tất cả đều xuất hiện. Mở bài có màn xuất phát
+   kiểu `Feature.webp`; HUD 4 làn; kết quả có hạng 1–4 và podium. Không có màn thua.
+9. **Phụ huynh**: khu vực riêng có cổng kiểm tra bằng phép nhân đơn giản; xem sao
    từng bài, tổng sao, bật/tắt giọng đọc – hiệu ứng, mở khoá tất cả, đặt lại tiến độ.
-9. **Không phạt**: không trừ sao, không khoá bài vì sai, không âm thanh chói, không
+10. **Không phạt**: không trừ sao, không khoá bài vì sai, không âm thanh chói, không
    hiệu ứng nhấp nháy nhanh. Tôn trọng `prefers-reduced-motion`.
 
 ## Tuning Knobs
@@ -75,7 +78,8 @@ Game độc lập, không nằm trong `design/gdd/systems-index.md`. Đây là s
 
 ## Deviations đã được người dùng chấp thuận
 
-- Đồ vật minh hoạ bằng emoji; chỉ ảnh xe là tài sản thật (`Asset/car1.webp`).
+- Đồ vật minh hoạ bằng emoji; ảnh xe/nhân vật là tài sản thật trong `Asset/`
+  (`Mc_Queen.webp` + 28 đối thủ).
 - Bài 15 "trước/sau" quy về trên/dưới/trái/phải cho rõ trên màn hình 2D.
 - Khối 3D vẽ SVG cách điệu thay vì ảnh chụp như sách.
 - Không tái sử dụng tranh minh hoạ trong PDF (bản quyền NXB Giáo dục Việt Nam);
