@@ -1,15 +1,15 @@
 # Session State — Bé Vui Học Toán 1
 
-**Cập nhật**: 2026-11-21 07:30
-**Trạng thái**: **Cuộc đua 4 tay đua đã hoàn thành** (McQueen + 3 đối thủ/28 nhân vật),
-màn xuất phát kiểu Feature.webp, HUD 4 làn, podium kết quả. Đang build lại `public/`
-và deploy Render bản mới. Bản live cũ vẫn ở https://be-vui-hoc-toan-1.onrender.com.
+**Cập nhật**: 2026-11-21 10:40
+**Trạng thái**: **Cuộc đua đã Live** tại https://be-vui-hoc-toan-1.onrender.com
+(commit `d22ef01`, 21 màn, 4 tay đua/màn, 28 đối thủ luân phiên). 65/65 unit test PASS;
+live check: intro 4 xe, HUD 4 làn, xe/confetti, podium 4, 30 ảnh Asset trả 200, 0 lỗi.
 
 ## Việc đang làm
 
-Biến mỗi màn thành một cuộc đua, dùng toàn bộ nhân vật trong `Asset/` và bố cục
-starting grid tham khảo `Feature.webp`. Giữ nguyên 21 màn, 11 dạng bài, không có
-màn thua: bé vẫn nhận sao theo số câu đúng ngay lần đầu, kết quả thêm hạng 1–4.
+Bàn giao bản cuộc đua: mỗi màn là 1 cuộc đua McQueen + 3 đối thủ, starting grid kiểu
+`Feature.webp`, HUD 4 làn, kết quả có hạng 1–4 và podium. Không có màn thua; sao vẫn
+theo số câu đúng ngay lần đầu.
 
 ## Tiến độ
 
