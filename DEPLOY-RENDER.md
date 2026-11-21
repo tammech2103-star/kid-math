@@ -1,8 +1,8 @@
 # Deploy lên Render — Bé Vui Học Toán 1
 
 **Trạng thái:** đã deploy tại **https://be-vui-hoc-toan-1.onrender.com**
-(static site, commit `d22ef01`, deploy 2026-11-21 10:35 GMT+7). Bản này có
-cuộc đua 4 tay đua và 28 nhân vật trong `Asset/`.
+(static site, commit `3f4df08`, deploy 2026-11-21 11:22 GMT+7). Bản này là
+**cuộc đua 1 đối 1**: McQueen với 1 trong 28 nhân vật trong `Asset/` mỗi màn.
 
 Mục tiêu: có một link HTTPS dạng `https://be-vui-hoc-toan-1.onrender.com` để mở trên tablet.
 Đây là **static site** — không backend, không database, không thu dữ liệu trẻ em.
