@@ -91,6 +91,9 @@ window.KM = window.KM || {};
     rng: rng,
     questions: KM.Questions,
     lessonSession: KM.LessonSession,
+    racers: KM.Racers,
+    race: KM.Race,
+    raceUI: KM.RaceUI,
     navigate: navigate,
     setSetting: setSetting
   };
