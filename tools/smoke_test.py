@@ -395,6 +395,62 @@ def main() -> int:
             "Mở khoá không được giữ sau khi tải lại",
         )
 
+        # Thua (hạng hai): hiệu ứng thua + tuỳ chọn "cho chơi lại" của phụ huynh.
+        loss_race = """() => KMApp.navigate('result', {
+          lessonId: 'intro',
+          summary: { stars: 2, firstTryCorrect: 3, total: 5, bestStreak: 2 },
+          record: { stars: 2, isNewBest: false, nextLessonId: 'b1' },
+          race: {
+            playerPlace: 2,
+            racers: [
+              { id: 'flo', name: 'Flo', src: 'Asset/Flo.webp', color: '#38b6e6',
+                isPlayer: false, place: 1, score: 4.4, finalProgress: 100 },
+              { id: 'mcqueen', name: 'McQueen', src: 'Asset/Mc_Queen.webp', color: '#d94132',
+                isPlayer: true, place: 2, score: 3.6, finalProgress: 82 }
+            ]
+          }
+        })"""
+        page.evaluate("() => KMApp.ctx.progress.setSetting('allowRetry', false)")
+        page.evaluate(loss_race)
+        page.wait_for_selector(".result-card.is-loss")
+        page.wait_for_timeout(300)
+        check(
+            page.evaluate(
+                "() => document.querySelector('.result-title').textContent"
+            ) == "Bé về đích thứ hai!",
+            "Tiêu đề màn thua sai",
+        )
+        check(page.locator(".confetti").count() == 0, "Màn thua vẫn bắn confetti")
+        check(page.locator(".loss-puff").count() == 2, "Màn thua thiếu khói xì hơi")
+        check(
+            page.evaluate("() => document.querySelector('.result-cheer') !== null"),
+            "Màn thua thiếu lời động viên",
+        )
+        check(
+            page.evaluate(
+                "() => document.querySelectorAll('.result-actions .btn').length"
+            ) == 2,
+            "Phụ huynh tắt chơi lại nhưng vẫn còn nút Chơi lại",
+        )
+        check(
+            page.evaluate(
+                "() => !!document.querySelector('.podium-card.is-winner')"
+            ),
+            "Màn thua không đánh dấu người thắng trên podium",
+        )
+        page.screenshot(path=str(OUT / "26-result-loss.png"))
+
+        page.evaluate("() => KMApp.ctx.progress.setSetting('allowRetry', true)")
+        page.evaluate(loss_race)
+        page.wait_for_selector(".result-card.is-loss")
+        page.wait_for_timeout(200)
+        check(
+            page.evaluate(
+                "() => document.querySelectorAll('.result-actions .btn').length"
+            ) == 3,
+            "Bật cho chơi lại nhưng thiếu nút Chơi lại",
+        )
+
         # Bàn phím: chọn đáp án bằng phím số.
         page.evaluate(
             "() => KMApp.navigate('lesson', { lessonId: 'b10', preview: true })"
