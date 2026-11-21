@@ -1,5 +1,6 @@
 /**
- * Giao diện cuộc đua: starting grid giống Feature.webp và HUD 4 tay đua.
+ * Giao diện cuộc đua 1 đối 1: starting grid kiểu Feature.webp và HUD 2 làn.
+ * Xe và thanh tiến độ được phóng to để nhìn rõ trên tablet.
  * @namespace KM.RaceUI
  */
 window.KM = window.KM || {};
@@ -39,7 +40,10 @@ KM.RaceUI = (function () {
       'aria-hidden': 'true'
     }));
 
-    race.liveRows().forEach(function (row) {
+    var initialRows = race.liveRows();
+    laneWrap.style.setProperty('--race-count', String(initialRows.length));
+
+    initialRows.forEach(function (row) {
       var fill = el('span', { class: 'race-fill' });
       fill.style.width = row.progress + '%';
       fill.style.background = row.color;
@@ -56,25 +60,32 @@ KM.RaceUI = (function () {
         'data-racer': row.id,
         role: 'group'
       }, [
-        el('div', { class: 'race-lane-top' }, [
-          el('img', {
-            class: 'race-thumb',
-            src: row.src,
-            alt: '',
-            loading: 'eager',
-            draggable: 'false'
-          }),
-          el('span', {
-            class: 'race-rank',
-            text: String(row.rank),
-            'aria-hidden': 'true'
-          })
-        ]),
-        el('span', { class: 'race-name', text: row.name }),
-        bar
+        el('img', {
+          class: 'race-thumb',
+          src: row.src,
+          alt: '',
+          loading: 'eager',
+          draggable: 'false'
+        }),
+        el('div', { class: 'race-lane-body' }, [
+          el('div', { class: 'race-lane-top' }, [
+            el('span', { class: 'race-name', text: row.name }),
+            el('span', {
+              class: 'race-rank',
+              text: String(row.rank),
+              'aria-hidden': 'true'
+            })
+          ]),
+          bar
+        ])
       ]);
       lane.setAttribute('aria-label', row.name + ', hạng ' + row.rank);
-      laneElements[row.id] = { lane: lane, fill: fill, bar: bar, rank: lane.querySelector('.race-rank') };
+      laneElements[row.id] = {
+        lane: lane,
+        fill: fill,
+        bar: bar,
+        rank: lane.querySelector('.race-rank')
+      };
       laneWrap.appendChild(lane);
     });
 
@@ -120,6 +131,26 @@ KM.RaceUI = (function () {
       }
     }
 
+    /** Một ô xe trên vạch xuất phát. */
+    function buildSlot(row) {
+      var slot = el('div', {
+        class: 'race-start-slot' + (row.isPlayer ? ' is-player' : '')
+      }, [
+        row.isPlayer
+          ? el('span', { class: 'race-start-you', text: 'BÉ', 'aria-hidden': 'true' })
+          : null,
+        el('img', {
+          class: 'race-start-car',
+          src: row.src,
+          alt: '',
+          draggable: 'false'
+        }),
+        el('span', { class: 'race-start-name', text: row.name })
+      ]);
+      slot.setAttribute('aria-label', row.name + (row.isPlayer ? ', xe của bé' : ''));
+      return slot;
+    }
+
     /**
      * Hiện màn xuất phát, sau đó gọi onDone.
      * @param {Function} onDone
@@ -127,31 +158,30 @@ KM.RaceUI = (function () {
     function showIntro(onDone) {
       var rows = race.liveRows();
       var gridOrder = rows.slice(1).concat([rows[0]]);
+      var duel = gridOrder.length === 2;
       var reduce = prefersReducedMotion();
       var title = el('div', {
         class: 'race-intro-title',
         'aria-live': 'polite',
         text: reduce ? 'Cuộc đua bắt đầu!' : 'Sẵn sàng...'
       });
-      var grid = el('div', { class: 'race-start-grid' });
-      gridOrder.forEach(function (row) {
-        var slot = el('div', {
-          class: 'race-start-slot' + (row.isPlayer ? ' is-player' : '')
-        }, [
-          row.isPlayer
-            ? el('span', { class: 'race-start-you', text: 'BÉ', 'aria-hidden': 'true' })
-            : null,
-          el('img', {
-            class: 'race-start-car',
-            src: row.src,
-            alt: '',
-            draggable: 'false'
-          }),
-          el('span', { class: 'race-start-name', text: row.name })
-        ]);
-        slot.setAttribute('aria-label', row.name + (row.isPlayer ? ', xe của bé' : ''));
-        grid.appendChild(slot);
+      var grid = el('div', {
+        class: 'race-start-grid' + (duel ? ' is-duel' : '')
       });
+      grid.style.setProperty('--race-count', String(gridOrder.length));
+      if (duel) {
+        grid.appendChild(buildSlot(gridOrder[0]));
+        grid.appendChild(el('span', {
+          class: 'race-vs',
+          text: 'VS',
+          'aria-hidden': 'true'
+        }));
+        grid.appendChild(buildSlot(gridOrder[1]));
+      } else {
+        gridOrder.forEach(function (row) {
+          grid.appendChild(buildSlot(row));
+        });
+      }
       var skip = el('button', {
         class: 'btn btn-soft race-skip',
         type: 'button',
