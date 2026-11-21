@@ -1,5 +1,5 @@
 /**
- * Luật cuộc đua của một màn: điểm của McQueen và 3 đối thủ, xếp hạng, tiến độ.
+ * Luật cuộc đua 1 đối 1 của một màn: điểm của McQueen và đối thủ, xếp hạng, tiến độ.
  * Không có trạng thái "thua" — mọi bé đều về đích và nhận sao theo số câu đúng.
  * @namespace KM.Race
  */
@@ -38,7 +38,7 @@ KM.Race = (function () {
     var rivals = (options.opponents || []).map(function (racer, index) {
       return Object.assign({}, racer, {
         score: 0,
-        pace: RIVAL_PACES[index] || 0.76,
+        pace: RIVAL_PACES[index] || RIVAL_PACES[0] || 0.86,
         isPlayer: false
       });
     });
@@ -59,7 +59,7 @@ KM.Race = (function () {
       player.score += firstTry ? 1 : RETRY_SCORE;
     }
 
-    /** Sai: các đối thủ nhích lên một chút, không trừ điểm của bé. */
+    /** Sai: đối thủ nhích lên một chút, không trừ điểm của bé. */
     function wrong() {
       if (settled) {
         return;
