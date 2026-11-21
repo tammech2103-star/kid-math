@@ -19,7 +19,7 @@
 | Bản build tĩnh `public/` | **PASS** (61 mục, 1.6 MB, 0 tài nguyên lỗi) |
 | Lighthouse trang chủ | **100 Accessibility / 100 Best Practices / 100 SEO** |
 | Lighthouse bài vị trí (b15) | **100 / 100 / 100** — `production/qa/lighthouse/lesson-position.html` |
-| **Live Render** | **PASS** — https://be-vui-hoc-toan-1.onrender.com (commit `9f05df2`) |
+| **Live Render** | **PASS** — https://be-vui-hoc-toan-1.onrender.com (commit `8c021af`) |
 | Trên live | Mũi tên ↑↓←→, badge 1/2, xe + confetti khi đúng |
 | Lỗi console | 0 |
 | Tài nguyên HTTP ≥ 400 | 0 |
@@ -54,6 +54,7 @@
 | SM-25 | PASS | Không tràn dọc: desktop 1280×900, laptop 1366×768, tablet 768×1024 / 1024×768, mobile 390×844 — nút đáp án cuối đều thấy được |
 | SM-26 | PASS | Hạng hai: màn kết quả `is-loss`, tiêu đề “Bé về đích thứ hai!”, không confetti, 2 vệt khói, lời động viên, podium khoanh vàng xe vô địch |
 | SM-27 | PASS | Phụ huynh tắt “Cho bé chơi lại khi thua” → màn thua chỉ còn 2 nút; bật lại → có nút “Chơi lại” (3 nút) |
+| SM-28 | PASS | Live (commit `8c021af`): chơi thật 3 câu sai lần đầu → hạng hai, màn thua đúng hiệu ứng, 0 lỗi console/404 |
 ## 3. Ảnh chụp bằng chứng
 
 | Tệp | Nội dung |
