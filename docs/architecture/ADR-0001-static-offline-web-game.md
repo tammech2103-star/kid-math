@@ -44,7 +44,8 @@ Quy ước:
 - Domain không đọc/ghi DOM, không đọc `localStorage` trực tiếp (nhận qua tham số).
 - Mọi thông số hành vi nằm trong `js/data/tuning.js`; mọi nội dung trong
   `js/data/curriculum.js`.
-- Ảnh xe dùng trực tiếp `Asset/car1.webp` (đã có alpha trong suốt, 1000×477).
+- Ảnh xe dùng trực tiếp `Asset/Mc_Queen.webp`; 28 nhân vật đối thủ cũng lấy từ
+  `Asset/` (đều có alpha trong suốt).
 
 ## Consequences
 
