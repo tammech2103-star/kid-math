@@ -62,9 +62,14 @@ window.KM = window.KM || {};
     Components.clear(root);
     Components.dismissToast();
     document.body.dataset.screen = name;
+    var screenTitle = name === 'lesson'
+      ? 'Đang học'
+      : (name === 'result'
+        ? 'Kết quả'
+        : (name === 'collection' ? 'Bộ sưu tập' : 'Phụ huynh'));
     document.title = name === 'home'
       ? tuning.appName
-      : tuning.appName + ' · ' + (name === 'lesson' ? 'Đang học' : (name === 'result' ? 'Kết quả' : 'Phụ huynh'));
+      : tuning.appName + ' · ' + screenTitle;
 
     var factory = KM.Screens[name];
     if (typeof factory !== 'function') {
@@ -91,6 +96,11 @@ window.KM = window.KM || {};
     rng: rng,
     questions: KM.Questions,
     lessonSession: KM.LessonSession,
+    gameMap: KM.GameMap || null,
+    games: KM.GameRegistry || null,
+    puzzle: KM.Puzzle && typeof KM.Puzzle.create === 'function'
+      ? KM.Puzzle.create({ progress: progress, curriculum: KM.Curriculum, tuning: tuning })
+      : null,
     racers: KM.Racers,
     race: KM.Race,
     raceUI: KM.RaceUI,

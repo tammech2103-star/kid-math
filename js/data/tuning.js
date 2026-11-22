@@ -68,6 +68,26 @@ KM.Tuning = (function () {
     },
     audio: {
       master: 0.5
+    },
+    puzzle: {
+      cols: 7,
+      rows: 3,
+      revealMs: 900
+    },
+    game: {
+      maxCoins: 10,
+      maxFlowers: 10,
+      coinPopMs: 320,
+      jumpMs: 520,
+      flowerGrowMs: 480,
+      kartBoostMs: 700,
+      wrongShakeMs: 360,
+      celebrateMs: 900,
+      introMs: 1200
+    },
+    hd: {
+      maxBytes: 400000,
+      basePath: 'Asset/hd/'
     }
   });
 }());

@@ -1,0 +1,695 @@
+/* --------------------------------------------------------------------------
+ * games.css — khung `game-stage` dùng chung + 3 minigame mẫu (ADR-0002).
+ * Chỉ style lớp trình bày trong `mount`; KHÔNG sửa hàng đáp án `.choices`
+ * của lesson.js (giữ nguyên 69 unit test). Nạp SAU tokens.css/app.css.
+ * Art: HD cartoony 3D, nhiều màu, bo tròn, bóng đổ dày cho bé 6 tuổi.
+ * -------------------------------------------------------------------------- */
+
+/* ----------------------------------------------------------- khung chung */
+.game-stage {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  min-height: clamp(168px, 25vh, 260px);
+  margin: 0 0 4px;
+  border: 3px solid rgba(255, 255, 255, 0.92);
+  border-radius: 26px;
+  background: linear-gradient(180deg, #9ee2ff 0%, #d9f4ff 62%, #b9edc9 100%);
+  background-color: #bfeaff;
+  box-shadow: inset 0 3px 0 rgba(255, 255, 255, 0.65),
+    inset 0 -10px 24px rgba(45, 120, 160, 0.12), var(--shadow-soft);
+  overflow: hidden;
+}
+
+.game-stage-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  pointer-events: none;
+}
+
+.game-stage-fallback {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  padding: 0 8% 6px;
+  font-size: clamp(1.8rem, 5vw, 3.4rem);
+  line-height: 1;
+  pointer-events: none;
+  filter: drop-shadow(0 4px 0 rgba(35, 52, 77, 0.12));
+}
+
+.game-stage-fallback > span {
+  display: inline-block;
+}
+
+/* Ảnh HD tải thành công: ẩn hoàn toàn lớp fallback (JS thêm .has-bg). */
+.game-stage.has-bg .game-stage-fallback {
+  display: none;
+}
+
+/* Nhãn do game tạo nằm trong stage; nhãn lesson.js là <p> anh em, giữ flow cũ. */
+.game-stage > .game-tribute {
+  position: absolute;
+  top: 8px;
+  left: 10px;
+  z-index: 6;
+}
+
+.question-card > .game-tribute {
+  align-self: flex-start;
+}
+
+.game-tribute {
+  max-width: calc(100% - 20px);
+  padding: 5px 12px;
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  border-radius: 999px;
+  background: rgba(35, 52, 77, 0.78);
+  box-shadow: 0 3px 0 rgba(35, 52, 77, 0.22), 0 6px 14px rgba(35, 52, 77, 0.18);
+  color: #fff;
+  font-size: clamp(0.7rem, 1.8vw, 0.84rem);
+  font-weight: 900;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Nếu Lead Programmer đã chèn nhãn ở lesson.js, JS sẽ không tạo nhãn thứ 2. */
+.game-stage.is-reduced *,
+.game-stage.is-reduced *::before,
+.game-stage.is-reduced *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* ----------------------------------------------- 1. introsuper mario coins */
+.game-stage--mario {
+  background:
+    radial-gradient(circle at 82% 12%, rgba(255, 245, 190, 0.95) 0 12%, transparent 13%),
+    linear-gradient(180deg, #66c8f8 0%, #bfeaff 56%, #8bd6a3 57%, #5fbb7c 100%);
+  background-color: #8bd6a3;
+}
+
+.game-stage--mario .game-stage-fallback {
+  background: linear-gradient(180deg, transparent 55%, rgba(64, 156, 92, 0.35) 55%);
+}
+
+.game-stage--mario .fb-cloud--a { align-self: flex-start; margin-top: 12%; }
+.game-stage--mario .fb-cloud--b { align-self: flex-start; margin-top: 6%; }
+.game-stage--mario .fb-hill { font-size: 1.35em; }
+.game-stage--mario .fb-bush { font-size: 1.1em; }
+
+.mario-hero {
+  position: absolute;
+  left: 4%;
+  bottom: 8%;
+  z-index: 3;
+  width: clamp(52px, 12vw, 78px);
+  height: clamp(58px, 13vw, 86px);
+  border: 3px solid rgba(35, 52, 77, 0.14);
+  border-radius: 50% 50% 42% 42%;
+  background: linear-gradient(160deg, #ff8d72, #e94d3f);
+  box-shadow: inset 0 5px 0 rgba(255, 255, 255, 0.35), 0 8px 0 rgba(35, 52, 77, 0.16);
+  transform-origin: 50% 100%;
+}
+
+.mario-hero-hat {
+  position: absolute;
+  top: -14%;
+  left: -6%;
+  width: 112%;
+  height: 34%;
+  border: 3px solid rgba(35, 52, 77, 0.12);
+  border-radius: 60% 60% 30% 30%;
+  background: linear-gradient(180deg, #ff5d52, #c62f2f);
+  box-shadow: inset 0 4px 0 rgba(255, 255, 255, 0.3);
+}
+
+.mario-hero-hat::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 12%;
+  width: 76%;
+  height: 8px;
+  border-radius: 999px;
+  background: #fff4d6;
+}
+
+.mario-hero-face {
+  position: absolute;
+  inset: 18% 6% 6%;
+  display: grid;
+  place-items: center;
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  line-height: 1;
+}
+
+.mario-scene {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-height: clamp(150px, 22vh, 230px);
+  padding: 36px 12px 10px;
+}
+
+.mario-coins {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(8px, 2vw, 18px);
+  min-height: 76px;
+}
+
+.mario-coin,
+.ac-flower,
+.mario-confirm {
+  min-width: 64px;
+  min-height: 64px;
+  border: 3px solid #fff;
+  border-radius: 22px;
+  background: radial-gradient(circle at 32% 24%, #fff4b0, #ffd245 58%, #f0a500);
+  box-shadow: 0 6px 0 #c77d00, 0 10px 18px rgba(35, 52, 77, 0.2),
+    inset 0 3px 0 rgba(255, 255, 255, 0.6);
+  color: #6b4400;
+  font-size: clamp(2rem, 5vw, 2.9rem);
+  line-height: 1;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform 0.14s var(--ease-bounce), filter 0.14s ease;
+}
+
+.mario-coin:hover,
+.ac-flower:hover,
+.mario-confirm:hover { transform: translateY(-3px); }
+
+.mario-coin:active,
+.ac-flower:active,
+.mario-confirm:active {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 #c77d00;
+}
+
+.mario-coin:focus-visible,
+.ac-flower:focus-visible,
+.mario-confirm:focus-visible {
+  outline: 4px solid var(--sky-deep);
+  outline-offset: 3px;
+}
+
+.mario-coin.is-collected {
+  filter: saturate(0.5) brightness(1.12);
+  opacity: 0.42;
+  box-shadow: inset 0 3px 0 rgba(255, 255, 255, 0.5);
+  transform: scale(0.78);
+  cursor: default;
+}
+
+.mario-coin-glyph { display: block; }
+
+.mario-counter,
+.mario-hint,
+.ac-hint,
+.kart-leg {
+  margin: 0;
+  padding: 3px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: var(--shadow-soft);
+  color: var(--ink);
+  font-size: clamp(0.82rem, 2vw, 0.98rem);
+  font-weight: 900;
+  text-align: center;
+}
+
+.mario-counter { background: var(--sun-soft); color: var(--sun-ink); }
+
+.mario-confirm {
+  font-size: clamp(0.86rem, 2.2vw, 1.05rem);
+  font-weight: 900;
+}
+
+.game-stage--mario.is-correct {
+  box-shadow: inset 0 3px 0 rgba(255, 255, 255, 0.65),
+    0 0 0 4px rgba(111, 227, 184, 0.9), var(--shadow-soft);
+}
+
+.game-stage--mario.is-wrong { box-shadow: 0 0 0 4px rgba(255, 107, 91, 0.85); }
+
+.mario-celebrate,
+.ac-celebrate,
+.kart-celebrate {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.mario-celebrate-piece,
+.ac-celebrate-piece,
+.kart-celebrate-piece {
+  display: inline-block;
+  font-size: clamp(1.5rem, 4vw, 2.6rem);
+  filter: drop-shadow(0 3px 0 rgba(35, 52, 77, 0.14));
+}
+
+/* --------------------------------------- 2. animal crossing: 2 luống hoa */
+.game-stage--animal {
+  background:
+    radial-gradient(circle at 15% 10%, rgba(255, 245, 214, 0.9) 0 14%, transparent 15%),
+    linear-gradient(180deg, #ffe8c9 0%, #ffd9e4 46%, #d8efb8 47%, #b9df97 100%);
+  background-color: #d8efb8;
+}
+
+.game-stage--animal .game-stage-fallback {
+  background: linear-gradient(180deg, transparent 45%, rgba(126, 180, 100, 0.3) 45%);
+}
+
+.game-stage--animal .fb-sun { align-self: flex-start; margin-top: 6%; }
+.game-stage--animal .fb-butterfly { align-self: flex-start; margin-top: 18%; }
+.game-stage--animal .fb-flower { font-size: 1.3em; }
+
+.ac-scene {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-height: clamp(150px, 22vh, 230px);
+  padding: 38px 12px 8px;
+}
+
+.ac-garden {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(10px, 3vw, 28px);
+  width: 100%;
+  max-width: 560px;
+}
+
+.ac-bed {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 8px 18px;
+  border: 3px solid rgba(255, 255, 255, 0.9);
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(255, 252, 245, 0.94), rgba(255, 244, 226, 0.88));
+  box-shadow: inset 0 4px 0 rgba(255, 255, 255, 0.65), var(--shadow-soft);
+}
+
+.ac-bed--1 { background: linear-gradient(180deg, #fffaf2, #ffe9d2); }
+.ac-bed--2 { background: linear-gradient(180deg, #fff8fb, #ffe4ef); }
+
+.ac-bed-label {
+  padding: 2px 12px;
+  border-radius: 999px;
+  background: var(--mint-soft);
+  color: var(--mint-ink);
+  font-size: clamp(0.76rem, 1.9vw, 0.9rem);
+  font-weight: 900;
+}
+
+.ac-bed--2 .ac-bed-label { background: #ffecf5; color: #a4376b; }
+
+.ac-flowers {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 66px;
+}
+
+.ac-flower {
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 24%, #fffdf5, #ffe6f2 58%, #ffc2dd);
+  box-shadow: 0 5px 0 #d98fb1, 0 9px 16px rgba(35, 52, 77, 0.16),
+    inset 0 3px 0 rgba(255, 255, 255, 0.75);
+  font-size: clamp(1.7rem, 4.6vw, 2.5rem);
+}
+
+.ac-bed--1 .ac-flower {
+  background: radial-gradient(circle at 32% 24%, #fffdf5, #fff0d4 58%, #ffd79a);
+  box-shadow: 0 5px 0 #d8a45e, 0 9px 16px rgba(35, 52, 77, 0.16),
+    inset 0 3px 0 rgba(255, 255, 255, 0.75);
+}
+
+.ac-flower.is-bud {
+  background: radial-gradient(circle at 32% 24%, #eaffdd, #d8f2c4 60%, #b6dfa0);
+}
+
+.ac-flower.is-planted {
+  border-color: #8fe0bb;
+  box-shadow: 0 4px 0 #79c9a4, inset 0 3px 0 rgba(255, 255, 255, 0.7);
+  transform: scale(1.04);
+  cursor: default;
+}
+
+.ac-flower.is-bloom { filter: saturate(1.25) drop-shadow(0 0 6px rgba(255, 214, 110, 0.8)); }
+
+.ac-soil {
+  position: absolute;
+  bottom: 4px;
+  left: 10%;
+  width: 80%;
+  height: 10px;
+  border-radius: 999px;
+  background: repeating-linear-gradient(90deg, #b98a5e 0 12px, #a8784e 12px 20px);
+  opacity: 0.7;
+}
+
+.ac-hint { background: #fffaf0; color: #8b5a2b; }
+
+.ac-basket {
+  position: absolute;
+  right: 4%;
+  bottom: 6%;
+  z-index: 3;
+  font-size: clamp(1.8rem, 4.5vw, 2.8rem);
+  filter: drop-shadow(0 4px 0 rgba(35, 52, 77, 0.12));
+}
+
+.game-stage--animal.is-correct {
+  box-shadow: inset 0 3px 0 rgba(255, 255, 255, 0.65),
+    0 0 0 4px rgba(255, 203, 107, 0.9), var(--shadow-soft);
+}
+
+.game-stage--animal.is-wrong { box-shadow: 0 0 0 4px rgba(255, 140, 160, 0.85); }
+
+.ac-bed.is-wrong,
+.ac-garden.is-wrong { transform: translateX(3px); }
+
+/* ------------------------------------- 3. mario kart: lớp trang trí đua */
+.game-stage--kart {
+  min-height: clamp(120px, 17vh, 178px);
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.12) 0 6px, transparent 6px 26px),
+    linear-gradient(180deg, #7ad6ff 0%, #d7f2ff 55%, #6fbd6f 56%, #4f9e5c 100%);
+  background-color: #6fbd6f;
+}
+
+.game-stage--kart .game-stage-fallback {
+  background: linear-gradient(180deg, transparent 54%, rgba(60, 130, 70, 0.35) 54%);
+}
+
+.game-stage--kart .kart-rainbow { align-self: flex-start; margin-top: 4%; font-size: 1.4em; }
+.game-stage--kart .kart-cloud--a { align-self: flex-start; margin-top: 10%; }
+.game-stage--kart .kart-cloud--b { align-self: flex-start; margin-top: 2%; }
+
+.kart-decor {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.kart-flag {
+  position: absolute;
+  right: 5%;
+  top: 34%;
+  font-size: clamp(1.6rem, 4.4vw, 2.6rem);
+  filter: drop-shadow(0 4px 0 rgba(35, 52, 77, 0.16));
+}
+
+.kart-boost {
+  position: absolute;
+  left: 8%;
+  bottom: 16%;
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  opacity: 0;
+}
+
+.kart-spark {
+  position: absolute;
+  font-size: clamp(1.2rem, 3vw, 1.9rem);
+  opacity: 0.45;
+}
+
+.kart-spark--a { left: 38%; top: 24%; }
+.kart-spark--b { right: 26%; bottom: 22%; }
+
+.kart-leg {
+  position: absolute;
+  left: 10px;
+  bottom: 8px;
+  z-index: 3;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--sky-ink);
+}
+
+/* Chỉ "mặc áo" cho HUD có sẵn của RaceUI — không thay đổi cấu trúc đua. */
+.race-hud.is-kart-themed {
+  border-color: #ffe27a;
+  box-shadow: 0 0 0 3px rgba(255, 210, 69, 0.55), var(--shadow-soft);
+}
+
+.race-hud.is-kart-themed::before {
+  content: "🏎️";
+  position: absolute;
+  left: 8px;
+  bottom: 4px;
+  z-index: 4;
+  font-size: 1.4rem;
+  pointer-events: none;
+}
+
+.race-hud.is-boost { filter: brightness(1.14) saturate(1.18); }
+.race-hud.is-slip { filter: saturate(0.6); }
+
+.game-stage--kart.is-correct { border-color: var(--sun); }
+.game-stage--kart.is-wrong { border-color: var(--coral); }
+
+/* --------------------------------------------------------- hoạt ảnh nhẹ */
+/* Mọi chuyển động nằm trong media query; reduced motion + .is-reduced tắt hết. */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes km-coin-bob {
+    0%, 100% { transform: translateY(0) rotate(-4deg); }
+    50% { transform: translateY(-9px) rotate(4deg); }
+  }
+
+  @keyframes km-coin-pop {
+    0% { transform: scale(0.78); }
+    55% { transform: scale(1.18) rotate(10deg); }
+    100% { transform: scale(0.78); }
+  }
+
+  @keyframes km-hero-jump {
+    0%, 100% { transform: translateY(0) scale(1); }
+    35% { transform: translateY(-34px) scale(1.06); }
+    70% { transform: translateY(-6px) scale(0.98); }
+  }
+
+  @keyframes km-stage-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-3px); }
+  }
+
+  @keyframes km-flower-grow {
+    0% { transform: scale(0.5) translateY(10px); }
+    70% { transform: scale(1.14) translateY(-3px); }
+    100% { transform: scale(1.04); }
+  }
+
+  @keyframes km-petal-fall {
+    0% { transform: translateY(-18px) rotate(0deg); opacity: 0; }
+    20% { opacity: 1; }
+    100% { transform: translateY(120px) rotate(220deg); opacity: 0; }
+  }
+
+  @keyframes km-cloud-drift {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(8px); }
+  }
+
+  @keyframes km-flag-wave {
+    0%, 100% { transform: rotate(-4deg); }
+    50% { transform: rotate(6deg); }
+  }
+
+  @keyframes km-boost-flash {
+    0%, 100% { opacity: 0; transform: translateX(0); }
+    40% { opacity: 1; transform: translateX(22px); }
+  }
+
+  .mario-coin:not(.is-collected):not(.is-reduced) { animation: km-coin-bob 1.5s ease-in-out infinite; }
+  .mario-coin:not(.is-collected):not(.is-reduced):nth-child(2n) { animation-delay: -0.5s; }
+  .mario-coin:not(.is-collected):not(.is-reduced):nth-child(3n) { animation-delay: -0.9s; }
+  .mario-coin.is-pop { animation: km-coin-pop 0.28s var(--ease-bounce) !important; }
+
+  .game-stage--mario.is-jumping .mario-hero { animation: km-hero-jump 0.52s var(--ease-bounce); }
+  .game-stage--mario.is-wrong .mario-scene { animation: km-stage-shake 0.45s ease; }
+  .game-stage--animal.is-wrong .ac-garden { animation: km-stage-shake 0.45s ease; }
+  .game-stage--kart.is-wrong .kart-decor { animation: km-stage-shake 0.4s ease; }
+
+  .ac-flower.is-growing:not(.is-reduced) { animation: km-flower-grow 0.46s var(--ease-bounce); }
+  .game-stage--animal.is-bloomed .ac-flower { animation: km-flower-grow 0.5s var(--ease-bounce) both; }
+
+  .game-stage-fallback .fb-cloud,
+  .game-stage--kart .kart-cloud { animation: km-cloud-drift 4s ease-in-out infinite; }
+
+  .kart-flag { animation: km-flag-wave 1.2s ease-in-out infinite; }
+  .kart-decor.is-boost .kart-boost { animation: km-boost-flash 0.7s ease-out; }
+  .kart-decor.is-boost .kart-spark { opacity: 1; }
+
+  .mario-celebrate-piece,
+  .ac-celebrate-piece,
+  .kart-celebrate-piece {
+    animation: km-petal-fall 0.9s ease-in forwards;
+    animation-delay: calc(var(--i) * 0.08s);
+  }
+}
+
+/* ------------------------------------------------------------ responsive */
+@media (max-width: 720px) {
+  .game-stage { min-height: 156px; border-radius: 20px; }
+  .game-stage--kart { min-height: 112px; }
+
+  .mario-scene,
+  .ac-scene { padding: 30px 8px 6px; gap: 4px; }
+
+  .mario-coins { gap: 6px; min-height: 62px; }
+  .mario-coin,
+  .ac-flower,
+  .mario-confirm { min-width: 64px; min-height: 64px; }
+
+  .ac-garden { gap: 8px; }
+  .ac-flowers { min-height: 64px; gap: 4px; }
+  .mario-hero { left: 2%; width: 52px; height: 58px; }
+  .ac-basket { font-size: 1.7rem; }
+  .game-tribute { font-size: 0.68rem; padding: 4px 9px; }
+}
+
+/* Tablet ngang: đảm bảo vùng chạm ≥ 64px cho mọi đối tượng tương tác. */
+@media (min-width: 721px) and (max-width: 1100px) {
+  .mario-coin,
+  .ac-flower,
+  .mario-confirm { min-width: 68px; min-height: 68px; }
+}
+
+/* --------------------------------------------------- OBS-01: bố cục gọn */
+/* Khi có minigame, stage + nhãn + khoảng cách từng bị cộng dồn làm nút đáp án
+ * tràn khỏi viewport (desktop 1025/900, tablet 1175/1024, mobile 953/844).
+ * Chỉ nén các lớp TRANG TRÍ; giữ nguyên .choices/.choice (≥ 92px, ≥ 64px chạm)
+ * và mọi logic của lesson.js. Áp dụng qua class .has-minigame do lesson.js thêm. */
+.screen.lesson.has-minigame {
+  gap: clamp(8px, 1.1vw, 14px);
+  padding-top: clamp(10px, 1.6vw, 22px);
+  padding-bottom: 16px;
+}
+
+.screen.lesson.has-minigame .question-card {
+  gap: clamp(8px, 1.1vw, 12px);
+  padding: clamp(12px, 1.8vw, 20px);
+}
+
+/* Ẩn luôn phương trình cũ: stage của game đã trình bày đề (vd. 2 luống hoa).
+ * Một số câu compose sinh thêm equation ~70px → đẩy nút đáp án xuống fold. */
+.screen.lesson.has-minigame .equation-slot {
+  display: none;
+}
+
+.screen.lesson.has-minigame .game-stage {
+  min-height: clamp(104px, 13vh, 148px);
+  margin-bottom: 0;
+}
+
+.screen.lesson.has-minigame .game-stage > .game-tribute {
+  top: 5px;
+  left: 8px;
+  padding: 3px 9px;
+  font-size: 0.68rem;
+}
+
+/* Phần chơi nằm gọn trong stage: vẫn 64px vùng chạm cho đồng xu/hoa. */
+.screen.lesson.has-minigame .mario-scene,
+.screen.lesson.has-minigame .ac-scene {
+  min-height: 0;
+  gap: 4px;
+  padding: 34px 10px 6px;
+}
+
+.screen.lesson.has-minigame .mario-coins,
+.screen.lesson.has-minigame .ac-flowers {
+  min-height: 64px;
+}
+
+.screen.lesson.has-minigame .mario-hero {
+  width: 48px;
+  height: 54px;
+}
+
+/* Lưới an toàn: với đề compose sinh tối đa 9 hoa/luống, dù bố cục đã nén,
+ * một số viewport thấp vẫn có thể đẩy hàng đáp án xuống. Dính nhẹ hàng này
+ * vào đáy viewport để bé LUÔN thấy nút bấm mà không cần cuộn. Chỉ áp dụng
+ * khi có minigame; không đổi cấu trúc .choices/.choice hay logic lesson.js. */
+.screen.lesson.has-minigame .choices {
+  position: sticky;
+  bottom: 8px;
+  z-index: 20;
+  padding: 6px;
+  margin: -6px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.94);
+}
+
+@media (max-width: 720px) {
+  /* Mobile: thêm một phần đuôi từ HUD đua (192px → 140px) để chắc chắn
+   * hàng đáp án cuối nằm trọn màn mà không phải cuộn. */
+  .screen.lesson.has-minigame .race-track { height: 140px; }
+  .screen.lesson.has-minigame .race-lane { height: 64px; }
+  .screen.lesson.has-minigame .race-racer {
+    --car-w: 140px;
+    --car-h: 62px;
+  }
+  /* Đề compose có thể sinh 9 hoa/luống. Với 2 cột, mỗi luống chỉ ~148px
+   * → 1 hoa/hàng → luống cao 600px+. Xếp 1 cột để luống rộng ~300px,
+   * 4 hoa/hàng, vẫn giữ vùng chạm 64px. */
+  .screen.lesson.has-minigame .ac-garden {
+    grid-template-columns: 1fr;
+    max-width: none;
+  }
+}
+
+/* Tablet ngang (chiều cao thấp): luống hoa b5 từng xếp 2 hàng → cao ~207px
+ * đẩy nút đáp án xuống dưới fold. Nới luống + hoa 64px để 5 bông nằm 1 hàng,
+ * vẫn đạt vùng chạm ≥ 64px. */
+@media (min-width: 721px) and (max-height: 820px) {
+  .screen.lesson.has-minigame .ac-garden {
+    max-width: 690px;
+    gap: 8px;
+  }
+  .screen.lesson.has-minigame .ac-flower {
+    min-width: 64px;
+    min-height: 64px;
+    font-size: 1.7rem;
+  }
+  .screen.lesson.has-minigame .ac-bed {
+    padding: 6px 6px 10px;
+    gap: 4px;
+  }
+  .screen.lesson.has-minigame .ac-flowers { gap: 4px; }
+}

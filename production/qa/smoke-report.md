@@ -1,7 +1,7 @@
 # Smoke Report — Bé Vui Học Toán 1
 
-**Ngày**: 2026-11-20 19:12
-**Phiên bản**: 1.0.0
+**Ngày**: 2026-11-22 12:50 (cập nhật Đợt 1 — 21 minigame + mảnh ghép)
+**Phiên bản**: 1.1.0-dot1
 **Môi trường**: Windows · Chrome 157.0.8103.80 · Python 3.12.10 · Playwright 1.65.2
 **Server kiểm thử**: `python -m http.server 8765 --bind 127.0.0.1`
 **Kết luận**: **PASS** — không có lỗi console, không tài nguyên 404.
@@ -10,7 +10,7 @@
 
 | Hạng mục | Kết quả |
 |----------|---------|
-| Unit test trình duyệt | **69/69 PASS** |
+| Unit test trình duyệt | **92/92 PASS** (69 cũ + 23 mới: puzzle, game-map/registry/contract) |
 | Smoke E2E desktop 1280×900 | **PASS** |
 | Smoke E2E mobile 390×844 | **PASS** |
 | Smoke E2E tablet 768×1024 và 1024×768 | **PASS** (xe intro 154/200 px, không tràn) |
@@ -58,13 +58,18 @@
 | SM-29 | PASS | Live (commit `9091759`): tắt công tắc qua UI → cả màn thắng và màn thua đều không còn nút “Chơi lại”; bật lại có đủ |
 | SM-30 | PASS | Bục trao thưởng: `.podium-step` = 2, có `.is-first`, bậc nhất cao hơn bậc nhì; hành động cuối vẫn thấy ở desktop/tablet/mobile |
 | SM-31 | PASS | Live (commit `245b283`): chơi thua thật → bục 2 bậc (72 px / 58 px), Flo nhất có cúp, McQueen nhì có badge BÉ, nút cuối vẫn thấy, 0 lỗi |
+| SM-32 | PASS | Đợt 1: registry 21 entry + 3 factory (`mario-bros`, `animal-crossing`, `mario-kart`); 18 bài fallback chơi bằng giao diện cũ, 0 lỗi console |
+| SM-33 | PASS | Vòng đời mảnh: xong intro → `.result-puzzle-strip`, `puzzle.pieces=[0]` → reload vẫn giữ → collection 1/21 sáng → chơi lại không tăng |
+| SM-34 | PASS | 3 ảnh HD `Asset/hd/{intro,b5,b20}.webp` load thật (`naturalWidth>0`), 1280×720, 23–27 KB (< 400 KB) |
+| SM-35 | PASS | OBS-01 đã sửa: nút đáp án cuối nằm trọn viewport **ngay khi vào màn** ở 1280×900 (763), 768×1024 (760), 1024×768 (716), 390×844 (744); visual cũ không còn render cạnh minigame |
+| SM-36 | PASS | Gate mở rộng: **3 game × 4 viewport** = 12/12 tổ hợp. Dùng seed đề xấu nhất `probe-b5-2` (7 hoa/luống): `intro` 763/760/716/744 · `b5` 886/943/754/830 · `b20` 704/717/638/686 — tất cả ≤ viewport |
 ## 3. Ảnh chụp bằng chứng
 
 | Tệp | Nội dung |
 |-----|----------|
 | `01-splash.png` | Màn chào có xe |
 | `02-home.png` | Trang chủ 21 bài |
-| `03-lesson-question.png` | Câu hỏi bài mở đầu |
+| `03-lesson-question.png` | Câu hỏi bài mở đầu — minigame `mario-bros` (đồng xu + nền HD) |
 | `04-intro-wrong.png` | Phản hồi sai (không có xe) |
 | `04-intro-reward.png` | Xe + sao + confetti khi đúng |
 | `04-intro-result.png` | Kết quả 2 sao |
@@ -92,6 +97,7 @@
 | `17-live-race-intro.png` | Intro 1 đối 1 trên bản Live |
 | `18-live-race-hud.png` | HUD 2 làn trên bản Live |
 | `19-live-race-result.png` | Podium 2 tay đua + xe + sao trên bản Live |
+| `27-collection-1-21.png` | Bộ sưu tập McQueen: 1 mảnh sáng / 20 ô khoá, progress 1/21 |
 
 ## 4. Lỗi phát hiện trong QA và đã sửa
 
@@ -148,4 +154,4 @@ python -m http.server 8765 --bind 127.0.0.1
 python tools/smoke_test.py
 ```
 
-Mở `tests/test-runner.html` để xem 56 unit test.
+Mở `tests/test-runner.html` để xem 92 unit test.

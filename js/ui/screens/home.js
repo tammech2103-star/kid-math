@@ -25,6 +25,33 @@ KM.Screens.home = (function () {
       return progress.starsFor(lesson.id) > 0;
     });
 
+    /**
+     * Số mảnh hiển thị trên nút bộ sưu tập. Ưu tiên `ctx.puzzle`, tự tạo service
+     * nếu app chưa wired; fallback đọc thẳng snapshot progress (ADR-0002).
+     * @returns {{count: number, total: number}}
+     */
+    function puzzleProgress() {
+      if (ctx.puzzle && typeof ctx.puzzle.count === 'function' &&
+          typeof ctx.puzzle.total === 'function') {
+        return { count: ctx.puzzle.count(), total: ctx.puzzle.total() };
+      }
+      if (KM.Puzzle) {
+        var service = KM.Puzzle.create({
+          progress: progress,
+          curriculum: ctx.curriculum,
+          tuning: tuning
+        });
+        return { count: service.count(), total: service.total() };
+      }
+      var snapshot = typeof progress.puzzle === 'function' ? progress.puzzle() : null;
+      return {
+        count: snapshot && snapshot.pieces ? snapshot.pieces.length : 0,
+        total: ctx.curriculum && ctx.curriculum.lessons ? ctx.curriculum.lessons.length : 21
+      };
+    }
+
+    var collectionProgress = puzzleProgress();
+
     var homeTitle = el('h1', { text: tuning.appName, tabindex: '-1' });
     var header = el('header', { class: 'topbar' }, [
       el('div', { class: 'brand' }, [
@@ -102,7 +129,24 @@ KM.Screens.home = (function () {
                 }
               }
             }
-          }, ['Chọn bài'])
+          }, ['Chọn bài']),
+          el('button', {
+            class: 'btn btn-soft home-collection-btn',
+            type: 'button',
+            'data-puzzle-collection': '',
+            on: {
+              click: function () {
+                ctx.audio.tap();
+                ctx.navigate('collection');
+              }
+            }
+          }, [
+            el('span', { class: 'btn-icon', text: '🧩', 'aria-hidden': 'true' }),
+            el('span', {
+              text: 'Bộ sưu tập McQueen · ' + collectionProgress.count + '/' +
+                collectionProgress.total
+            })
+          ])
         ])
       ]),
       el('div', { class: 'hero-art' }, [

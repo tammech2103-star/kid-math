@@ -1,6 +1,7 @@
 /**
  * Tiến độ học tập: sao từng bài, mở khoá tuần tự, cài đặt và đặt lại.
  * Nhận storage qua tham số để test được mà không cần localStorage thật.
+ * ADR-0002: mảnh ghép McQueen nằm chung state `kidmath.v1` (không dùng key riêng).
  * @namespace KM.Progress
  */
 window.KM = window.KM || {};
@@ -18,8 +19,35 @@ KM.Progress = (function () {
         unlockAll: false,
         allowRetry: true
       },
-      lessons: {}
+      lessons: {},
+      puzzle: { v: 1, pieces: [] }
     };
+  }
+
+  /**
+   * Chuẩn hoá mảnh ghép: state cũ thiếu `puzzle` vẫn đọc được, không mất sao/cài đặt.
+   * Chỉ giữ index nguyên không âm, loại trùng và sắp xếp tăng dần.
+   * @param {*} raw
+   * @returns {{v: number, pieces: Array<number>}}
+   */
+  function normalizePuzzle(raw) {
+    var result = { v: 1, pieces: [] };
+    if (!raw || typeof raw !== 'object') {
+      return result;
+    }
+    if (Array.isArray(raw.pieces)) {
+      var seen = {};
+      raw.pieces.forEach(function (value) {
+        var index = Number(value);
+        if (!isFinite(index) || index < 0 || Math.floor(index) !== index || seen[index]) {
+          return;
+        }
+        seen[index] = true;
+        result.pieces.push(index);
+      });
+      result.pieces.sort(function (a, b) { return a - b; });
+    }
+    return result;
   }
 
   /**
@@ -51,6 +79,7 @@ KM.Progress = (function () {
         };
       });
     }
+    state.puzzle = normalizePuzzle(raw.puzzle);
     return state;
   }
 
@@ -242,7 +271,34 @@ KM.Progress = (function () {
       return lessons.slice();
     }
 
-    /** Xoá toàn bộ sao, giữ cài đặt. */
+    /**
+     * Bản sao của phần mảnh ghép để UI/domain đọc, không cho sửa state trực tiếp.
+     * @returns {{v: number, pieces: Array<number>}}
+     */
+    function puzzle() {
+      return { v: 1, pieces: state.puzzle.pieces.slice() };
+    }
+
+    /**
+     * Trao một mảnh theo index (0-based, theo thứ tự curriculum). Idempotent.
+     * @param {number} index
+     * @returns {boolean} true nếu mảnh mới được thêm.
+     */
+    function awardPuzzlePiece(index) {
+      var value = Number(index);
+      if (!isFinite(value) || value < 0 || Math.floor(value) !== value) {
+        return false;
+      }
+      if (state.puzzle.pieces.indexOf(value) !== -1) {
+        return false;
+      }
+      state.puzzle.pieces.push(value);
+      state.puzzle.pieces.sort(function (a, b) { return a - b; });
+      save();
+      return true;
+    }
+
+    /** Xoá toàn bộ sao, giữ cài đặt (và xoá mảnh theo ADR-0002). */
     function resetProgress() {
       var current = settings();
       state = defaultState();
@@ -274,6 +330,8 @@ KM.Progress = (function () {
       nextLesson: nextLesson,
       nextLessonAfter: nextLessonAfter,
       orderedLessons: orderedLessons,
+      puzzle: puzzle,
+      awardPuzzlePiece: awardPuzzlePiece,
       resetProgress: resetProgress,
       resetAll: resetAll,
       isPersistent: isPersistent,

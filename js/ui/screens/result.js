@@ -29,6 +29,24 @@ KM.Screens.result = (function () {
       ctx.navigate('home');
       return { destroy: function () {} };
     }
+    /*
+     * ADR-0002: mảnh thưởng theo HOÀN THÀNH, không theo hạng nhất/nhì.
+     * award() idempotent nên chơi lại không tăng số mảnh. ctx.puzzle chưa wired
+     * thì bỏ qua êm để các đợt trước vẫn chạy.
+     */
+    var award = null;
+    if (ctx.puzzle && typeof ctx.puzzle.award === 'function') {
+      try {
+        award = ctx.puzzle.award(params.lessonId);
+      } catch (error) {
+        award = null;
+      }
+    }
+    var puzzleTotal = award && typeof ctx.puzzle.total === 'function'
+      ? ctx.puzzle.total()
+      : (ctx.curriculum && ctx.curriculum.lessons ? ctx.curriculum.lessons.length : 21);
+    var puzzleTuning = ctx.tuning && ctx.tuning.puzzle ? ctx.tuning.puzzle : {};
+
     var stars = Math.max(1, Math.min(3, record.stars || summary.stars || 1));
     var runStars = Math.max(1, Math.min(3, summary.stars || 1));
     var race = params.race || null;
@@ -139,6 +157,18 @@ KM.Screens.result = (function () {
       ]);
     }
 
+    var revealHandle = null;
+    var puzzleStrip = award && award.index >= 0
+      ? el('div', { class: 'result-puzzle-strip', role: 'status', 'aria-live': 'polite' }, [
+        el('span', { class: 'result-puzzle-target', text: '🧩', 'aria-hidden': 'true' }),
+        el('span', {
+          text: (award.added ? '🎉 Nhận mảnh ' : '🧩 Mảnh ') +
+            String(award.index + 1 < 10 ? '0' : '') + (award.index + 1) + '/' + puzzleTotal +
+            (award.added ? '! Bé xem bộ sưu tập nhé!' : ' đã có trong bộ sưu tập!')
+        })
+      ])
+      : null;
+
     var card = el('div', { class: 'result-card' + (lost ? ' is-loss' : '') }, [
       el('span', { class: 'result-eyebrow', text: lesson.label + ' · Trang ' + lesson.page }),
       race
@@ -198,6 +228,7 @@ KM.Screens.result = (function () {
         ? el('span', { class: 'result-record', text: '🏆 Kỷ lục mới của bé!' })
         : null,
       podium,
+      puzzleStrip,
       el('div', { class: 'result-actions' }, actions),
       el('p', {
         class: 'result-total',
@@ -208,6 +239,19 @@ KM.Screens.result = (function () {
     screen.appendChild(card);
     ctx.root.appendChild(screen);
     titleNode.focus({ preventScroll: true });
+
+    if (puzzleStrip && KM.PuzzleUI && typeof KM.PuzzleUI.revealBanner === 'function') {
+      revealHandle = KM.PuzzleUI.revealBanner({
+        index: award.index,
+        total: puzzleTotal,
+        alreadyOwned: award.added === false,
+        revealMs: puzzleTuning.revealMs,
+        style: ctx.puzzle && typeof ctx.puzzle.styleFor === 'function'
+          ? ctx.puzzle.styleFor(award.index)
+          : undefined,
+        target: puzzleStrip
+      });
+    }
 
     ctx.audio[lost ? 'lose' : 'win']();
     if (!lost) {
@@ -239,6 +283,10 @@ KM.Screens.result = (function () {
     return {
       destroy: function () {
         window.clearTimeout(speechTimer);
+        if (revealHandle) {
+          revealHandle.destroy();
+          revealHandle = null;
+        }
         ctx.speech.stop();
       }
     };

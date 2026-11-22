@@ -1,0 +1,338 @@
+/* Bộ sưu tập McQueen — nạp sau app.css (ADR-0002). Mọi text tiếng Việt. */
+
+/* ---------------------------------------------------- nút trên màn hình chủ */
+.home-collection-btn {
+  max-width: 100%;
+  white-space: normal;
+}
+
+/* ------------------------------------------------------------ một ô mảnh */
+.puzzle-grid {
+  --puzzle-cols: 7;
+  --puzzle-rows: 3;
+  display: grid;
+  grid-template-columns: repeat(var(--puzzle-cols), minmax(0, 1fr));
+  gap: clamp(4px, 1vw, 10px);
+  width: 100%;
+  max-width: 940px;
+  margin: 0 auto;
+}
+
+.puzzle-piece {
+  position: relative;
+  /* Ảnh gốc 1000×477, lưới 7×3 → mỗi ô rộng 142.9 cao 159 (tỷ lệ 0.898). */
+  aspect-ratio: 0.898;
+  min-height: 38px;
+  overflow: hidden;
+  border-radius: clamp(6px, 1.2vw, 14px);
+  border: 2px solid #fff;
+  background: var(--sky-soft);
+  box-shadow: 0 4px 10px rgba(35, 52, 77, 0.12);
+}
+
+.puzzle-piece.is-locked {
+  background: repeating-linear-gradient(
+    135deg,
+    #e9f1fb 0 8px,
+    #dfeaf7 8px 16px
+  );
+  border-color: #d3e1f0;
+  box-shadow: none;
+}
+
+.puzzle-piece-art {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.puzzle-piece-unknown {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #9bb0c9;
+  font-weight: 900;
+  font-size: clamp(1rem, 3vw, 2rem);
+}
+
+.puzzle-piece-no {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  z-index: 1;
+  min-width: 1.5em;
+  padding: 1px 3px;
+  border-radius: 6px;
+  background: rgba(35, 52, 77, 0.72);
+  color: #fff;
+  font-size: clamp(0.58rem, 1.4vw, 0.78rem);
+  font-weight: 800;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.is-locked .puzzle-piece-no {
+  background: rgba(35, 52, 77, 0.38);
+}
+
+/* -------------------------------------------------- dải nhận mảnh nổi lên */
+.puzzle-reveal {
+  position: fixed;
+  left: 50%;
+  bottom: clamp(16px, 5vh, 48px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: calc(100vw - 24px);
+  padding: 12px 20px;
+  border: 3px solid #fff;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #fff, var(--sun-soft));
+  box-shadow: 0 18px 40px rgba(35, 52, 77, 0.24);
+  color: var(--coral-ink);
+  font-weight: 900;
+  font-size: clamp(0.95rem, 2.4vw, 1.12rem);
+  white-space: nowrap;
+  transform: translateX(-50%);
+  animation: puzzle-banner-in 0.28s var(--ease-bounce) both;
+}
+
+.puzzle-reveal-icon,
+.puzzle-reveal-target {
+  font-size: 1.3em;
+  line-height: 1;
+}
+
+.puzzle-reveal-fly {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  width: 34px;
+  height: 38px;
+  border-radius: 6px;
+  border: 2px solid #fff;
+  box-shadow: 0 6px 14px rgba(35, 52, 77, 0.3);
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.puzzle-reveal.is-flying .puzzle-reveal-fly {
+  animation: puzzle-fly var(--puzzle-reveal-ms, 0.9s) ease-in forwards;
+}
+
+.puzzle-reveal.is-static .puzzle-reveal-fly {
+  display: none;
+}
+
+@keyframes puzzle-banner-in {
+  from { opacity: 0; transform: translate(-50%, 18px) scale(0.92); }
+  to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+}
+
+@keyframes puzzle-fly {
+  0% { opacity: 1; transform: translateY(-50%) translate(0, 0) scale(1); }
+  65% { opacity: 1; }
+  100% {
+    opacity: 0;
+    transform: translateY(-50%) translate(var(--fly-x, 120px), var(--fly-y, -160px)) scale(0.4);
+  }
+}
+
+/* ---------------------------------------------------------- màn bộ sưu tập */
+.collection {
+  align-items: stretch;
+}
+
+.collection-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 3px solid #fff;
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: var(--shadow-soft);
+}
+
+.collection-topbar .brand-copy {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.collection-title {
+  margin: 0;
+  font-size: clamp(1.3rem, 3vw, 2.1rem);
+  line-height: 1.15;
+}
+
+.collection-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--grape-soft);
+  color: var(--grape-ink);
+  font-weight: 900;
+  font-size: clamp(0.95rem, 2vw, 1.15rem);
+  white-space: nowrap;
+}
+
+.collection-card {
+  width: min(980px, 100%);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 2vw, 20px);
+  padding: clamp(14px, 2.6vw, 28px);
+  border: 4px solid #fff;
+  border-radius: var(--radius-xl);
+  background:
+    radial-gradient(circle at 50% 0%, var(--sun-soft), transparent 46%),
+    linear-gradient(180deg, #fff, var(--sky-soft));
+  box-shadow: var(--shadow-card);
+}
+
+.collection-card.is-complete {
+  border-color: var(--sun);
+}
+
+.collection-intro,
+.collection-foot {
+  margin: 0;
+  text-align: center;
+  color: var(--ink-soft);
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.collection-foot {
+  color: var(--grape-ink);
+}
+
+.collection-complete {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.collection-full {
+  display: block;
+  width: min(100%, 700px);
+  height: auto;
+  border: 4px solid #fff;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+
+.collection-cheer {
+  margin: 0;
+  text-align: center;
+  color: var(--coral-ink);
+  font-size: clamp(1.05rem, 2.6vw, 1.4rem);
+  font-weight: 900;
+}
+
+.collection-back-bottom {
+  align-self: center;
+}
+
+/* Dải mảnh trên màn kết quả, đặt sau bục trao thưởng. */
+.result-puzzle-strip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 3px solid #fff;
+  border-radius: 999px;
+  background: var(--grape-soft);
+  color: var(--grape-ink);
+  font-weight: 800;
+  font-size: clamp(0.9rem, 2vw, 1rem);
+  text-align: center;
+}
+
+.result-puzzle-target {
+  font-size: 1.2em;
+  line-height: 1;
+}
+
+/* -------------------------------------------------------------- responsive */
+@media (max-width: 1024px) {
+  .collection-card {
+    padding: 16px;
+  }
+
+  .puzzle-grid {
+    gap: 6px;
+  }
+}
+
+@media (max-width: 768px) {
+  .collection-topbar {
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .collection-back {
+    min-height: 46px;
+    padding: 0 14px;
+  }
+
+  .puzzle-grid {
+    gap: 4px;
+  }
+
+  .puzzle-piece-no {
+    font-size: 0.6rem;
+  }
+
+  .collection-card {
+    border-radius: var(--radius-lg);
+  }
+}
+
+@media (max-width: 480px) {
+  .collection-topbar {
+    flex-wrap: wrap;
+  }
+
+  .collection-count {
+    padding: 6px 10px;
+  }
+
+  .home-collection-btn {
+    padding: 0 16px;
+    font-size: 0.92rem;
+  }
+
+  .puzzle-reveal {
+    width: calc(100vw - 24px);
+    justify-content: center;
+    border-radius: 20px;
+    white-space: normal;
+  }
+
+  .puzzle-reveal-fly {
+    display: none;
+  }
+}
+
+/* ---------------------------------------------------------- reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .puzzle-reveal,
+  .puzzle-reveal-fly {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .puzzle-reveal-fly {
+    display: none;
+  }
+}

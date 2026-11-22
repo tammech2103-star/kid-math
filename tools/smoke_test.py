@@ -12,6 +12,7 @@ Yêu cầu: python -m pip install -r tools/requirements-test.txt
 """
 from __future__ import annotations
 
+import json
 import pathlib
 import re
 import sys
@@ -28,10 +29,91 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = ROOT / "production" / "qa" / "screenshots"
 OUT.mkdir(parents=True, exist_ok=True)
 
+# ADR-0002 / quick-spec: 69 test cũ + 23 test mới (puzzle + game-map).
+EXPECTED_UNIT_TESTS = 92
+HD_MAX_BYTES = 400000
+PHASE1_GAMES = {
+    "intro": ("mario-bros", "Super Mario Bros.", "Asset/hd/intro.webp"),
+    "b5": ("animal-crossing", "Animal Crossing", "Asset/hd/b5.webp"),
+    "b20": ("mario-kart", "Mario Kart 8", "Asset/hd/b20.webp"),
+}
+RESTORE_RESULT = """() => KMApp.navigate('result', {
+  lessonId: 'intro',
+  summary: { stars: 2, firstTryCorrect: 3, total: 5, bestStreak: 2 },
+  record: { stars: 2, isNewBest: false, nextLessonId: 'b1' }
+})"""
+
 
 def check(condition: bool, message: str) -> None:
     if not condition:
         raise AssertionError(message)
+
+
+def filter_console_errors(errors: list[str]) -> list[str]:
+    """Bỏ cảnh báo headless không liên quan (đồng nhất với gate cuối script cũ)."""
+    return [
+        error for error in errors
+        if "favicon" not in error.lower() and "speech" not in error.lower()
+    ]
+
+
+def check_no_new_errors(errors: list[str], before: int, label: str) -> None:
+    new_errors = filter_console_errors(errors[before:])
+    check(not new_errors, f"{label}: lỗi console mới: " + " | ".join(new_errors[:3]))
+
+
+def watch_errors(page, errors: list[str]) -> None:
+    # Gắn URL nguồn để gate cuối có thể bỏ qua 404 favicon của test-runner.html.
+    page.on(
+        "console",
+        lambda message: errors.append(
+            f"{message.text} @ {message.location.get('url', '')}"
+        ) if message.type == "error" else None,
+    )
+    page.on("pageerror", lambda error: errors.append(f"pageerror: {error}"))
+
+
+def check_hd_background(page, src: str, label: str) -> None:
+    """Ảnh nền HD phải tải thật (không chỉ có URL trong CSS)."""
+    result = page.evaluate(
+        """(src) => new Promise((resolve) => {
+          const img = new Image();
+          img.onload = () => resolve({ loaded: true, width: img.naturalWidth });
+          img.onerror = () => resolve({ loaded: false, width: 0 });
+          img.src = src;
+        })""",
+        src,
+    )
+    check(
+        result["loaded"] and result["width"] > 0,
+        f"{label}: ảnh HD {src} không tải được (naturalWidth={result['width']})",
+    )
+
+
+def check_game_stage(page, lesson_id: str, label: str) -> None:
+    """Kiểm tra mount .game-stage, nhãn cảm hứng và ảnh nền của game mẫu."""
+    game_id, tribute, bg = PHASE1_GAMES[lesson_id]
+    check(
+        page.locator(f'.game-stage[data-game-id="{game_id}"]').count() == 1,
+        f"{label}: thiếu .game-stage[data-game-id=\"{game_id}\"]",
+    )
+    label_text = page.locator(".game-tribute").first.text_content() or ""
+    check(
+        "Cảm hứng: " + tribute in label_text,
+        f"{label}: nhãn cảm hứng sai: {label_text}",
+    )
+    background = page.evaluate(
+        "() => getComputedStyle(document.querySelector('.game-stage')).backgroundImage"
+    )
+    check(bg in background, f"{label}: nền game sai: {background}")
+    check_hd_background(page, bg, label)
+
+
+def puzzle_pieces(page) -> list:
+    raw = page.evaluate("() => localStorage.getItem('kidmath.v1')")
+    check(raw is not None, "Thiếu storage key kidmath.v1")
+    state = json.loads(raw)
+    return state.get("puzzle", {}).get("pieces", [])
 
 
 def current_question(page) -> dict:
@@ -155,6 +237,87 @@ def play_lesson(page, *, wrong_first: bool = False, shot_prefix: str | None = No
     return stars
 
 
+def inspect_viewport(
+    page,
+    label: str,
+    failures: list[str],
+    observations: list[str],
+    *,
+    check_result: bool = True,
+) -> None:
+    """Đo nút đáp án cuối (ngay khi vào màn + sau khi cuộn) và nút kết quả.
+
+    `check_result=False` dùng cho các bài minigame khác `intro`: chỉ đo hàng
+    đáp án, không dựng lại màn result (RESTORE_RESULT).
+    """
+    page.evaluate("() => window.scrollTo({ top: 0, behavior: 'instant' })")
+    initial = page.evaluate(
+        """() => {
+          const list = Array.from(document.querySelectorAll('.choice'));
+          const rect = list[list.length - 1].getBoundingClientRect();
+          return { top: Math.round(rect.top), bottom: Math.round(rect.bottom),
+                   viewport: innerHeight, scrollHeight: document.documentElement.scrollHeight };
+        }"""
+    )
+    observations.append(
+        f"{label}: nút đáp án cuối ban đầu top={initial['top']} "
+        f"bottom={initial['bottom']} viewport={initial['viewport']} "
+        f"scrollHeight={initial['scrollHeight']}"
+    )
+    # OBS-01: với bé 6 tuổi, nút đáp án phải THẤY NGAY, không cần cuộn.
+    if initial["bottom"] > initial["viewport"] + 1:
+        failures.append(
+            f"{label}: nút đáp án cuối nằm dưới fold khi chưa cuộn "
+            f"(bottom={initial['bottom']} viewport={initial['viewport']})"
+        )
+    # CSS có scroll-behavior: smooth → cuộn xong rồi mới đo ở evaluate riêng.
+    page.evaluate("() => window.scrollTo({ top: 100000, behavior: 'instant' })")
+    page.wait_for_timeout(120)
+    reachable = page.evaluate(
+        """() => {
+          const list = Array.from(document.querySelectorAll('.choice'));
+          const el = list[list.length - 1];
+          const rect = el.getBoundingClientRect();
+          return { top: rect.top, bottom: rect.bottom, left: rect.left, right: rect.right,
+                   width: innerWidth, height: innerHeight,
+                   overflowX: document.documentElement.scrollWidth > innerWidth + 1 };
+        }"""
+    )
+    inside = (
+        reachable["top"] >= -1 and reachable["bottom"] <= reachable["height"] + 1
+        and reachable["left"] >= -1 and reachable["right"] <= reachable["width"] + 1
+    )
+    if reachable["overflowX"] or not inside:
+        failures.append(
+            f"{label}: nút đáp án cuối không nằm trọn trong viewport sau khi cuộn "
+            f"({json.dumps(reachable, ensure_ascii=False)})"
+        )
+
+    if not check_result:
+        return
+    page.evaluate("() => window.scrollTo({ top: 0, behavior: 'instant' })")
+    page.evaluate(RESTORE_RESULT)
+    page.wait_for_selector(".result-card")
+    result = page.evaluate(
+        """() => {
+          const el = document.querySelector('.result-actions .btn-primary');
+          const rect = el.getBoundingClientRect();
+          return { top: rect.top, bottom: rect.bottom, left: rect.left, right: rect.right,
+                   width: innerWidth, height: innerHeight,
+                   overflowX: document.documentElement.scrollWidth > innerWidth + 1 };
+        }"""
+    )
+    result_inside = (
+        result["top"] >= -1 and result["bottom"] <= result["height"] + 1
+        and result["left"] >= -1 and result["right"] <= result["width"] + 1
+    )
+    if result["overflowX"] or not result_inside:
+        failures.append(
+            f"{label}: nút kết quả không nằm trọn trong viewport "
+            f"({json.dumps(result, ensure_ascii=False)})"
+        )
+
+
 def main() -> int:
     console_errors: list[str] = []
     bad_responses: list[str] = []
@@ -209,11 +372,24 @@ def main() -> int:
         )
         page.screenshot(path=str(OUT / "02-home.png"), full_page=True)
 
+        # Đợt 1: đúng 3 ảnh HD mẫu, mỗi ảnh không vượt ngân sách hd.maxBytes.
+        hd_files = sorted((ROOT / "Asset" / "hd").glob("*.webp"))
+        check(len(hd_files) == 3, f"Đợt 1 cần đúng 3 ảnh HD, nhận {len(hd_files)}")
+        for hd_file in hd_files:
+            check(
+                hd_file.stat().st_size <= HD_MAX_BYTES,
+                f"Ảnh HD vượt {HD_MAX_BYTES} bytes: {hd_file.name} "
+                f"({hd_file.stat().st_size} bytes)",
+            )
+
+        errors_before_intro = len(console_errors)
         page.click(".hero-actions .btn-primary")
         page.wait_for_selector(".question-card")
         page.wait_for_selector(".race-intro")
         page.wait_for_timeout(350)
         page.screenshot(path=str(OUT / "03b-race-intro.png"))
+        check_game_stage(page, "intro", "intro (mario-bros)")
+        check_no_new_errors(console_errors, errors_before_intro, "intro (mario-bros)")
         check(
             page.locator(".race-start-car").count() == 2,
             "Màn xuất phát không đúng 2 xe (1 đối 1)",
@@ -256,6 +432,38 @@ def main() -> int:
         intro_stars = play_lesson(page, wrong_first=True, shot_prefix="04-intro")
         check(intro_stars == 2, f"Bài mở đầu phải 2 sao, nhận {intro_stars}")
 
+        # ADR-0002 AC-3: mảnh 0 được trao, lưu storage, sống qua reload.
+        check(
+            page.locator(".result-puzzle-strip").count() == 1,
+            "Màn kết quả thiếu dải nhận mảnh ghép",
+        )
+        check(
+            "Nhận mảnh 01/21" in (page.locator(".result-puzzle-strip").text_content() or ""),
+            "Dải nhận mảnh không đúng thông điệp 'Nhận mảnh 01/21'",
+        )
+        check(puzzle_pieces(page) == [0], f"puzzle.pieces sai sau intro: {puzzle_pieces(page)}")
+        check_no_new_errors(console_errors, errors_before_intro, "intro result")
+
+        page.reload(wait_until="load")
+        page.wait_for_selector(".home")
+        check(puzzle_pieces(page) == [0], "Mảnh ghép không được giữ sau khi tải lại trang")
+        page.evaluate("() => KMApp.navigate('collection')")
+        page.wait_for_selector(".collection")
+        collection_info = page.evaluate(
+            """() => ({
+              lit: document.querySelectorAll('.puzzle-piece.is-revealed').length,
+              locked: document.querySelectorAll('.puzzle-piece.is-locked').length,
+              count: document.querySelector('.collection-count-value').textContent
+            })"""
+        )
+        check(collection_info["lit"] == 1, f"Bộ sưu tập phải sáng 1 ô: {collection_info}")
+        check(collection_info["locked"] == 20, f"Bộ sưu tập phải khoá 20 ô: {collection_info}")
+        check(collection_info["count"] == "1/21", f"Tiến độ bộ sưu tập sai: {collection_info}")
+        page.screenshot(path=str(OUT / "27-collection-1-21.png"), full_page=True)
+        # Khôi phục màn kết quả để giữ nguyên luồng smoke cũ (nút "Bài tiếp").
+        page.evaluate(RESTORE_RESULT)
+        page.wait_for_selector(".result-card")
+
         stats = page.evaluate("() => KMApp.ctx.progress.stats()")
         check(stats["stars"] == 2, f"Tổng sao sai sau bài mở đầu: {stats}")
         check(
@@ -270,8 +478,18 @@ def main() -> int:
             "Không chuyển sang Bài 1",
         )
         skip_race_intro(page)
+        errors_before_fallback = len(console_errors)
+        check(
+            page.locator(".game-stage").count() == 0,
+            "b1 chưa có factory Đợt 1 nhưng lại chèn game-stage",
+        )
+        check(
+            page.locator(".race-hud").count() == 1,
+            "b1 fallback vẫn phải giữ race HUD",
+        )
         page.screenshot(path=str(OUT / "05-b1-question.png"))
         b1_stars = play_lesson(page, shot_prefix="06-b1")
+        check_no_new_errors(console_errors, errors_before_fallback, "b1 fallback")
         check(b1_stars == 3, f"Bài 1 phải 3 sao, nhận {b1_stars}")
         check(
             page.evaluate("() => KMApp.ctx.progress.isUnlocked('b2')"),
@@ -303,19 +521,38 @@ def main() -> int:
         )
         check(len(lesson_ids) == 21, f"Không đủ 21 màn: {len(lesson_ids)}")
         for lesson_id in lesson_ids:
+            errors_before_lesson = len(console_errors)
             page.evaluate(
                 "(id) => KMApp.navigate('lesson', { lessonId: id, preview: true })", lesson_id
             )
             page.wait_for_selector(".question-card")
             skip_race_intro(page)
             page.wait_for_timeout(100)
+            if lesson_id in PHASE1_GAMES:
+                check_game_stage(page, lesson_id, f"{lesson_id} preview")
+            else:
+                check(
+                    page.locator(".game-stage").count() == 0,
+                    f"{lesson_id}: bài chưa có factory không được chèn game-stage",
+                )
+            if lesson_id == "b20":
+                check(
+                    page.locator(".race-hud").count() == 1,
+                    "b20 (mario-kart) vẫn phải giữ race HUD",
+                )
+            check_no_new_errors(console_errors, errors_before_lesson, f"{lesson_id} preview")
             info = page.evaluate(
                 "() => ({ total: document.querySelectorAll('.choice').length,"
-                " hasVisual: !!document.querySelector('.visual, .equation, .choice svg, .choice-glyph'),"
+                " hasVisual: !!document.querySelector('.game-stage, .visual, .equation, .choice svg, .choice-glyph'),"
                 " overflow: document.documentElement.scrollWidth > innerWidth + 1 })"
             )
             check(info["total"] >= 2, f"{lesson_id} thiếu lựa chọn")
             check(info["hasVisual"], f"{lesson_id} thiếu hình minh hoạ")
+            if lesson_id in PHASE1_GAMES:
+                check(
+                    page.locator(".visual-slot .visual").count() == 0,
+                    f"{lesson_id}: không render lại visual cũ khi đã có minigame (OBS-01)",
+                )
             check(not info["overflow"], f"{lesson_id} bị tràn ngang")
             if lesson_id in sample_shots:
                 page.wait_for_timeout(650)
@@ -657,14 +894,143 @@ def main() -> int:
         file_page.screenshot(path=str(OUT / "13-file-offline.png"), full_page=True)
         file_page.close()
 
+        # AC-6: trình chạy unit test trong trình duyệt (69 cũ + 23 mới).
+        test_page = context.new_page()
+        watch_errors(test_page, console_errors)
+        test_page.goto(f"{BASE_URL}/tests/test-runner.html", wait_until="load")
+        test_page.wait_for_function("() => !!window.__TEST_RESULTS__", timeout=15000)
+        unit_results = test_page.evaluate("() => window.__TEST_RESULTS__")
+        check(
+            unit_results["failed"] == 0,
+            "Unit test runner có test lỗi: "
+            + str([item for group in unit_results["suites"]
+                   for item in group["tests"] if not item["pass"]][:3]),
+        )
+        check(
+            unit_results["total"] == EXPECTED_UNIT_TESTS,
+            f"Unit test runner có {unit_results['total']} test, "
+            f"cần {EXPECTED_UNIT_TESTS}",
+        )
+        print(
+            f"Unit test: {unit_results['passed']} PASSED / "
+            f"{unit_results['failed']} FAILED (tổng {unit_results['total']})"
+        )
+        test_page.close()
+
+        # AC-3: chơi lại bài đã có mảnh — số mảnh không tăng (context riêng).
+        replay_ctx = browser.new_context(
+            viewport={"width": 1280, "height": 900}, locale="vi-VN"
+        )
+        replay_page = replay_ctx.new_page()
+        watch_errors(replay_page, console_errors)
+        replay_page.goto(f"{BASE_URL}/index.html", wait_until="load")
+        replay_page.evaluate(
+            """() => localStorage.setItem('kidmath.v1', JSON.stringify({
+              v: 1, createdAt: Date.now(),
+              settings: { speech: true, sfx: true, unlockAll: false, allowRetry: true },
+              lessons: { intro: { stars: 2, best: 3, plays: 1, lastPlayed: Date.now() } },
+              puzzle: { v: 1, pieces: [0] }
+            }))"""
+        )
+        replay_page.reload(wait_until="load")
+        replay_page.click(".splash-start")
+        replay_page.wait_for_selector(".home")
+        replay_page.evaluate(RESTORE_RESULT)
+        replay_page.wait_for_selector(".result-card")
+        check(
+            "đã có trong bộ sưu tập"
+            in (replay_page.locator(".result-puzzle-strip").text_content() or ""),
+            "Mảnh đã có nhưng thông điệp nhận mảnh không đúng",
+        )
+        replay_page.click(".result-actions .btn-soft")
+        replay_page.wait_for_selector(".question-card")
+        check(
+            replay_page.evaluate("() => KMApp.current().debugState().lesson.id") == "intro",
+            "Nút Chơi lại không mở lại bài intro",
+        )
+        play_lesson(replay_page)
+        check(
+            puzzle_pieces(replay_page) == [0],
+            f"Chơi lại intro làm tăng số mảnh: {puzzle_pieces(replay_page)}",
+        )
+        replay_ctx.close()
+
+        # AC-5: b20 dùng race có sẵn → vẫn có bục trao thưởng ở màn kết quả.
+        errors_before_b20_result = len(console_errors)
+        page.evaluate(
+            """() => KMApp.navigate('result', {
+              lessonId: 'b20',
+              summary: { stars: 2, firstTryCorrect: 5, total: 8, bestStreak: 3 },
+              record: { stars: 2, isNewBest: false, nextLessonId: null },
+              race: {
+                playerPlace: 1,
+                racers: [
+                  { id: 'mcqueen', name: 'McQueen', src: 'Asset/Mc_Queen.webp',
+                    color: '#d94132', isPlayer: true, place: 1, score: 5, finalProgress: 100 },
+                  { id: 'flo', name: 'Flo', src: 'Asset/Flo.webp',
+                    color: '#38b6e6', isPlayer: false, place: 2, score: 4.4, finalProgress: 88 }
+                ]
+              }
+            })"""
+        )
+        page.wait_for_selector(".result-card")
+        check(page.locator(".podium-step").count() == 2, "b20: result thiếu bục 2 bậc")
+        check(
+            page.locator(".result-puzzle-strip").count() == 1,
+            "b20: result thiếu dải nhận mảnh",
+        )
+        check_no_new_errors(console_errors, errors_before_b20_result, "b20 result")
+
+        # AC-7: desktop / tablet (2 hướng) / mobile — nút đáp án cuối và nút kết quả.
+        viewport_failures: list[str] = []
+        viewport_observations: list[str] = []
+        viewport_sizes = [
+            ("desktop 1280x900", 1280, 900),
+            ("tablet 768x1024", 768, 1024),
+            ("tablet 1024x768", 1024, 768),
+            ("mobile 390x844", 390, 844),
+        ]
+        for vp_label, vp_width, vp_height in viewport_sizes:
+            vp_ctx = browser.new_context(
+                viewport={"width": vp_width, "height": vp_height}, locale="vi-VN"
+            )
+            vp_page = vp_ctx.new_page()
+            watch_errors(vp_page, console_errors)
+            vp_page.goto(f"{BASE_URL}/index.html", wait_until="load")
+            if vp_page.locator(".splash-start").count():
+                vp_page.click(".splash-start")
+            vp_page.wait_for_selector(".home")
+            for lesson_id in ("intro", "b5", "b20"):
+                if lesson_id == "b5":
+                    # Đề xấu nhất đã probe: 3 và 7 → 7 hoa/luống (OBS-01).
+                    vp_page.evaluate(
+                        "() => { KMApp.ctx.rng = KM.Rng.create('probe-b5-2'); }"
+                    )
+                vp_page.evaluate(
+                    "id => KMApp.navigate('lesson', { lessonId: id, preview: true })",
+                    lesson_id,
+                )
+                vp_page.wait_for_selector(".question-card")
+                skip_race_intro(vp_page)
+                vp_page.wait_for_timeout(100)
+                inspect_viewport(
+                    vp_page,
+                    f"{vp_label} · {lesson_id}",
+                    viewport_failures,
+                    viewport_observations,
+                    check_result=(lesson_id == "intro"),
+                )
+                vp_page.evaluate("() => KMApp.navigate('home')")
+                vp_page.wait_for_selector(".home")
+            vp_ctx.close()
+        for observation in viewport_observations:
+            print("VIEWPORT " + observation)
+        check(not viewport_failures, "Lỗi viewport: " + " | ".join(viewport_failures))
+
         browser.close()
 
     # Bỏ qua cảnh báo không phải lỗi của trình duyệt headless.
-    real_errors = [
-        error
-        for error in console_errors
-        if "favicon" not in error.lower() and "speech" not in error.lower()
-    ]
+    real_errors = filter_console_errors(console_errors)
     check(not real_errors, "Lỗi console: " + " | ".join(real_errors))
     check(not bad_responses, "Tài nguyên lỗi: " + ", ".join(bad_responses[:5]))
 
