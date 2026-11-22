@@ -2,6 +2,8 @@
 <html lang="vi">
 <head>
   <meta charset="utf-8">
+  <!-- Ảnh cover/sprite trong test dùng path gốc "Asset/..." → đặt base về root dự án. -->
+  <base href="../">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Kiểm thử — Bé Vui Học Toán 1</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%9A%97%3C/text%3E%3C/svg%3E">
@@ -44,33 +46,71 @@
     <a class="back" href="../index.html">← Về game</a>
   </div>
 
-  <script src="../js/core/rng.js"></script>
-  <script src="../js/core/vi-numbers.js"></script>
-  <script src="../js/core/speech.js"></script>
-  <script src="../js/data/tuning.js"></script>
-  <script src="../js/data/curriculum.js"></script>
-  <script src="../js/data/racers.js"></script>
-  <script src="../js/domain/questions.js"></script>
-  <script src="../js/domain/lesson-session.js"></script>
-  <script src="../js/domain/progress.js"></script>
-  <script src="../js/domain/race.js"></script>
+  <script src="js/core/rng.js"></script>
+  <script src="js/core/vi-numbers.js"></script>
+  <script src="js/core/speech.js"></script>
+  <script src="js/data/tuning.js"></script>
+  <script src="js/data/curriculum.js"></script>
+  <script src="js/data/racers.js"></script>
+  <script src="js/domain/questions.js"></script>
+  <script src="js/domain/lesson-session.js"></script>
+  <script src="js/domain/progress.js"></script>
+  <script src="js/domain/race.js"></script>
 
   <!-- ADR-0002: puzzle + registry. Các file game tự đăng ký factory khi nạp. -->
-  <script src="../js/domain/puzzle.js"></script>
-  <script src="../js/data/game-map.js"></script>
-  <script src="../js/ui/games/contract.js"></script>
-  <script src="../js/ui/games/registry.js"></script>
-  <script src="../js/ui/games/mario-bros.js"></script>
-  <script src="../js/ui/games/animal-crossing.js"></script>
-  <script src="../js/ui/games/mario-kart.js"></script>
+  <script src="js/domain/puzzle.js"></script>
+  <script src="js/data/game-map.js"></script>
+  <script src="js/ui/games/contract.js"></script>
+  <script src="js/ui/games/registry.js"></script>
+  <!-- game-intro.js capture KM.Components.el lúc nạp → components.js phải đứng trước. -->
+  <script src="js/ui/components.js"></script>
+  <script src="js/ui/games/kit.js"></script>
+  <!-- sprite.js capture window.requestAnimationFrame lúc nạp → cài stub trước. -->
+  <script>
+    (function () {
+      var nextId = 1;
+      var queue = Object.create(null);
+      window.__KMTestRaf = {
+        pending: function () { return Object.keys(queue).length; },
+        reset: function () { queue = Object.create(null); },
+        flush: function (timestamp) {
+          var ids = Object.keys(queue).map(Number).sort(function (a, b) { return a - b; });
+          var callbacks = ids.map(function (id) {
+            var callback = queue[id];
+            delete queue[id];
+            return callback;
+          });
+          callbacks.forEach(function (callback) { callback(timestamp); });
+        }
+      };
+      window.requestAnimationFrame = function (callback) {
+        var id = nextId++;
+        queue[id] = callback;
+        return id;
+      };
+      window.cancelAnimationFrame = function (id) { delete queue[id]; };
+      window.webkitRequestAnimationFrame = window.requestAnimationFrame;
+      window.webkitCancelAnimationFrame = window.cancelAnimationFrame;
+    }());
+  </script>
+  <script src="js/ui/sprite.js"></script>
+  <script src="js/ui/screens/game-intro.js"></script>
+  <script src="js/ui/games/mario-bros.js"></script>
+  <script src="js/ui/games/animal-crossing.js"></script>
+  <script src="js/ui/games/mario-kart.js"></script>
+  <script src="js/ui/games/splatoon.js"></script>
 
-  <script src="unit/framework.js"></script>
-  <script src="unit/core.test.js"></script>
-  <script src="unit/curriculum.test.js"></script>
-  <script src="unit/domain.test.js"></script>
-  <script src="unit/race.test.js"></script>
-  <script src="unit/puzzle.test.js"></script>
-  <script src="unit/game-map.test.js"></script>
+  <script src="tests/unit/framework.js"></script>
+  <script src="tests/unit/core.test.js"></script>
+  <script src="tests/unit/curriculum.test.js"></script>
+  <script src="tests/unit/domain.test.js"></script>
+  <script src="tests/unit/race.test.js"></script>
+  <script src="tests/unit/puzzle.test.js"></script>
+  <script src="tests/unit/game-map.test.js"></script>
+  <script src="tests/unit/game-map-v2.test.js"></script>
+  <script src="tests/unit/game-intro.test.js"></script>
+  <script src="tests/unit/sprite.test.js"></script>
+  <script src="tests/unit/splatoon.test.js"></script>
   <script>
     window.addEventListener('load', function () {
       window.KMTest.run();

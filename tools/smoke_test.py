@@ -29,9 +29,13 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = ROOT / "production" / "qa" / "screenshots"
 OUT.mkdir(parents=True, exist_ok=True)
 
-# ADR-0002 / quick-spec: 69 test cũ + 23 test mới (puzzle + game-map).
-EXPECTED_UNIT_TESTS = 92
+# Đếm thực tế bằng `grep -c 'T.test(' tests/unit/*.test.js` sau khi viết xong:
+# cũ 92 + game-map-v2 10 + game-intro 7 + sprite 7 + splatoon 1 = 117.
+EXPECTED_UNIT_TESTS = 117
 HD_MAX_BYTES = 400000
+COVER_MAX_BYTES = 400000
+SPRITE_MAX_BYTES = 180000
+INTRO_FLAG_PREFIX = "km_game_intro_v1_"
 PHASE1_GAMES = {
     "intro": ("mario-bros", "Super Mario Bros.", "Asset/hd/intro.webp"),
     "b5": ("animal-crossing", "Animal Crossing", "Asset/hd/b5.webp"),
@@ -107,6 +111,152 @@ def check_game_stage(page, lesson_id: str, label: str) -> None:
     )
     check(bg in background, f"{label}: nền game sai: {background}")
     check_hd_background(page, bg, label)
+
+
+def check_stage(page, lesson_id: str, label: str) -> None:
+    """ADR-0003: mọi bài đều có factory → đúng 1 .game-stage."""
+    info = page.evaluate(
+        """() => {
+          const list = document.querySelectorAll('.game-stage');
+          const stage = list[0];
+          return {
+            count: list.length,
+            gameId: stage ? stage.getAttribute('data-game-id') : null,
+            sprite: document.querySelectorAll('.game-stage canvas.km-sprite').length
+          };
+        }"""
+    )
+    check(info["count"] == 1, f"{label}: cần đúng 1 .game-stage, nhận {info['count']}")
+    check(info["gameId"], f"{label}: .game-stage thiếu data-game-id")
+    check(
+        info["sprite"] >= 1,
+        f"{label}: .game-stage thiếu canvas sprite (runtime không khởi tạo)",
+    )
+
+
+def check_asset_files(lesson_ids: list[str]) -> None:
+    """21 HD + 21 cover + 21 sprite = 63 ảnh, đúng tên bài, đúng ngân sách."""
+    groups = [
+        ("hd", HD_MAX_BYTES, "HD"),
+        ("covers", COVER_MAX_BYTES, "cover"),
+        ("sprites", SPRITE_MAX_BYTES, "sprite"),
+    ]
+    expected_names = set(lesson_ids)
+    for folder, budget, label in groups:
+        files = sorted((ROOT / "Asset" / folder).glob("*.webp"))
+        check(
+            len(files) == 21,
+            f"Asset/{folder} cần đúng 21 ảnh, nhận {len(files)}",
+        )
+        check(
+            {f.stem for f in files} == expected_names,
+            f"Asset/{folder} sai tên file so với 21 lessonId",
+        )
+        for path in files:
+            size = path.stat().st_size
+            check(
+                size <= budget,
+                f"Ảnh {label} vượt {budget} bytes: {path.name} ({size} bytes)",
+            )
+        biggest = max(path.stat().st_size for path in files)
+        print(f"ASSET {label}: 21 file, lớn nhất {biggest} bytes / budget {budget}")
+
+
+def check_all_images(page, lesson_ids: list[str]) -> None:
+    """Tải thật 63 ảnh trong trình duyệt; ảnh lỗi là FAIL smoke."""
+    results = page.evaluate(
+        """(ids) => {
+          const srcs = [];
+          ids.forEach((id) => {
+            srcs.push('Asset/hd/' + id + '.webp');
+            srcs.push('Asset/covers/' + id + '.webp');
+            srcs.push('Asset/sprites/' + id + '.webp');
+          });
+          return Promise.all(srcs.map((src) => new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => resolve({ src, ok: img.naturalWidth > 0, width: img.naturalWidth });
+            img.onerror = () => resolve({ src, ok: false, width: 0 });
+            img.src = src;
+          })));
+        }""",
+        lesson_ids,
+    )
+    bad = [item for item in results if not item["ok"]]
+    check(len(results) == 63, f"Phải kiểm tra 63 ảnh, nhận {len(results)}")
+    check(not bad, "63 ảnh có file tải lỗi: " + ", ".join(
+        f"{item['src']} (width={item['width']})" for item in bad[:5]
+    ))
+    print(f"ASSET load: {len(results)}/63 ảnh tải OK")
+
+
+def enter_intro(page, lesson_id: str, label: str, shot: str | None = None) -> None:
+    """Điều hướng trực tiếp tới màn intro (reason manual luôn render)."""
+    page.evaluate(
+        "(id) => KMApp.navigate('gameIntro', { lessonId: id, reason: 'manual' })",
+        lesson_id,
+    )
+    page.wait_for_selector(".game-intro", timeout=8000)
+    check(
+        page.locator(f'.game-intro[data-lesson-id="{lesson_id}"]').count() == 1,
+        f"{label}: intro sai lessonId",
+    )
+    if shot:
+        page.screenshot(path=str(OUT / shot))
+
+
+def observe_layout(
+    page,
+    lesson_id: str,
+    vp_label: str,
+    vp_key: str,
+    failures: list[str],
+    observations: list[str],
+    *,
+    flag_stage_height: bool,
+) -> None:
+    """Đo .game-stage + nút đáp án cuối TRƯỚC khi cuộn (OBS-01)."""
+    page.evaluate("() => window.scrollTo({ top: 0, behavior: 'instant' })")
+    data = page.evaluate(
+        """() => {
+          const stages = document.querySelectorAll('.game-stage');
+          const stage = stages[0];
+          const choices = Array.from(document.querySelectorAll('.choice'));
+          const last = choices[choices.length - 1];
+          const rect = last ? last.getBoundingClientRect() : null;
+          return {
+            stageCount: stages.length,
+            stageHeight: stage ? stage.getBoundingClientRect().height : 0,
+            choices: choices.length,
+            lastTop: rect ? Math.round(rect.top) : 0,
+            lastBottom: rect ? Math.round(rect.bottom) : 0,
+            viewport: innerHeight,
+            overflowX: document.documentElement.scrollWidth > innerWidth + 1
+          };
+        }"""
+    )
+    observations.append(
+        f"{lesson_id} · {vp_label}: stage={data['stageHeight']:.1f}px "
+        f"choices={data['choices']} last.bottom={data['lastBottom']} "
+        f"viewport={data['viewport']} overflowX={data['overflowX']}"
+    )
+    tag = f"{lesson_id} · {vp_label}"
+    if data["stageCount"] != 1:
+        failures.append(f"{tag}: có {data['stageCount']} .game-stage, cần 1")
+    if data["choices"] < 2:
+        failures.append(f"{tag}: chỉ có {data['choices']} nút đáp án")
+    if flag_stage_height and data["stageHeight"] > 170:
+        failures.append(
+            f"{tag}: .game-stage cao {data['stageHeight']:.1f}px > 170px "
+            "(OBS-01 chưa nén)"
+        )
+    if data["lastBottom"] > data["viewport"] + 1:
+        failures.append(
+            f"{tag}: nút đáp án cuối nằm dưới fold khi chưa cuộn "
+            f"(bottom={data['lastBottom']} viewport={data['viewport']})"
+        )
+    if data["overflowX"]:
+        failures.append(f"{tag}: tràn ngang (overflowX=true)")
+    page.screenshot(path=str(OUT / f"obs01-{lesson_id}-{vp_key}.png"))
 
 
 def puzzle_pieces(page) -> list:
@@ -372,19 +522,41 @@ def main() -> int:
         )
         page.screenshot(path=str(OUT / "02-home.png"), full_page=True)
 
-        # Đợt 1: đúng 3 ảnh HD mẫu, mỗi ảnh không vượt ngân sách hd.maxBytes.
-        hd_files = sorted((ROOT / "Asset" / "hd").glob("*.webp"))
-        check(len(hd_files) == 3, f"Đợt 1 cần đúng 3 ảnh HD, nhận {len(hd_files)}")
-        for hd_file in hd_files:
-            check(
-                hd_file.stat().st_size <= HD_MAX_BYTES,
-                f"Ảnh HD vượt {HD_MAX_BYTES} bytes: {hd_file.name} "
-                f"({hd_file.stat().st_size} bytes)",
-            )
+        # Giai đoạn C: 21 HD + 21 cover + 21 sprite = 63 ảnh, tải thật trong browser.
+        lesson_ids = page.evaluate(
+            "() => KMApp.ctx.curriculum.lessons.map((lesson) => lesson.id)"
+        )
+        check(len(lesson_ids) == 21, f"Không đủ 21 màn: {len(lesson_ids)}")
+        check_asset_files(lesson_ids)
+        check_all_images(page, lesson_ids)
 
         errors_before_intro = len(console_errors)
+        check(
+            page.evaluate(
+                "(id) => sessionStorage.getItem('" + INTRO_FLAG_PREFIX + "' + id)",
+                "intro",
+            ) is None,
+            "Flag intro bài intro đã có từ trước khi bấm Học tiếp",
+        )
         page.click(".hero-actions .btn-primary")
+        page.wait_for_selector(".game-intro", timeout=8000)
+        check(
+            page.locator('.game-intro[data-lesson-id="intro"]').count() == 1,
+            "Nút Học tiếp không mở đúng màn intro của bài intro",
+        )
+        page.screenshot(path=str(OUT / "03a-game-intro.png"))
+        page.click(".game-intro .btn-primary")
         page.wait_for_selector(".question-card")
+        check(
+            page.evaluate("() => document.body.dataset.screen") == "lesson",
+            "Bấm Bắt đầu không vào thẳng màn học (không được skipIntro)",
+        )
+        check(
+            page.evaluate(
+                "() => sessionStorage.getItem('" + INTRO_FLAG_PREFIX + "intro')"
+            ) == "1",
+            "Bấm Bắt đầu chưa ghi flag km_game_intro_v1_intro",
+        )
         page.wait_for_selector(".race-intro")
         page.wait_for_timeout(350)
         page.screenshot(path=str(OUT / "03b-race-intro.png"))
@@ -479,13 +651,11 @@ def main() -> int:
         )
         skip_race_intro(page)
         errors_before_fallback = len(console_errors)
-        check(
-            page.locator(".game-stage").count() == 0,
-            "b1 chưa có factory Đợt 1 nhưng lại chèn game-stage",
-        )
+        # ADR-0003: 21/21 bài đều có factory → b1 cũng có đúng 1 game-stage.
+        check_stage(page, "b1", "b1 sau khi chọn Bài tiếp")
         check(
             page.locator(".race-hud").count() == 1,
-            "b1 fallback vẫn phải giữ race HUD",
+            "b1 vẫn phải giữ race HUD",
         )
         page.screenshot(path=str(OUT / "05-b1-question.png"))
         b1_stars = play_lesson(page, shot_prefix="06-b1")
@@ -516,10 +686,6 @@ def main() -> int:
             "b15": "position",
             "b18": "fact-family",
         }
-        lesson_ids = page.evaluate(
-            "() => KMApp.ctx.curriculum.lessons.map((lesson) => lesson.id)"
-        )
-        check(len(lesson_ids) == 21, f"Không đủ 21 màn: {len(lesson_ids)}")
         for lesson_id in lesson_ids:
             errors_before_lesson = len(console_errors)
             page.evaluate(
@@ -528,13 +694,9 @@ def main() -> int:
             page.wait_for_selector(".question-card")
             skip_race_intro(page)
             page.wait_for_timeout(100)
+            check_stage(page, lesson_id, f"{lesson_id} preview")
             if lesson_id in PHASE1_GAMES:
                 check_game_stage(page, lesson_id, f"{lesson_id} preview")
-            else:
-                check(
-                    page.locator(".game-stage").count() == 0,
-                    f"{lesson_id}: bài chưa có factory không được chèn game-stage",
-                )
             if lesson_id == "b20":
                 check(
                     page.locator(".race-hud").count() == 1,
@@ -548,11 +710,10 @@ def main() -> int:
             )
             check(info["total"] >= 2, f"{lesson_id} thiếu lựa chọn")
             check(info["hasVisual"], f"{lesson_id} thiếu hình minh hoạ")
-            if lesson_id in PHASE1_GAMES:
-                check(
-                    page.locator(".visual-slot .visual").count() == 0,
-                    f"{lesson_id}: không render lại visual cũ khi đã có minigame (OBS-01)",
-                )
+            check(
+                page.locator(".visual-slot .visual").count() == 0,
+                f"{lesson_id}: không render lại visual cũ khi đã có minigame (OBS-01)",
+            )
             check(not info["overflow"], f"{lesson_id} bị tràn ngang")
             if lesson_id in sample_shots:
                 page.wait_for_timeout(650)
@@ -894,7 +1055,7 @@ def main() -> int:
         file_page.screenshot(path=str(OUT / "13-file-offline.png"), full_page=True)
         file_page.close()
 
-        # AC-6: trình chạy unit test trong trình duyệt (69 cũ + 23 mới).
+        # AC-6: trình chạy unit test trong trình duyệt (117 test sau Giai đoạn C).
         test_page = context.new_page()
         watch_errors(test_page, console_errors)
         test_page.goto(f"{BASE_URL}/tests/test-runner.html", wait_until="load")
@@ -981,16 +1142,17 @@ def main() -> int:
         )
         check_no_new_errors(console_errors, errors_before_b20_result, "b20 result")
 
-        # AC-7: desktop / tablet (2 hướng) / mobile — nút đáp án cuối và nút kết quả.
-        viewport_failures: list[str] = []
-        viewport_observations: list[str] = []
+        # OBS-01 mở rộng Giai đoạn C: 21 bài × 4 viewport (84 ảnh) + 4 ảnh intro.
+        # Gom mọi failure lại, in hết, chụp đủ evidence RỒI mới FAIL gate.
+        layout_failures: list[str] = []
+        layout_observations: list[str] = []
         viewport_sizes = [
-            ("desktop 1280x900", 1280, 900),
-            ("tablet 768x1024", 768, 1024),
-            ("tablet 1024x768", 1024, 768),
-            ("mobile 390x844", 390, 844),
+            ("desktop 1280x900", "1280x900", 1280, 900, False),
+            ("tablet landscape 1024x768", "1024x768", 1024, 768, True),
+            ("tablet portrait 768x1024", "768x1024", 768, 1024, False),
+            ("mobile 390x844", "390x844", 390, 844, True),
         ]
-        for vp_label, vp_width, vp_height in viewport_sizes:
+        for vp_label, vp_key, vp_width, vp_height, flag_stage in viewport_sizes:
             vp_ctx = browser.new_context(
                 viewport={"width": vp_width, "height": vp_height}, locale="vi-VN"
             )
@@ -1000,39 +1162,82 @@ def main() -> int:
             if vp_page.locator(".splash-start").count():
                 vp_page.click(".splash-start")
             vp_page.wait_for_selector(".home")
-            for lesson_id in ("intro", "b5", "b20"):
-                if lesson_id == "b5":
-                    # Đề xấu nhất đã probe: 3 và 7 → 7 hoa/luống (OBS-01).
-                    vp_page.evaluate(
-                        "() => { KMApp.ctx.rng = KM.Rng.create('probe-b5-2'); }"
-                    )
+
+            # Ảnh intro mỗi viewport + kiểm tra luồng home → gameIntro → lesson.
+            enter_intro(
+                vp_page, "intro", f"{vp_label} · intro",
+                f"obs01-gameintro-{vp_key}.png",
+            )
+            vp_page.click(".game-intro .btn-primary")
+            vp_page.wait_for_selector(".question-card", timeout=8000)
+            check(
                 vp_page.evaluate(
-                    "id => KMApp.navigate('lesson', { lessonId: id, preview: true })",
+                    "() => sessionStorage.getItem('" + INTRO_FLAG_PREFIX + "intro')"
+                ) == "1",
+                f"{vp_label}: intro không ghi flag sau khi bấm Bắt đầu",
+            )
+            skip_race_intro(vp_page)
+            vp_page.evaluate("() => KMApp.navigate('home')")
+            vp_page.wait_for_selector(".home")
+
+            for lesson_id in lesson_ids:
+                # Cố định đề để measurement OBS-01 lặp lại được (đặc biệt b5 hay xấu nhất).
+                vp_page.evaluate(
+                    "(id) => { KMApp.ctx.rng = KM.Rng.create("
+                    "id === 'b5' ? 'probe-b5-2' : 'obs01-' + id); }",
                     lesson_id,
                 )
-                vp_page.wait_for_selector(".question-card")
+                vp_page.evaluate(
+                    "(id) => KMApp.navigate('lesson', { lessonId: id, preview: true })",
+                    lesson_id,
+                )
+                vp_page.wait_for_selector(".question-card", timeout=8000)
                 skip_race_intro(vp_page)
-                vp_page.wait_for_timeout(100)
-                inspect_viewport(
+                vp_page.wait_for_timeout(60)
+                observe_layout(
                     vp_page,
-                    f"{vp_label} · {lesson_id}",
-                    viewport_failures,
-                    viewport_observations,
-                    check_result=(lesson_id == "intro"),
+                    lesson_id,
+                    vp_label,
+                    vp_key,
+                    layout_failures,
+                    layout_observations,
+                    flag_stage_height=flag_stage,
                 )
                 vp_page.evaluate("() => KMApp.navigate('home')")
                 vp_page.wait_for_selector(".home")
             vp_ctx.close()
-        for observation in viewport_observations:
-            print("VIEWPORT " + observation)
-        check(not viewport_failures, "Lỗi viewport: " + " | ".join(viewport_failures))
 
+        for observation in layout_observations:
+            print("LAYOUT " + observation)
+        for failure in layout_failures:
+            print("LAYOUT-FAIL " + failure)
+        # Luôn in tóm tắt OBS-01 để log PASS có số liệu, không chỉ log FAIL.
+        if layout_failures:
+            print(
+                f"OBS-01: {len(layout_failures)} failures / "
+                f"{len(layout_observations)} measurements — "
+                "screenshots vẫn được lưu đầy đủ"
+            )
+        else:
+            print(
+                f"OBS-01: {len(layout_failures)} failures / "
+                f"{len(layout_observations)} measurements — "
+                "tất cả bài đạt ngân sách chiều cao stage"
+            )
         browser.close()
 
     # Bỏ qua cảnh báo không phải lỗi của trình duyệt headless.
     real_errors = filter_console_errors(console_errors)
     check(not real_errors, "Lỗi console: " + " | ".join(real_errors))
     check(not bad_responses, "Tài nguyên lỗi: " + ", ".join(bad_responses[:5]))
+    print(f"CONSOLE/HTTP: 0 lỗi console, 0 response >=400 ({len(console_errors)} raw)")
+
+    # OBS-01 là gate cuối: mọi screenshot/evidence + console/404 đã được kiểm tra.
+    check(
+        not layout_failures,
+        f"OBS-01 có {len(layout_failures)} lỗi layout: "
+        + " | ".join(layout_failures[:6]),
+    )
 
     print("PASS — smoke test hoàn tất")
     print(f"Ảnh chụp: {OUT}")

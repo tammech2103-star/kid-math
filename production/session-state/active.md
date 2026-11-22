@@ -1,95 +1,108 @@
 # Session State — Bé Vui Học Toán 1
 
-**Cập nhật**: 2026-11-22 12:50
-**Trạng thái**: **Đợt 1 của redesign "21 minigame + mảnh ghép McQueen" đã xong,
-đang chờ deploy**. Live hiện vẫn là bản cũ commit `245b283` (cuộc đua 1 đối 1);
-bản Đợt 1 chưa push lên GitHub, chưa Manual Deploy Render.
+**Cập nhật**: 2026-11-22 — **Redesign 21 bài HOÀN TẤT local, FINAL GATE PASS, chưa deploy đợt 2.**
+**Trạng thái deploy**: Live site vẫn là **Đợt 1** — commit `2c901b9` trên `main`,
+Render deploy `dep-dc18iebl550s73dpa3hg` (Deploy succeeded), URL
+`https://be-vui-hoc-toan-1.onrender.com`. Đợt redesign này **chỉ có trên local**;
+chưa commit/push/deploy theo yêu cầu "xin phép riêng trước khi deploy".
 
-## Việc đang làm
+## Việc đang làm (đã xong code+QA, chờ phép deploy)
 
 Chuyển 21 bài từ một màn chơi chung sang **21 trò chơi riêng** lấy cảm hứng Nintendo
 (ghi rõ tên cảm hứng trong UI, art HD tự sinh, không copy tài sản Nintendo).
 Mỗi bài xong nhận **1/21 mảnh ghép McQueen** (lưới 7×3); đủ 21 mảnh hiện ảnh full.
 Cuộc đua 1 đối 1 + bục trao thưởng được giữ làm game Bài 20 và màn tổng kết chung.
 
-**Đợt 1 đã bàn giao**: nền tảng registry + puzzle + 3 game mẫu
-(`mario-bros` cho `intro`, `animal-crossing` cho `b5`, `mario-kart` cho `b20`)
-+ 3 ảnh nền HD + bộ sưu tập. 18 bài còn lại tạm fallback về giao diện cũ.
+## Redesign 21 bài — tiến độ đầy đủ
 
-## Tiến độ
+- [x] **Giai đoạn A — thiết kế** (5 file):
+      `design/quick-specs/all-21-distinct-games.md` (21 cơ chế, 21 động tác, 42 edge
+      case, 21 AC), `design/art/art-bible-hd.md` + `design/art/sprite-style-guide.md`
+      (21 style id canonical, 21 prompt), `docs/architecture/ADR-0003-...md` +
+      `docs/architecture/game-module-interface.md` (GameMap v2 8 field, route
+      `gameIntro`, `KM.Sprite`, 8 archetype layout/variant, cover `alt=""`).
+- [x] **Chuẩn chốt**: style theo art bible, layout/variant theo ADR-0003, asset path
+      `Asset/{hd,covers,sprites}/{lessonId}.webp` (không dùng `{gameId}`).
+- [x] **Giai đoạn B — 63/63 ảnh procedural** (AI bị chặn bởi `Invalid credential` của
+      `opencode/grok-imagine-image-2.0`; user chọn Pillow): 21 sprite 384×384 RGBA
+      4×4, 21 cover 640×360, 21 nền HD 1280×720. Tổng **984.600 B (0,94 MB)** /
+      63 file. 0 cặp sprite/cover trùng, 21/21 sheet idle≠cheer, mọi file ≤ ngân sách.
+      User đã duyệt contact sheet trực quan.
+- [x] **Giai đoạn C — core**: GameMap v2 (8 field, freeze + identity), `KM.Sprite.create`
+      (rAF dùng chung, reduced-motion, destroy do shell sở hữu), `KM.Screens.gameIntro`
+      (flag `km_game_intro_v1_<lessonId>` trong sessionStorage + fallback `KM._introFlags`),
+      route `home → gameIntro(lessonId) → lesson`, cover trên thẻ bài + intro,
+      shell `lesson.js` nối sprite, script order trong `index.html`.
+- [x] **Giai đoạn C — gameplay**: `js/ui/games/kit.js` + 18 module mới; 18/18 contract
+      hợp lệ, smoke fake-DOM trả lời 18/18. 3 module cũ giữ nguyên; `b20/mario-kart`
+      vẫn KHÔNG gọi `onAnswer` (giữ race 1v1 + bục).
+- [x] **Sửa regression splatoon**: câu `position` có 4 đáp án (`js/domain/questions.js:704`)
+      nhưng module chỉ có 3 vị trí → đáp án 4 đè lên đáp án 1. Thêm `TARGET_SPOTS_4`
+      (dải ngang 2%/26%/50%/74%, target 76px khi >3 đáp án), phủ bởi
+      `tests/unit/splatoon.test.js`.
+- [x] **Giai đoạn C — CSS archetype**: `css/games.css` append-only đến 1784 dòng;
+      21 style id unique, 8 archetype × b/c/d, cover/sprite/intro responsive,
+      OBS-01 compression (root `min-height:0 !important`, `.mario-scene`,
+      `.ac-scene`/`.ac-garden`/`.ac-bed`). 0 rule `.choices`/`.choice` mới, 0
+      `position:fixed|sticky` mới, 0 rule nén nhắm trực tiếp `.game-stage`.
+- [x] **Giai đoạn C — QA package**: 4 test file mới (game-map-v2 10, game-intro 7,
+      sprite 7, splatoon 1); `tests/test-runner.html` với `<base href="../">`, rAF stub,
+      script order đúng; `tools/smoke_test.py` phủ 63 ảnh, luồng intro, 21 stage,
+      21×4 OBS-01 measurement, 88 screenshot. `EXPECTED_UNIT_TESTS=117`.
+- [x] **FINAL GATE PASS** (QA tự rerun, không chỉ tin self-audit):
+      unit **117/117 PASS**, ảnh **63/63** load OK, console **0** / HTTP **0** ≥400,
+      **OBS-01: 0 failures / 84 measurements**, stage cao nhất **166.0px ≤170px**,
+      dòng cuối `PASS — smoke test hoàn tất`.
+      Log: `C:\Users\2103\AppData\Local\Temp\opencode\phase-c-final-gate.log`.
+      BUG-001 **Resolved/Closed** (39/84 → 0/84).
+      Báo cáo: `production/qa/phase-c-qa-report.md`.
 
-- [x] Chốt 5 quyết định sáng tạo với người dùng (21 game, tribute tên, ảnh HD,
-      21 mảnh 7×3, giữ đua/bục)
-- [x] Quick spec `minigame-nintendo-2026-11-22.md` + ADR-0002 + art bible HD
-- [x] `game-map.js` (21 entry), `registry.js`, `contract.js`, tài liệu interface
-- [x] Puzzle domain/UI + collection +-home entry; state lưu trong `kidmath.v1`, tương thích cũ
-- [x] 3 module game mẫu + `css/games.css`; nối script/CSS/tuning trong index/app
-- [x] 3 ảnh HD 1280×720 WebP: `intro` 23.4 KB, `b5` 26.6 KB, `b20` 27.0 KB
-- [x] Sửa 2 bug tích hợp: `addChild()` đệ quy trong 3 game; `ctx.puzzle` gán nhầm namespace
-- [x] Sửa **OBS-01**: bỏ visual cũ khi có minigame + nén `.has-minigame` + ẩn
-      `.equation-slot` + mobile xếp luống hoa 1 cột + `.choices` sticky làm lưới an toàn.
-      Gate nay phủ **3 game × 4 viewport** với seed đề xấu nhất (7 hoa/luống): 12/12
-      nút đáp án nằm trọn viewport ngay khi vào màn (xem `qa-plan-minigames-dot1.md`)
-- [x] 92/92 unit test PASS; `python tools/smoke_test.py` PASS; 0 console error, 0 404
-- [ ] Build lại `public/` + `deploy/kid-math-render.zip`
-- [ ] Upload file đổi lên GitHub repo `tammech2103-star/kid-math`
-- [ ] Render → Manual Deploy → Deploy latest commit → verify live
-- [ ] Đợt 2 (9 game chương 1–2 + ảnh HD), Đợt 3 (9 game chương 3–5 + ảnh HD)
-
-## Quyết định quan trọng
+## Quyết định quan trọng (giữ nguyên từ Đợt 1)
 
 1. **Giữ lõi học tập**: `Question`, `LessonSession`, tính sao, RNG, speech, audio,
-   parent gate, localStorage không đổi. Minigame chỉ là lớp tương tác gọi `onAnswer`.
+   parent gate, localStorage `kidmath.v1` không đổi. Minigame chỉ gọi `onAnswer(value)`;
+   `b20` không gọi (race là luật riêng).
 2. **Hợp đồng game**: `createGame({ctx, question, mount, onAnswer, reducedMotion})`
-   → `{render, onCorrect, onWrong, celebrate, destroy}`. Registry trả `null` cho
-   game chưa làm → bài đó dùng giao diện cũ, dự án luôn chạy được giữa các đợt.
-3. **Bản quyền**: ghi tên game cảm hứng + art tự sinh; không copy sprite/logo/nhạc.
+   → `{render, onCorrect, onWrong, celebrate, destroy}`.
+3. **Bản quyền**: ghi tên game cảm hứng + art tự sinh/procedural; không copy
+   sprite/logo/nhạc/nhân vật Nintendo.
 4. **Mảnh ghép**: 1 mảnh/bài, nhận tự động, **thua vẫn nhận**, chơi lại không tăng;
    cắt ảnh bằng CSS `background-position`, không sinh 21 file.
-5. **OBS-01**: khi có minigame thì `.visual-slot` cũ không render; class `has-minigame`
-   chỉ nén lớp trang trí. `.choices` được `position: sticky; bottom: 8px` giữ ở đáy
-   màn cho đề nhiều hoa — **không đổi cấu trúc `.choices`/`.choice` hay logic lesson.js**.
-6. Tiếp tục giữ: web tĩnh offline `file://`, không backend, không Node runtime,
-   nút chạm ≥64px, bàn phím 1–9/R/Esc, `prefers-reduced-motion`.
+5. **OBS-01**: `.choices`/`.choice` giữ nguyên cấu trúc, không `position:fixed|sticky`
+   mới; chỉ nén lớp trang trí CON của `.screen.lesson.has-minigame .game-stage`;
+   nút đáp án thấy được không cần cuộn ở 4 viewport.
+6. Web tĩnh offline `file://`, không backend, không Node runtime, chạm ≥64px,
+   bàn phím 1–9/R/Esc, `prefers-reduced-motion`.
 
-## File chính (mới/có đổi trong Đợt 1)
-
-- `design/quick-specs/minigame-nintendo-2026-11-22.md`
-- `docs/architecture/ADR-0002-minigame-registry-and-puzzle-rewards.md`
-- `docs/architecture/game-module-interface.md`
-- `design/art/art-bible-hd.md`, `design/art/hd-prompts-dot1.md`
-- `js/data/game-map.js`, `js/data/tuning.js` (mục `puzzle/game/hd`)
-- `js/ui/games/{contract,registry,mario-bros,animal-crossing,mario-kart}.js`
-- `js/domain/{puzzle,progress}.js`, `js/ui/puzzle.js`
-- `js/ui/screens/{lesson,result,home,collection}.js`
-- `css/{games,puzzle}.css`, `index.html`, `js/app.js`
-- `Asset/hd/{intro,b5,b20}.webp`, `tools/generate_hd_backgrounds.py`
-- `tests/unit/{puzzle,game-map}.test.js`, `tests/test-runner.html`, `tools/smoke_test.py`
-- `production/qa/{qa-plan-minigames-dot1.md,smoke-report.md}`
-
-## Kết quả kiểm thử hiện tại
+## Kết quả kiểm thử hiện tại (local, đợt redesign)
 
 | Hạng mục | Kết quả | Bằng chứng |
 |----------|---------|------------|
-| Unit test | **92/92 PASS** (69 cũ + 23 mới) | `tests/test-runner.html`, QuickJS |
-| Smoke E2E | **PASS** | `python tools/smoke_test.py` |
-| 21 registry entry / 3 factory / 18 fallback | PASS | `game-map.test.js`, smoke |
-| Vòng đời mảnh (award → reload → collection → replay) | PASS | smoke, `27-collection-1-21.png` |
-| B20 race HUD + bục 2 bậc + dải mảnh | PASS | smoke |
-| 3 game × 4 viewport (không cần cuộn để thấy đáp án) | PASS | `intro` 763/760/716/744 · `b5` 886/943/754/830 · `b20` 704/717/638/686 |
-| Ảnh HD | PASS | 1280×720, 23–27 KB (< 400 KB) |
-| Offline `file://` | PASS | tự động trong smoke, 0 lỗi console |
-| Live Render | **bản cũ** `245b283` | Đợt 1 chưa deploy |
+| Unit test | **117/117 PASS** (92 cũ + 25 mới) | `tests/test-runner.html`, smoke log |
+| Smoke E2E | **PASS** | `phase-c-final-gate.log` |
+| 63 ảnh HD/cover/sprite | 63/63 load OK, ≤ ngân sách | smoke log |
+| Luồng `home → gameIntro → lesson` + flag | PASS | smoke, `game-intro.test.js` |
+| 21 bài × 1 `.game-stage` + sprite | PASS 21/21 | smoke |
+| Console / HTTP ≥400 | 0 / 0 | smoke log |
+| OBS-01 21 bài × 4 viewport | **0 fail / 84**, max 166.0px | smoke log, 88 screenshot |
+| Race b20 + bục + vòng đời mảnh 21/21 | PASS | smoke |
+| Offline `file://` + reduced-motion + keyboard | PASS | smoke |
+| BUG-001 OBS-01 stage height | **Resolved/Closed** | `production/qa/bugs/BUG-001-...md` |
 
-## Câu hỏi mở
+## Rủi ro còn lại
 
-- Máy phụ huynh đã cài giọng tiếng Việt chưa? (game không đọc giọng sai ngôn ngữ)
+- **Chưa có manual playtest với trẻ em 6 tuổi** cho redesign 21 bài. Automation +
+  evidence (117 unit, 84 layout, 88 screenshot) KHÔNG thay thế sign-off Visual/Feel.
+- Live site vẫn là Đợt 1; mọi thay đổi đợt này chưa lên GitHub/Render.
+- Máy phụ huynh đã cài giọng tiếng Việt chưa? (không đọc giọng sai ngôn ngữ)
 - Có muốn thu âm lời khen giọng người thật thay TTS không?
-- Đợt 2/3 có đổi thứ tự 18 game còn lại không, hay giữ nguyên bản đồ đã duyệt?
 
 ## Bước tiếp theo
 
-1. [ ] Build + pack deploy, upload GitHub, Manual Deploy Render, verify live.
-2. [ ] Trình ảnh chụp 3 minigame/collection cho người dùng duyệt trực quan.
-3. [ ] Triển khai Đợt 2: 9 game chương 1–2 + 9 ảnh HD, chạy lại full gate + deploy.
-4. [ ] Triển khai Đợt 3: 9 game chương 3–5 + 9 ảnh HD, playtest đủ 21/21 mảnh, freeze 1.0.
+1. [x] Giai đoạn A thiết kế + B 63 ảnh + C code + QA package.
+2. [x] FINAL GATE PASS + BUG-001 Closed + QA report chốt.
+3. [ ] Rebuild `public/` + `deploy/kid-math-render.zip` từ source local mới nhất.
+4. [ ] **Xin phép riêng** trước khi commit/push GitHub hoặc deploy Render đợt redesign.
+      (Không có `git`/`gh`/token trong session; lần trước upload bằng web UI.)
+5. [ ] Sau khi có phép: upload, Manual Deploy, verify live 21 game + intro + sprite.
+6. [ ] Manual playtest với trẻ em — xếp lịch riêng, không chặn deploy kỹ thuật.
