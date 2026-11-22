@@ -1,5 +1,5 @@
 /**
- * Màn "Bộ sưu tập McQueen": lưới 7×3 các mảnh ghép, ảnh đầy đủ khi hoàn thành.
+ * Màn "Bộ sưu tập Trường vui": lưới 7×3 các mảnh ghép, ảnh đầy đủ khi hoàn thành.
  * ADR-0002: đọc mảnh qua `ctx.puzzle` (hoặc tạo service từ progress nếu chưa wired).
  * @namespace KM.Screens
  */
@@ -46,7 +46,7 @@ KM.Screens.collection = (function () {
 
     var titleNode = el('h1', {
       class: 'collection-title',
-      text: 'Bộ sưu tập McQueen',
+      text: 'Bộ sưu tập Trường vui',
       tabindex: '-1'
     });
 
@@ -111,13 +111,13 @@ KM.Screens.collection = (function () {
         el('img', {
           class: 'collection-full',
           src: puzzle.src(),
-          alt: 'Bức tranh McQueen hoàn chỉnh',
+          alt: 'Bức tranh Trường vui hoàn chỉnh',
           draggable: 'false'
         }),
         el('p', {
           class: 'collection-cheer',
           text: 'Tuyệt vời! Bé đã ghép đủ ' + total +
-            ' mảnh và có bức tranh McQueen hoàn chỉnh!'
+            ' mảnh và có bức tranh Trường vui hoàn chỉnh!'
         })
       ]));
     }

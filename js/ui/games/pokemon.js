@@ -1,182 +1,275 @@
 /**
- * Minigame bài `b3` — quây lưới một nhóm sinh vật (cảm hứng: Pokémon).
- * Design: quick-spec mục 04 (arena/b — 2 cụm rời rạc, không lưới/không trục, động tác "quây").
- * Nhãn 3 đích lấy từ question.choices (left/right/equal), không hardcode.
+ * Module game độc lập — "Hai đảo giấy và lưới vây" (bài b3).
+ * Nguồn: design/quick-specs/ui-redesign-21-distinct-screens.md (bảng 21 giao diện, dòng 4)
+ * Quyết định: docs/architecture/ADR-0004-independent-game-modules-and-skill-asset-pipeline.md
+ * Hợp đồng: KM.Games['pokemon'](options) -> { render, onWrong, onCorrect, celebrate, destroy, handleKey }
+ * Kênh trả lời duy nhất: CustomEvent('km:answer', { bubbles:true, detail:{value} }) trên options.mount.
+ * ES5 thuần; mọi số gameplay đọc từ KM.Tuning.game (có default an toàn). Không lưới toạ độ, không trục, không asset ngoài.
  */
 window.KM = window.KM || {};
 KM.Games = KM.Games || {};
 
-KM.Games.pokemon = (function () {
-  'use strict';
+KM.Games['pokemon'] = function (options) {
+  if (!options) { options = {}; }
+  var mount = options.mount;
+  var q = options.question || null;
+  var reduced = !!options.reducedMotion;
+  var audio = options.audio || {};
 
-  var K = KM.GameKit;
-  var GAME_ID = 'pokemon';
-  var SPOTS = [
-    [12, 18], [34, 12], [58, 20], [78, 14], [20, 52],
-    [46, 46], [68, 56], [86, 48], [12, 76], [38, 78],
-    [62, 80], [84, 74]
-  ];
+  var root = document.createElement('div');
+  root.className = 'kmg-pokemon';
+  if (reduced) { root.classList.add('is-reduced'); }
+  mount.appendChild(root);
 
-  function choiceBy(choices, value) {
-    var i;
-    for (i = 0; i < choices.length; i += 1) {
-      if (choices[i] && choices[i].value === value) {
-        return choices[i];
-      }
+  var locked = false;
+  var timers = [];
+  var nodes = [];
+  var listeners = [];
+  var hotspots = [];
+  var promptNode;
+  var kindNode;
+  var equationNode;
+  var scene;
+  var hintNode;
+  var markNode;
+  var i;
+
+  function tune(name, fallback) {
+    var g = (window.KM && KM.Tuning && KM.Tuning.game) || {};
+    var v = g[name];
+    return (typeof v === 'number' && isFinite(v)) ? v : fallback;
+  }
+
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) { n.className = cls; }
+    if (text != null) { n.textContent = String(text); }
+    return n;
+  }
+
+  function listen(node, type, fn) {
+    node.addEventListener(type, fn, false);
+    listeners.push([node, type, fn]);
+  }
+
+  function makeButton(cls, text, onClick) {
+    var b = el('button', 'kmg-btn ' + cls, text);
+    b.type = 'button';
+    b.style.minWidth = '64px';
+    b.style.minHeight = '64px';
+    listen(b, 'click', onClick);
+    return b;
+  }
+
+  function tap() {
+    if (audio && typeof audio.tap === 'function') { audio.tap(); }
+  }
+
+  function find(v) {
+    var list = (q && q.choices) || [];
+    var j;
+    if (v == null) { return null; }
+    for (j = 0; j < list.length; j += 1) {
+      if (String(list[j].value) === String(v)) { return list[j]; }
     }
     return null;
   }
 
-  function createGame(options) {
-    return K.base(options, {
-      gameId: GAME_ID,
-      lessonId: 'b3',
-      tribute: 'Pokémon',
-      prefix: 'pk',
-      hint: 'Chạm vào một cụm để thả lưới vây, hoặc chạm "Bằng nhau" nhé!',
-
-      build: function (k) {
-        var field = K.node('div', {
-          'class': 'pk-field',
-          'style': {
-            position: 'relative',
-            'min-height': '168px',
-            'border-radius': '22px',
-            background: 'linear-gradient(180deg, #fdf6e8, #eaf6dd)'
-          }
-        });
-        var left = K.node('div', {
-          'class': 'pk-cluster',
-          'data-cluster': 'left',
-          'style': { position: 'absolute', left: '4%', top: '12%', width: '43%', height: '76%' }
-        });
-        var right = K.node('div', {
-          'class': 'pk-cluster',
-          'data-cluster': 'right',
-          'style': { position: 'absolute', right: '4%', top: '12%', width: '43%', height: '76%' }
-        });
-        var net = K.node('div', {
-          'class': 'pk-net',
-          'aria-hidden': 'true',
-          'style': {
-            position: 'absolute',
-            left: '4%',
-            top: '12%',
-            width: '43%',
-            height: '76%',
-            border: '4px dashed #2d7d9a',
-            'border-radius': '46% 54% 48% 52%',
-            'pointer-events': 'none',
-            'z-index': '3'
-          }
-        });
-        var equalWrap = K.node('div', {
-          'class': 'pk-equal-wrap',
-          'style': {
-            position: 'absolute',
-            left: 'calc(50% - 50px)',
-            bottom: '4px',
-            'z-index': '4'
-          }
-        });
-        field.appendChild(left);
-        field.appendChild(right);
-        field.appendChild(net);
-        field.appendChild(equalWrap);
-        k.field = field;
-        k.left = left;
-        k.right = right;
-        k.net = net;
-        k.equalWrap = equalWrap;
-
-        k.track(field, 'click', function (event) {
-          var cluster = K.closestData(event.target, field, 'data-cluster');
-          var isEqual = K.closestData(event.target, field, 'data-equal');
-          if (cluster) {
-            var side = cluster.getAttribute('data-cluster');
-            k.net.style.left = side === 'left' ? '4%' : '53%';
-            if (!k.reduced) {
-              k.net.style.transition = 'transform 260ms ease';
-              k.net.style.transform = 'scale(1.06)';
-              k.later(function () { k.net.style.transform = ''; }, 260);
-            }
-            k.hint('Đã quây nhóm ' + (side === 'left' ? '1' : '2') + '!');
-            k.answer(side);
-            return;
-          }
-          if (isEqual) {
-            k.answer('equal');
-            return;
-          }
-          if (!k.reduced && !k.locked) {
-            k.net.style.transition = 'transform 220ms ease';
-            k.net.style.transform = 'translateY(-6px)';
-            k.later(function () { k.net.style.transform = ''; }, 220);
-          }
-          k.hint('Bé thả lưới trúng một cụm hoặc nút giữa nhé');
-        });
-        k.add(field);
-      },
-
-      render: function (k, q) {
-        var groups = q && q.visual && q.visual.groups || [];
-        var choices = (q && q.choices) || [];
-        var equal = choiceBy(choices, 'equal');
-        var i;
-        k.net.style.transform = '';
-        k.left.textContent = '';
-        k.right.textContent = '';
-        [[k.left, groups[0]], [k.right, groups[1]]].forEach(function (pair) {
-          var host = pair[0];
-          var group = pair[1];
-          var count = group && typeof group.count === 'number' ? group.count : 0;
-          var glyph = group && group.glyph ? group.glyph : '⭐';
-          for (i = 0; i < count && i < SPOTS.length; i += 1) {
-            host.appendChild(K.node('span', {
-              'class': 'pk-critter',
-              text: glyph,
-              'aria-hidden': 'true',
-              'style': {
-                position: 'absolute',
-                left: SPOTS[i][0] + '%',
-                top: SPOTS[i][1] + '%',
-                'font-size': 'clamp(1.3rem, 3.6vw, 2rem)',
-                'line-height': '1'
-              }
-            }));
-          }
-        });
-        while (k.equalWrap.firstChild) {
-          k.equalWrap.removeChild(k.equalWrap.firstChild);
-        }
-        if (equal) {
-          k.equalWrap.appendChild(k.btn({
-            'class': 'pk-equal',
-            'data-equal': '1',
-            'aria-label': 'Chọn ' + (equal.label || 'Bằng nhau'),
-            text: equal.icon ? equal.icon + ' ' + (equal.label || '') : (equal.label || '='),
-            'style': {
-              'min-width': '92px',
-              background: '#fff3c4',
-              color: '#6b4a00'
-            }
-          }));
-        }
-      },
-
-      onWrong: function (k) {
-        k.hint('Chưa đúng, bé thả lưới lại nhé!');
-        k.net.style.left = '4%';
-        if (!k.reduced) {
-          k.net.style.transform = 'scale(0.92)';
-          k.later(function () { k.net.style.transform = ''; }, 260);
-        }
-      }
-    });
+  function hint(t) {
+    if (hintNode) {
+      hintNode.textContent = t;
+      hintNode.classList.add('is-on');
+    }
   }
 
-  KM.Games.pokemon = createGame;
-  KM.Games[GAME_ID] = createGame;
-  K.register(GAME_ID, createGame);
-  return createGame;
-}());
+  function clearHint() {
+    if (hintNode) {
+      hintNode.textContent = '';
+      hintNode.classList.remove('is-on');
+    }
+  }
+
+  function submit(v) {
+    if (locked) { return false; }
+    var found = find(v);
+    if (!found) { hint('Bé chọn lại nhé!'); return false; }
+    locked = true;
+    mount.dispatchEvent(new CustomEvent('km:answer', {
+      bubbles: true,
+      detail: { value: found.value }
+    }));
+    tap();
+    return true;
+  }
+
+  function renderEquation(node, question) {
+    var eq = question && question.equation;
+    var tokens;
+    var j;
+    node.textContent = '';
+    if (!eq) { node.style.display = 'none'; return; }
+    node.style.display = '';
+    tokens = eq.tokens || [];
+    for (j = 0; j < tokens.length; j += 1) {
+      node.appendChild(el('span', 'kmg-token',
+        tokens[j].type === 'slot' ? '?' : tokens[j].value));
+    }
+    if (!tokens.length && eq.alt) { node.textContent = eq.alt; }
+    node.setAttribute('aria-label', eq.alt || node.textContent);
+  }
+
+  function clusterButton(group, value, fallbackLabel) {
+    var b = makeButton('kmg-cluster', '', function () {
+      if (locked) { return; }
+      b.classList.add('is-picked');
+      submit(value);
+    });
+    var title = el('span', 'kmg-cluster-title',
+      group && group.label ? group.label : (group && group.badge ? group.badge : fallbackLabel));
+    b.appendChild(title);
+    var dots = el('span', 'kmg-cluster-dots');
+    dots.style.cssText = 'display:flex;flex-wrap:wrap;gap:4px;justify-content:center;max-width:200px;';
+    var count = group && typeof group.count === 'number' ? group.count : 0;
+    if (!isFinite(count)) { count = 0; }
+    count = Math.max(0, Math.min(tune('maxCoins', 10), count));
+    if (count === 0) {
+      dots.appendChild(el('span', 'kmg-empty', '0'));
+    } else {
+      var k;
+      for (k = 0; k < count; k += 1) {
+        dots.appendChild(el('span', 'kmg-item', (group && group.glyph) || '🍎'));
+      }
+    }
+    b.appendChild(dots);
+    b.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:8px;';
+    b.setAttribute('aria-label', (title.textContent || fallbackLabel) + ' — ' + count);
+    return b;
+  }
+
+  function render(next) {
+    if (next) { q = next; }
+    locked = false;
+    hotspots = [];
+    root.classList.remove('is-correct');
+    root.classList.remove('is-celebrate');
+    clearHint();
+    if (markNode) { markNode.textContent = ''; markNode.classList.remove('is-on'); }
+
+    promptNode.textContent = q && q.text ? q.text : '';
+    kindNode.textContent = q && q.kind ? q.kind : '';
+    root.setAttribute('data-kind', q && q.kind ? q.kind : '');
+    renderEquation(equationNode, q);
+
+    scene.textContent = '';
+    var groups = (q && q.visual && q.visual.groups) || [];
+    var gap = Math.max(80, Math.min(240, tune('clusterGapPx', 160)));
+    var row = el('div', 'kmg-islands');
+    row.style.cssText = 'display:flex;align-items:center;justify-content:center;' +
+      'flex-wrap:wrap;gap:' + gap + 'px;';
+
+    row.appendChild(clusterButton(groups[0], 'left', 'Nhóm 1'));
+
+    var net = el('div', 'kmg-net');
+    net.style.cssText = 'display:flex;flex-direction:column;gap:8px;align-items:center;' +
+      'padding:12px;border:3px dashed #5b8c3a;border-radius:24px;min-width:64px;';
+    listen(net, 'click', function (event) {
+      if (locked) { return; }
+      if (event.target !== net) { return; }
+      net.classList.toggle('is-back');
+      hint('Bé chạm vào đảo hoặc nút nhé!');
+    });
+    var list = (q && q.choices) || [];
+    for (i = 0; i < list.length; i += 1) {
+      (function (choice) {
+        var icon = choice.icon != null ? choice.icon : (choice.aria || choice.glyph || '');
+        var label = choice.label != null ? choice.label : String(choice.value);
+        var b = makeButton('kmg-hotspot kmg-sign', (icon ? icon + ' ' : '') + label, function () {
+          if (locked) { return; }
+          b.classList.add('is-picked');
+          submit(choice.value);
+        });
+        b.setAttribute('aria-label', choice.aria || label);
+        hotspots.push(b);
+        net.appendChild(b);
+      }(list[i]));
+    }
+    row.appendChild(net);
+    row.appendChild(clusterButton(groups[1], 'right', 'Nhóm 2'));
+    scene.appendChild(row);
+  }
+
+  function handleKey(key) {
+    var s = String(key);
+    var idx;
+    if (!/^[1-9]$/.test(s)) { return false; }
+    idx = parseInt(s, 10) - 1;
+    if (!hotspots[idx]) { return false; }
+    hotspots[idx].click();
+    return true;
+  }
+
+  function onWrong() {
+    var picked = root.querySelectorAll('.is-picked');
+    var j;
+    locked = false;
+    for (j = 0; j < picked.length; j += 1) { picked[j].classList.remove('is-picked'); }
+    root.classList.remove('is-correct');
+    root.classList.remove('is-celebrate');
+    if (markNode) { markNode.textContent = ''; markNode.classList.remove('is-on'); }
+    hint('Thử lại nhé!');
+  }
+
+  function onCorrect() {
+    root.classList.add('is-correct');
+  }
+
+  function celebrate() {
+    root.classList.add('is-celebrate');
+    if (markNode) { markNode.textContent = '✓'; markNode.classList.add('is-on'); }
+  }
+
+  function destroy() {
+    for (i = 0; i < timers.length; i += 1) { clearTimeout(timers[i]); }
+    timers = [];
+    for (i = 0; i < listeners.length; i += 1) {
+      listeners[i][0].removeEventListener(listeners[i][1], listeners[i][2], false);
+    }
+    listeners = [];
+    for (i = 0; i < nodes.length; i += 1) {
+      if (nodes[i].parentNode) { nodes[i].parentNode.removeChild(nodes[i]); }
+    }
+    nodes = [];
+    if (root.parentNode) { root.parentNode.removeChild(root); }
+    locked = true;
+    hotspots = [];
+  }
+
+  promptNode = el('div', 'kmg-prompt');
+  kindNode = el('span', 'kmg-kind');
+  equationNode = el('div', 'kmg-equation');
+  scene = el('div', 'kmg-scene');
+  hintNode = el('div', 'kmg-hint');
+  hintNode.setAttribute('aria-live', 'polite');
+  markNode = el('span', 'kmg-mark');
+  markNode.setAttribute('aria-hidden', 'true');
+
+  root.appendChild(promptNode);
+  root.appendChild(kindNode);
+  root.appendChild(equationNode);
+  root.appendChild(scene);
+  root.appendChild(hintNode);
+  root.appendChild(markNode);
+  nodes.push(scene);
+  nodes.push(hintNode);
+
+  if (q) { render(q); }
+
+  return {
+    render: render,
+    onWrong: onWrong,
+    onCorrect: onCorrect,
+    celebrate: celebrate,
+    destroy: destroy,
+    handleKey: handleKey
+  };
+};

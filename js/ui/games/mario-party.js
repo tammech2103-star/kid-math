@@ -1,199 +1,356 @@
 /**
- * Minigame bài `b6` — tung xí ngầu đi vòng bàn (cảm hứng: Mario Party).
- * Design: quick-spec mục 07 (board/a — 12 ô + xí ngầu tâm, động tác "tung").
- * G2: dispatch theo question.kind; kind lạ → hiện tĩnh q.text/q.visual, vẫn giữ hàng đáp án.
+ * Module game độc lập — "Bàn ô xí ngầu 12 ô" (bài b6).
+ * Nguồn: design/quick-specs/ui-redesign-21-distinct-screens.md (bảng 21 giao diện, dòng 7)
+ * Quyết định: docs/architecture/ADR-0004-independent-game-modules-and-skill-asset-pipeline.md
+ * Hợp đồng: KM.Games['mario-party'](options) -> { render, onWrong, onCorrect, celebrate, destroy, handleKey }
+ * Kênh trả lời duy nhất: CustomEvent('km:answer', { bubbles:true, detail:{value} }) trên options.mount.
+ * ES5 thuần; mọi số gameplay đọc từ KM.Tuning.game (có default an toàn). Không asset ngoài.
+ * dieFace(r) = 1 + (r % 6): chỉ đổi mặt xí ngầu, không đổi question/choices, không phát event.
  */
 window.KM = window.KM || {};
 KM.Games = KM.Games || {};
 
-KM.Games.marioParty = (function () {
-  'use strict';
+KM.Games['mario-party'] = function (options) {
+  if (!options) { options = {}; }
+  var mount = options.mount;
+  var q = options.question || null;
+  var reduced = !!options.reducedMotion;
+  var audio = options.audio || {};
 
-  var K = KM.GameKit;
-  var GAME_ID = 'mario-party';
-  var FACES = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
-  var TILES = 12;
-  var KIND_ICON = {
-    count: '🔢',
-    compareGroups: '⚖️',
-    compareSign: '↔️',
-    compose: '🧩',
-    sequence: '🔀'
-  };
-  var KIND_TILE = { count: 1, compareGroups: 4, compareSign: 7, compose: 10, sequence: 5 };
+  var root = document.createElement('div');
+  root.className = 'kmg-mario-party';
+  if (reduced) { root.classList.add('is-reduced'); }
+  mount.appendChild(root);
 
-  function tokenStrip(k, q) {
-    var wrap = K.node('div', {
-      'style': {
-        display: 'flex', 'flex-wrap': 'wrap', gap: '6px',
-        'align-items': 'center', 'justify-content': 'center', 'min-height': '52px'
-      }
-    });
-    if (q && q.kind === 'sequence' && q.visual && q.visual.values) {
-      q.visual.values.forEach(function (value) {
-        wrap.appendChild(K.node('span', {
-          text: value == null ? '?' : String(value),
-          'aria-hidden': 'true',
-          'style': {
-            'min-width': '44px', 'min-height': '44px', padding: '4px 8px',
-            'border-radius': '12px', background: '#fff', color: '#23324a',
-            display: 'grid', 'place-items': 'center', 'font-weight': '900'
-          }
-        }));
-      });
-      return wrap;
+  var locked = false;
+  var timers = [];
+  var nodes = [];
+  var listeners = [];
+  var hotspots = [];
+  var rolls = 0;
+  var dieNode;
+  var promptNode;
+  var kindNode;
+  var equationNode;
+  var scene;
+  var hintNode;
+  var markNode;
+  var i;
+
+  function tune(name, fallback) {
+    var g = (window.KM && KM.Tuning && KM.Tuning.game) || {};
+    var v = g[name];
+    return (typeof v === 'number' && isFinite(v)) ? v : fallback;
+  }
+
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) { n.className = cls; }
+    if (text != null) { n.textContent = String(text); }
+    return n;
+  }
+
+  function listen(node, type, fn) {
+    node.addEventListener(type, fn, false);
+    listeners.push([node, type, fn]);
+  }
+
+  function makeButton(cls, text, onClick) {
+    var b = el('button', 'kmg-btn ' + cls, text);
+    b.type = 'button';
+    b.style.minWidth = '64px';
+    b.style.minHeight = '64px';
+    listen(b, 'click', onClick);
+    return b;
+  }
+
+  function tap() {
+    if (audio && typeof audio.tap === 'function') { audio.tap(); }
+  }
+
+  function find(v) {
+    var list = (q && q.choices) || [];
+    var j;
+    if (v == null) { return null; }
+    for (j = 0; j < list.length; j += 1) {
+      if (String(list[j].value) === String(v)) { return list[j]; }
     }
-    var groups = q && q.visual && q.visual.groups;
-    if (groups && groups.length) {
-      groups.forEach(function (group) {
-        wrap.appendChild(K.node('span', {
-          text: (group.glyph || '⭐') + ' ' + (group.count || 0),
-          'aria-hidden': 'true',
-          'style': { 'font-size': '1.3rem', padding: '2px 6px' }
-        }));
-      });
-      return wrap;
+    return null;
+  }
+
+  function hint(t) {
+    if (hintNode) {
+      hintNode.textContent = t;
+      hintNode.classList.add('is-on');
     }
-    var tokens = q && q.equation && q.equation.tokens;
-    if (tokens) {
-      tokens.forEach(function (token) {
-        wrap.appendChild(K.node('span', {
-          text: token.type === 'slot' ? '?' : String(token.value),
-          'aria-hidden': 'true',
-          'style': { 'font-size': '1.3rem', padding: '2px 6px', 'font-weight': '900' }
-        }));
-      });
-      return wrap;
+  }
+
+  function clearHint() {
+    if (hintNode) {
+      hintNode.textContent = '';
+      hintNode.classList.remove('is-on');
     }
-    wrap.appendChild(K.node('span', {
-      text: q && q.text ? q.text : '',
-      'style': { 'font-size': '1rem', 'font-weight': '700' }
+  }
+
+  function submit(v) {
+    if (locked) { return false; }
+    var found = find(v);
+    if (!found) { hint('Bé chọn lại nhé!'); return false; }
+    locked = true;
+    mount.dispatchEvent(new CustomEvent('km:answer', {
+      bubbles: true,
+      detail: { value: found.value }
     }));
-    return wrap;
+    tap();
+    return true;
   }
 
-  function createGame(options) {
-    return K.base(options, {
-      gameId: GAME_ID,
-      lessonId: 'b6',
-      tribute: 'Mario Party',
-      prefix: 'mp',
-      hint: 'Chạm xí ngầu để đi vòng bàn, rồi chạm ô đáp án nhé!',
+  function renderEquation(node, question) {
+    var eq = question && question.equation;
+    var tokens;
+    var j;
+    node.textContent = '';
+    if (!eq) { node.style.display = 'none'; return; }
+    node.style.display = '';
+    tokens = eq.tokens || [];
+    for (j = 0; j < tokens.length; j += 1) {
+      node.appendChild(el('span', 'kmg-token',
+        tokens[j].type === 'slot' ? '?' : tokens[j].value));
+    }
+    if (!tokens.length && eq.alt) { node.textContent = eq.alt; }
+    node.setAttribute('aria-label', eq.alt || node.textContent);
+  }
 
-      build: function (k) {
-        var board = K.node('div', {
-          'class': 'mp-board',
-          'style': {
-            position: 'relative', 'min-height': '176px', 'border-radius': '24px',
-            background: 'radial-gradient(circle at 50% 50%, #fff6d8 0 28%, #f2d7ff 29% 100%)'
-          }
-        });
-        var ring = K.node('div', { 'class': 'mp-ring', 'style': { position: 'absolute', inset: '0' } });
-        var info = K.node('div', {
-          'class': 'mp-info',
-          'style': {
-            position: 'absolute', left: '18%', top: '24%', width: '64%',
-            'min-height': '52px', display: 'grid', 'place-items': 'center', 'z-index': '2'
-          }
-        });
-        var diceWrap = K.node('div', {
-          'style': { position: 'absolute', left: 'calc(50% - 40px)', bottom: '6%', 'z-index': '4' }
-        });
-        var die = k.btn({
-          'class': 'mp-die',
-          'aria-label': 'Tung xí ngầu',
-          text: FACES[0],
-          'style': {
-            'min-width': '80px', 'min-height': '80px', 'border-radius': '20px',
-            background: '#fff', color: '#7e3fa8', 'font-size': '2rem'
-          }
-        });
-        var token = K.node('span', {
-          'class': 'mp-token', text: '🔴', 'aria-hidden': 'true',
-          'style': { position: 'absolute', 'font-size': '1.5rem', 'z-index': '3', transition: k.reduced ? 'none' : 'left 240ms ease, top 240ms ease' }
-        });
-        var answers = K.node('div', {
-          'class': 'mp-answers',
-          'style': {
-            position: 'relative', display: 'flex', 'flex-wrap': 'wrap', gap: '8px',
-            'justify-content': 'center'
-          }
-        });
-        diceWrap.appendChild(die);
-        ring.appendChild(token);
-        board.appendChild(ring);
-        board.appendChild(info);
-        board.appendChild(diceWrap);
-        k.board = board;
-        k.ring = ring;
-        k.info = info;
-        k.token = token;
-        k.die = die;
-        k.answers = answers;
-        k.rolls = 0;
+  function dieFace(r) {
+    return 1 + (r % 6);
+  }
 
-        k.track(die, 'click', function () {
-          k.rolls += 1;
-          k.die.textContent = FACES[k.rolls % FACES.length];
-          var face = (k.rolls % 6) + 1;
-          var tile = (KIND_TILE[k.currentKind] || 0) + face;
-          k.moveToken(tile);
-          k.hint('Xí ngầu ra ' + face + '. Bộ đáp án vẫn là của câu này nhé!');
-        });
-        k.moveToken = function (tile) {
-          var index = ((tile % TILES) + TILES) % TILES;
-          var angle = (index / TILES) * Math.PI * 2 - Math.PI / 2;
-          k.token.style.left = (50 + Math.cos(angle) * 40) + '%';
-          k.token.style.top = (50 + Math.sin(angle) * 40) + '%';
-        };
-        k.track(answers, 'click', function (event) {
-          var tile = K.closestData(event.target, answers, 'data-answer');
-          if (tile) {
-            k.answer(tile.getAttribute('data-value'));
-          }
-        });
-        k.add(board);
-        k.add(answers);
-      },
+  function tokenRow(text) {
+    var row = el('div', 'kmg-token-row');
+    row.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;justify-content:center;' +
+      'align-items:center;min-height:64px;';
+    row.appendChild(el('span', 'kmg-token-text', text));
+    return row;
+  }
 
-      render: function (k, q) {
-        var choices = (q && q.choices) || [];
-        var kind = q && q.kind;
-        var i;
-        k.currentKind = kind;
-        k.rolls = 0;
-        k.die.textContent = FACES[0];
-        k.moveToken(KIND_TILE[kind] || 0);
-        while (k.info.firstChild) {
-          k.info.removeChild(k.info.firstChild);
-        }
-        k.info.appendChild(tokenStrip(k, q));
-        while (k.answers.firstChild) {
-          k.answers.removeChild(k.answers.firstChild);
-        }
-        for (i = 0; i < choices.length; i += 1) {
-          k.answers.appendChild(k.btn({
-            'class': 'mp-answer',
-            'data-answer': String(i),
-            'data-value': String(choices[i].value),
-            'aria-label': 'Chọn đáp án ' + (choices[i].label != null ? choices[i].label : choices[i].value),
-            text: choices[i].label != null ? String(choices[i].label) : String(choices[i].value),
-            'style': { background: '#fffdf4', color: '#5b2f7c', 'min-width': '72px' }
-          }));
-        }
-      },
+  function visualTokens(question) {
+    var visual = question && question.visual;
+    var row = el('div', 'kmg-token-row');
+    var groups;
+    var values;
+    var j;
+    var count;
+    row.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;justify-content:center;' +
+      'align-items:center;min-height:64px;';
 
-      onWrong: function (k) {
-        k.moveToken(KIND_TILE[k.currentKind] || 0);
-        k.die.textContent = FACES[0];
-        k.rolls = 0;
-        k.hint('Quân cờ về ô đầu. Bé tung lại xí ngầu nhé!');
+    if (!visual) { return null; }
+
+    if (visual.kind === 'sequence' && visual.values) {
+      values = visual.values;
+      for (j = 0; j < values.length; j += 1) {
+        row.appendChild(el('span', 'kmg-seq-cell',
+          values[j] == null ? '?' : String(values[j])));
       }
-    });
+      return row;
+    }
+
+    if (visual.groups && visual.groups.length) {
+      groups = visual.groups;
+      for (j = 0; j < groups.length; j += 1) {
+        count = groups[j] && typeof groups[j].count === 'number' ? groups[j].count : 0;
+        if (!isFinite(count)) { count = 0; }
+        count = Math.max(0, Math.min(tune('maxCoins', 10), count));
+        var pocket = el('span', 'kmg-pocket');
+        pocket.style.cssText = 'display:inline-flex;flex-wrap:wrap;gap:2px;' +
+          'max-width:160px;justify-content:center;';
+        if (count === 0) {
+          pocket.appendChild(el('span', 'kmg-empty', '0'));
+        } else {
+          var k;
+          for (k = 0; k < count; k += 1) {
+            pocket.appendChild(el('span', 'kmg-item', groups[j].glyph || '🍎'));
+          }
+        }
+        row.appendChild(pocket);
+      }
+      return row;
+    }
+
+    if (question.equation && question.equation.tokens) {
+      var tokens = question.equation.tokens;
+      for (j = 0; j < tokens.length; j += 1) {
+        row.appendChild(el('span', 'kmg-token',
+          tokens[j].type === 'slot' ? '?' : tokens[j].value));
+      }
+      return row;
+    }
+
+    if (visual.alt) { return tokenRow(visual.alt); }
+    return null;
   }
 
-  KM.Games.marioParty = createGame;
-  KM.Games[GAME_ID] = createGame;
-  K.register(GAME_ID, createGame);
-  return createGame;
-}());
+  function render(next) {
+    if (next) { q = next; }
+    locked = false;
+    rolls = 0;
+    hotspots = [];
+    root.classList.remove('is-correct');
+    root.classList.remove('is-celebrate');
+    clearHint();
+    if (markNode) { markNode.textContent = ''; markNode.classList.remove('is-on'); }
+
+    promptNode.textContent = q && q.text ? q.text : '';
+    kindNode.textContent = q && q.kind ? q.kind : '';
+    root.setAttribute('data-kind', q && q.kind ? q.kind : '');
+    renderEquation(equationNode, q);
+
+    scene.textContent = '';
+    var boardSize = Math.max(64, tune('tileSizePx', 80));
+    var tiles = Math.max(5, Math.min(16, tune('boardTiles', 12)));
+    var side = Math.ceil(tiles / 4) + 1;
+    var board = el('div', 'kmg-board');
+    board.style.cssText = 'position:relative;width:' + (boardSize * side) + 'px;' +
+      'height:' + (boardSize * side) + 'px;max-width:100%;margin:0 auto;';
+
+    for (i = 0; i < tiles; i += 1) {
+      var angle = (i / tiles) * Math.PI * 2;
+      var tile = el('div', 'kmg-tile');
+      tile.style.position = 'absolute';
+      tile.style.width = boardSize + 'px';
+      tile.style.height = boardSize + 'px';
+      tile.style.lineHeight = boardSize + 'px';
+      tile.style.left = (50 + Math.cos(angle) * 36) + '%';
+      tile.style.top = (50 + Math.sin(angle) * 36) + '%';
+      tile.style.marginLeft = -(boardSize / 2) + 'px';
+      tile.style.marginTop = -(boardSize / 2) + 'px';
+      tile.style.textAlign = 'center';
+      tile.style.borderRadius = '12px';
+      tile.style.border = '2px solid #b98a4b';
+      tile.style.background = 'rgba(255,255,255,0.75)';
+      tile.textContent = '•';
+      tile.setAttribute('aria-hidden', 'true');
+      board.appendChild(tile);
+    }
+
+    var center = el('div', 'kmg-center');
+    center.style.cssText = 'position:absolute;left:50%;top:50%;margin-left:-' +
+      (boardSize * 1.6) + 'px;margin-top:-' + (boardSize * 1.6) + 'px;width:' +
+      (boardSize * 3.2) + 'px;min-height:64px;z-index:2;text-align:center;';
+
+    dieNode = makeButton('kmg-die', '🎲 ' + dieFace(rolls), function () {
+      if (locked) { return; }
+      rolls += 1;
+      dieNode.textContent = '🎲 ' + dieFace(rolls);
+      dieNode.setAttribute('aria-label', 'Xí ngầu mặt ' + dieFace(rolls));
+      tap();
+    });
+    dieNode.setAttribute('aria-label', 'Xí ngầu mặt ' + dieFace(rolls));
+    center.appendChild(dieNode);
+
+    var tokens = visualTokens(q);
+    if (tokens) { center.appendChild(tokens); }
+    if (q && q.text) { center.appendChild(tokenRow(q.text)); }
+    board.appendChild(center);
+    scene.appendChild(board);
+
+    var list = (q && q.choices) || [];
+    var answers = el('div', 'kmg-answers');
+    answers.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px;';
+    for (i = 0; i < list.length; i += 1) {
+      (function (choice) {
+        var label = choice.label != null
+          ? choice.label
+          : (choice.shape || choice.glyph || choice.icon || choice.aria || String(choice.value));
+        var b = makeButton('kmg-hotspot kmg-num', label, function () {
+          if (locked) { return; }
+          b.classList.add('is-picked');
+          submit(choice.value);
+        });
+        b.setAttribute('aria-label', choice.aria || label);
+        hotspots.push(b);
+        answers.appendChild(b);
+      }(list[i]));
+    }
+    scene.appendChild(answers);
+  }
+
+  function handleKey(key) {
+    var s = String(key);
+    var idx;
+    if (!/^[1-9]$/.test(s)) { return false; }
+    idx = parseInt(s, 10) - 1;
+    if (!hotspots[idx]) { return false; }
+    hotspots[idx].click();
+    return true;
+  }
+
+  function onWrong() {
+    var picked = root.querySelectorAll('.is-picked');
+    var j;
+    locked = false;
+    rolls = 0;
+    if (dieNode) {
+      dieNode.textContent = '🎲 ' + dieFace(rolls);
+      dieNode.setAttribute('aria-label', 'Xí ngầu mặt ' + dieFace(rolls));
+    }
+    for (j = 0; j < picked.length; j += 1) { picked[j].classList.remove('is-picked'); }
+    root.classList.remove('is-correct');
+    root.classList.remove('is-celebrate');
+    if (markNode) { markNode.textContent = ''; markNode.classList.remove('is-on'); }
+    hint('Thử lại nhé!');
+  }
+
+  function onCorrect() {
+    root.classList.add('is-correct');
+  }
+
+  function celebrate() {
+    root.classList.add('is-celebrate');
+    if (markNode) { markNode.textContent = '✓'; markNode.classList.add('is-on'); }
+  }
+
+  function destroy() {
+    for (i = 0; i < timers.length; i += 1) { clearTimeout(timers[i]); }
+    timers = [];
+    for (i = 0; i < listeners.length; i += 1) {
+      listeners[i][0].removeEventListener(listeners[i][1], listeners[i][2], false);
+    }
+    listeners = [];
+    for (i = 0; i < nodes.length; i += 1) {
+      if (nodes[i].parentNode) { nodes[i].parentNode.removeChild(nodes[i]); }
+    }
+    nodes = [];
+    if (root.parentNode) { root.parentNode.removeChild(root); }
+    locked = true;
+    hotspots = [];
+  }
+
+  promptNode = el('div', 'kmg-prompt');
+  kindNode = el('span', 'kmg-kind');
+  equationNode = el('div', 'kmg-equation');
+  scene = el('div', 'kmg-scene');
+  hintNode = el('div', 'kmg-hint');
+  hintNode.setAttribute('aria-live', 'polite');
+  markNode = el('span', 'kmg-mark');
+  markNode.setAttribute('aria-hidden', 'true');
+
+  root.appendChild(promptNode);
+  root.appendChild(kindNode);
+  root.appendChild(equationNode);
+  root.appendChild(scene);
+  root.appendChild(hintNode);
+  root.appendChild(markNode);
+  nodes.push(scene);
+  nodes.push(hintNode);
+
+  if (q) { render(q); }
+
+  return {
+    render: render,
+    onWrong: onWrong,
+    onCorrect: onCorrect,
+    celebrate: celebrate,
+    destroy: destroy,
+    handleKey: handleKey
+  };
+};

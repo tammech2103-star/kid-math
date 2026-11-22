@@ -1,4 +1,4 @@
-/* Bộ sưu tập McQueen — nạp sau app.css (ADR-0002). Mọi text tiếng Việt. */
+/* Bộ sưu tập Trường vui — nạp sau app.css (ADR-0002). Mọi text tiếng Việt. */
 
 /* ---------------------------------------------------- nút trên màn hình chủ */
 .home-collection-btn {
@@ -20,8 +20,8 @@
 
 .puzzle-piece {
   position: relative;
-  /* Ảnh gốc 1000×477, lưới 7×3 → mỗi ô rộng 142.9 cao 159 (tỷ lệ 0.898). */
-  aspect-ratio: 0.898;
+  /* Ảnh gốc 1200×900 (4:3), lưới 7×3 → mỗi ô rộng 171.4 cao 300 (tỷ lệ 0.571). */
+  aspect-ratio: 0.571;
   min-height: 38px;
   overflow: hidden;
   border-radius: clamp(6px, 1.2vw, 14px);

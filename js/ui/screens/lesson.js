@@ -1,5 +1,9 @@
 /**
- * Màn hình chơi một bài: hiển thị câu hỏi, lựa chọn, phản hồi và chuyển câu.
+ * Màn hình chơi một bài: shell tối giản quanh đúng một module game độc lập.
+ *
+ * Shell sở hữu LessonSession, sao, âm thanh, TTS và điều hướng. Module game
+ * sở hữu toàn bộ nội dung trong `mount` và báo đáp án qua `km:answer`.
+ * Không có hàng đáp án dùng chung, không có màn đua xe / bục trao thưởng.
  * @namespace KM.Screens
  */
 window.KM = window.KM || {};
@@ -10,7 +14,6 @@ KM.Screens.lesson = (function () {
 
   var el = KM.Components.el;
   var Components = KM.Components;
-  var Visuals = KM.Visuals;
 
   /**
    * @param {object} ctx
@@ -34,25 +37,15 @@ KM.Screens.lesson = (function () {
     var questions = ctx.questions.forLesson(lesson, ctx.rng, tuning);
     var session = ctx.lessonSession.create({ questions: questions, tuning: tuning });
     var timers = [];
-    var choiceButtons = [];
     var earnedStars = 0;
     var locked = false;
     var finished = false;
     var questionSpeakTimer = null;
     var game = null;
-    var spriteHandle = null;
-    var heroHost = null;
+    var mount = null;
+    var onAnswerEvent = null;
 
     var screen = el('div', { class: 'screen lesson' });
-    var attempt = ctx.progress.entryFor(lesson.id).plays;
-    var opponents = ctx.racers.opponentsForLesson(lesson.id, attempt);
-    var rival = opponents[0] || null;
-    var race = ctx.race.create({
-      total: questions.length,
-      player: ctx.racers.player,
-      opponents: opponents
-    });
-    var raceUI = ctx.raceUI.create({ race: race, ctx: ctx, screen: screen });
 
     function later(callback, delay) {
       var id = window.setTimeout(callback, delay);
@@ -69,8 +62,8 @@ KM.Screens.lesson = (function () {
     }
 
     /**
-     * @param {string} lessonId
-     * @returns {object|null} Cấu hình game của bài học (ADR-0002).
+     * Dữ liệu tĩnh của bài; module game không gọi GameMap.
+     * @returns {object|null}
      */
     function gameEntryFor(lessonId) {
       return KM.GameMap && typeof KM.GameMap.forLesson === 'function'
@@ -79,17 +72,7 @@ KM.Screens.lesson = (function () {
     }
 
     /**
-     * @param {string} gameId
-     * @returns {Function|null} Factory đã đăng ký, hoặc null để dùng màn chơi cũ.
-     */
-    function gameFactoryFor(gameId) {
-      return gameId && KM.GameRegistry && typeof KM.GameRegistry.get === 'function'
-        ? KM.GameRegistry.get(gameId)
-        : null;
-    }
-
-    /**
-     * Gọi một phương thức của game nếu có; lỗi game không được làm hỏng màn học.
+     * Gọi một phương thức tuỳ chọn của game; lỗi module không làm hỏng màn học.
      * @param {string} method
      * @param {*} [arg]
      */
@@ -101,39 +84,6 @@ KM.Screens.lesson = (function () {
         game[method](arg);
       } catch (error) {
         console.error('[KM] game.' + method + ' failed:', error);
-      }
-    }
-
-    /**
-     * Đổi frame feel của sprite do lesson shell sở hữu. Game vẫn có thể gọi trực tiếp
-     * qua `options.sprite`; helper này chỉ áp trạng thái bắt buộc của màn học.
-     * @param {string} name idle|move|action|cheer
-     */
-    function setSpriteState(name) {
-      if (!spriteHandle || typeof spriteHandle.setState !== 'function') {
-        return;
-      }
-      try {
-        spriteHandle.setState(name);
-      } catch (error) {
-        console.error('[KM] sprite.setState failed:', error);
-      }
-    }
-
-    /**
-     * Game gọi onAnswer(value); LessonSession vẫn là nguồn chân lý.
-     * @param {*} value Giá trị đáp án mà game trả về.
-     */
-    function onGameAnswer(value) {
-      var question = session.current();
-      if (!question || locked || finished) {
-        return;
-      }
-      for (var i = 0; i < question.choices.length; i += 1) {
-        if (String(question.choices[i].value) === String(value)) {
-          handlePick(question, question.choices[i], choiceButtons[i] || null);
-          return;
-        }
       }
     }
 
@@ -188,10 +138,9 @@ KM.Screens.lesson = (function () {
       el('div', { class: 'lesson-tools' }, [speechButton, sfxButton])
     ]);
 
-    var raceStatus = el('span', {
-      class: 'race-status',
-      text: '🏁 ' + (rival ? 'Đua với ' + rival.name + ' · ' : '') +
-        'Câu 1/' + questions.length
+    var progressText = el('span', {
+      class: 'question-progress',
+      text: 'Câu 1/' + questions.length
     });
     var meterValue = el('span', { class: 'star-meter-value', text: '0' });
     var meter = el('div', {
@@ -203,8 +152,7 @@ KM.Screens.lesson = (function () {
       meterValue
     ]);
 
-    var progressRow = el('div', { class: 'progress-row' }, [raceStatus, meter]);
-    var raceSlot = el('div', { class: 'race-slot' });
+    var progressRow = el('div', { class: 'progress-row' }, [progressText, meter]);
 
     var questionText = el('p', {
       class: 'question-text',
@@ -222,36 +170,33 @@ KM.Screens.lesson = (function () {
       }
     }, ['🔊 Nghe lại']);
 
-    var visualSlot = el('div', { class: 'visual-slot' });
-    var equationSlot = el('div', { class: 'equation-slot' });
-    var choicesNode = el('div', { class: 'choices' });
-
     var questionCard = el('section', { class: 'question-card', 'aria-label': 'Câu hỏi' }, [
-      el('div', { class: 'question-head' }, [questionText, speakReplay]),
-      visualSlot,
-      equationSlot,
-      choicesNode
+      el('div', { class: 'question-head' }, [questionText, speakReplay])
     ]);
-
     var foot = el('div', { class: 'lesson-foot' });
 
     screen.appendChild(header);
     screen.appendChild(progressRow);
-    screen.appendChild(raceSlot);
     screen.appendChild(questionCard);
     screen.appendChild(foot);
-    raceSlot.appendChild(raceUI.hud);
-    ctx.root.appendChild(screen);
 
-    // ADR-0002: game là lớp trình bày nằm trước bảng đáp án. Không có factory
-    // thì không chèn gì cả → hành vi cũ (fallback) được giữ nguyên.
     var gameEntry = gameEntryFor(lesson.id);
-    var gameFactory = gameEntry ? gameFactoryFor(gameEntry.gameId) : null;
-    if (gameFactory) {
+    var inputHint = 'Chạm vào đáp án đúng';
+    if (gameEntry) {
+      if (gameEntry.inputHint) {
+        inputHint = gameEntry.inputHint;
+      }
+      if (gameEntry.introText) {
+        questionCard.setAttribute('aria-description', gameEntry.introText);
+      }
+
       var mountAttrs = {
-        class: 'game-stage',
+        class: 'game-mount',
         'data-game-id': gameEntry.gameId
       };
+      if (gameEntry.title) {
+        mountAttrs['aria-label'] = gameEntry.title;
+      }
       if (gameEntry.bg) {
         mountAttrs.style = {
           'background-image': 'url("' + gameEntry.bg + '")',
@@ -260,32 +205,8 @@ KM.Screens.lesson = (function () {
           'background-repeat': 'no-repeat'
         };
       }
-      var mount = el('div', mountAttrs);
-      // ADR-0003: shell riêng theo entry, vẫn chỉ là một .game-stage duy nhất.
-      mount.classList.add(gameEntry.layout ? 'stage--' + gameEntry.layout : 'stage--scene');
-      if (gameEntry.style) {
-        mount.classList.add('style--' + gameEntry.style);
-      }
-      mount.setAttribute('data-variant', gameEntry.variant || 'a');
-
-      // OBS-01: đánh dấu màn có minigame để CSS nén bố cục, giữ nút đáp án
-      // nằm trong viewport (không đổi cấu trúc .choices / .choice).
-      screen.classList.add('has-minigame', 'minigame-' + gameEntry.gameId);
+      mount = el('div', mountAttrs);
       var palette = gameEntry.palette || {};
-
-      // Lesson shell tạo và sở hữu sprite handle; game chỉ nhận qua options.sprite.
-      heroHost = el('div', { class: 'km-hero-sprite', 'aria-hidden': 'true' });
-      mount.insertBefore(heroHost, mount.firstChild);
-      if (gameEntry.sprite && KM.Sprite && typeof KM.Sprite.create === 'function') {
-        spriteHandle = KM.Sprite.create({
-          mount: heroHost,
-          src: gameEntry.sprite,
-          state: 'idle',
-          reducedMotion: prefersReducedMotion(),
-          motionMs: gameEntry.motionMs || 240,
-          frameSize: 96
-        });
-      }
       if (palette.sky) {
         mount.style.setProperty('--game-sky', palette.sky);
       }
@@ -295,108 +216,62 @@ KM.Screens.lesson = (function () {
       if (palette.ink) {
         mount.style.setProperty('--game-ink', palette.ink);
       }
-      var tributeLabel = el('p', {
-        class: 'game-tribute',
-        text: '🎮 Cảm hứng: ' + (gameEntry.tribute || gameEntry.title || '')
-      });
-      // Nhãn nằm trong stage (position:absolute) → không chiếm thêm một dòng
-      // ở question-card. Các module game tự nhận diện và không tạo nhãn trùng.
-      mount.appendChild(tributeLabel);
-      questionCard.insertBefore(mount, choicesNode);
-      try {
-        game = gameFactory({
-          ctx: ctx,
-          question: session.current(),
-          mount: mount,
-          onAnswer: onGameAnswer,
-          reducedMotion: prefersReducedMotion(),
-          sprite: spriteHandle
-        });
-        if (KM.GameContract && typeof KM.GameContract.assert === 'function') {
-          KM.GameContract.assert(game);
+      questionCard.appendChild(mount);
+
+      // Một kênh trả lời duy nhất: module phát km:answer trên chính mount.
+      onAnswerEvent = function (event) {
+        var detail = event && event.detail;
+        if (!detail || detail.value == null) {
+          return;
         }
-      } catch (error) {
-        console.error('[KM] game init failed:', error);
-        game = null;
-        if (spriteHandle) {
-          spriteHandle.destroy();
-          spriteHandle = null;
+        var question = session.current();
+        if (!question || locked || finished) {
+          return;
         }
-        if (heroHost && heroHost.parentNode) {
-          heroHost.parentNode.removeChild(heroHost);
+        for (var i = 0; i < question.choices.length; i += 1) {
+          if (String(question.choices[i].value) === String(detail.value)) {
+            handlePick(question, question.choices[i]);
+            return;
+          }
         }
-        if (mount.parentNode) {
-          mount.parentNode.removeChild(mount);
+      };
+      mount.addEventListener('km:answer', onAnswerEvent);
+
+      var gameFactory = KM.Games && typeof KM.Games[gameEntry.gameId] === 'function'
+        ? KM.Games[gameEntry.gameId]
+        : null;
+      if (gameFactory) {
+        try {
+          game = gameFactory({
+            mount: mount,
+            question: session.current(),
+            reducedMotion: prefersReducedMotion(),
+            audio: ctx.audio
+          });
+        } catch (error) {
+          console.error('[KM] game init failed:', error);
+          game = null;
         }
-        if (tributeLabel.parentNode) {
-          tributeLabel.parentNode.removeChild(tributeLabel);
+        if (game) {
+          // Hợp đồng cũ có thể chờ các method bắt buộc; bỏ qua nếu chặn instance mới.
+          try {
+            if (KM.GameContract && typeof KM.GameContract.assert === 'function') {
+              KM.GameContract.assert(game);
+            }
+          } catch (error) {
+            /* Hợp đồng mới: mọi method đều tuỳ chọn. */
+          }
         }
       }
     }
+
+    ctx.root.appendChild(screen);
 
     function speakCurrent() {
       var question = session.current();
       if (question) {
         ctx.speech.speak(question.say);
       }
-    }
-
-    function choiceContent(question, choice) {
-      if (question.choiceRender === 'shape') {
-        return [Visuals.shapeSvg(choice.shape, {
-          size: 62,
-          color: ctx.curriculum.shapes[choice.shape].color,
-          label: choice.label
-        })];
-      }
-      if (question.choiceRender === 'glyph') {
-        return [el('span', { class: 'choice-glyph', text: choice.glyph, 'aria-hidden': 'true' })];
-      }
-      if (question.choiceRender === 'number') {
-        return [el('span', { class: 'choice-value', text: choice.label })];
-      }
-      if (question.choiceRender === 'sign') {
-        return [el('span', { class: 'choice-sign', text: choice.label })];
-      }
-      var styleVars = {};
-      if (choice.badgeBg) {
-        styleVars['--badge-bg'] = choice.badgeBg;
-      }
-      if (choice.color) {
-        styleVars['--badge-ink'] = choice.color;
-      }
-      return [el('span', {
-        class: 'choice-text-stack' + (choice.badge ? ' is-badge' : ''),
-        'data-icon': choice.icon || '',
-        style: Object.keys(styleVars).length ? styleVars : null
-      }, [
-        el('span', { class: 'choice-label', text: choice.label })
-      ])];
-    }
-
-    function renderChoices(question) {
-      choiceButtons = [];
-      while (choicesNode.firstChild) {
-        choicesNode.removeChild(choicesNode.firstChild);
-      }
-      choicesNode.className = 'choices choices-' + question.choiceRender +
-        ' choices-count-' + question.choices.length;
-      question.choices.forEach(function (choice) {
-        var aria = choice.aria || (question.choiceRender === 'number'
-          ? 'Số ' + choice.label
-          : choice.label);
-        var button = el('button', {
-          class: 'choice choice-' + question.choiceRender,
-          type: 'button',
-          'data-value': String(choice.value),
-          'aria-label': aria
-        }, choiceContent(question, choice));
-        button.addEventListener('click', function () {
-          handlePick(question, choice, button);
-        });
-        choiceButtons.push(button);
-        choicesNode.appendChild(button);
-      });
     }
 
     function renderQuestion() {
@@ -406,50 +281,15 @@ KM.Screens.lesson = (function () {
         return;
       }
       locked = false;
-      setSpriteState('idle');
       questionCard.classList.remove('is-correct');
-      choicesNode.classList.remove('is-locked');
       questionText.textContent = question.text;
 
-      while (visualSlot.firstChild) {
-        visualSlot.removeChild(visualSlot.firstChild);
-      }
-      while (equationSlot.firstChild) {
-        equationSlot.removeChild(equationSlot.firstChild);
-      }
-
-      // OBS-01: khi đã có minigame, stage là hình minh hoạ của câu hỏi.
-      // Giữ lại visual cũ chỉ cho các bài fallback — tránh cộng thêm ~180px
-      // làm tràn nút đáp án khỏi viewport.
-      if (question.visual && !game) {
-        var visual = el('div', {
-          class: 'visual',
-          role: 'img',
-          'aria-label': question.visual.alt || ''
-        });
-        var rendered = Visuals.render(question.visual);
-        if (rendered) {
-          rendered.setAttribute('aria-hidden', 'true');
-          visual.appendChild(rendered);
-        }
-        visualSlot.appendChild(visual);
-      }
-      if (question.equation) {
-        var equation = Visuals.renderEquation(question.equation);
-        if (equation) {
-          equation.setAttribute('role', 'img');
-          equation.setAttribute('aria-label', question.equation.alt || '');
-          equationSlot.appendChild(equation);
-        }
-      }
-
-      renderChoices(question);
+      // Module tự render visual/equation/hotspot trong mount.
       callGame('render', question);
 
-      raceStatus.textContent = '🏁 ' + (rival ? 'Đua với ' + rival.name + ' · ' : '') +
-        'Câu ' + (session.progress().index + 1) + '/' + session.progress().total;
-      raceUI.update();
-      foot.textContent = 'Chạm vào đáp án đúng';
+      progressText.textContent = 'Câu ' + (session.progress().index + 1) +
+        '/' + session.progress().total;
+      foot.textContent = inputHint;
 
       if (questionSpeakTimer) {
         window.clearTimeout(questionSpeakTimer);
@@ -465,7 +305,7 @@ KM.Screens.lesson = (function () {
       questionText.focus({ preventScroll: true });
     }
 
-    function handlePick(question, choice, button) {
+    function handlePick(question, choice) {
       if (locked || finished) {
         return;
       }
@@ -480,41 +320,16 @@ KM.Screens.lesson = (function () {
 
       if (!result.correct) {
         callGame('onWrong', choice);
-        setSpriteState('idle');
-        race.wrong();
-        raceUI.update();
         ctx.audio.wrong();
-        if (button) {
-          button.classList.add('is-wrong');
-        }
-        Components.shake(button);
         Components.toast('Thử lại nhé! Bé làm được mà 💪', { tone: 'gentle', duration: 1600 });
         ctx.speech.speak('Chưa đúng. Bé thử lại nhé!');
-        later(function () {
-          if (button) {
-            button.classList.remove('is-wrong');
-          }
-        }, tuning.timing.wrongHoldMs);
         return;
       }
 
       locked = true;
       callGame('onCorrect', result);
-      setSpriteState('cheer');
-      choicesNode.classList.add('is-locked');
-      Components.dismissToast();
-      choiceButtons.forEach(function (item) {
-        item.classList.remove('is-wrong');
-      });
-      if (button) {
-        button.classList.add('is-correct');
-      }
-      race.correct(result.firstTry);
-      race.completeQuestion();
-      raceUI.update();
       ctx.audio.correct();
       ctx.audio.star();
-      ctx.audio.engine();
 
       if (result.firstTry) {
         earnedStars += 1;
@@ -522,11 +337,8 @@ KM.Screens.lesson = (function () {
         meter.setAttribute('aria-label', earnedStars + ' sao đạt được trong bài');
       }
 
-      Components.carCelebration(screen, {
-        title: 'Đúng rồi!',
-        sub: result.firstTry ? '+1 ⭐' : 'Bé làm được rồi!',
-        duration: tuning.timing.carPopMs
-      });
+      Components.dismissToast();
+      Components.toast('Đúng rồi!', { tone: 'success', duration: 1400 });
       Components.confetti(screen, tuning.confetti.count, tuning.timing.confettiMs + 500);
       callGame('celebrate');
 
@@ -553,21 +365,20 @@ KM.Screens.lesson = (function () {
       }
       finished = true;
       var summary = session.summary();
-      var raceSummary = race.settle();
-      raceUI.update({ final: true });
-      raceStatus.textContent = '🏁 Về đích!';
       var record = ctx.progress.recordResult(lesson.id, summary);
       later(function () {
         ctx.navigate('result', {
           lessonId: lesson.id,
           summary: summary,
-          record: record,
-          race: raceSummary
+          record: record
         });
       }, 900);
     }
 
     function onKeyDown(event) {
+      if (event.defaultPrevented) {
+        return;
+      }
       if (event.key === 'Escape') {
         ctx.navigate('home');
         return;
@@ -576,34 +387,35 @@ KM.Screens.lesson = (function () {
         speakCurrent();
         return;
       }
-      var index = parseInt(event.key, 10) - 1;
-      if (index >= 0 && index < choiceButtons.length && !Number.isNaN(index)) {
-        event.preventDefault();
-        choiceButtons[index].click();
+      if (!/^[1-9]$/.test(event.key) || !game || typeof game.handleKey !== 'function') {
+        return;
+      }
+      try {
+        if (game.handleKey(event.key) === true) {
+          event.preventDefault();
+        }
+      } catch (error) {
+        console.error('[KM] game.handleKey failed:', error);
       }
     }
 
     document.addEventListener('keydown', onKeyDown);
-    raceUI.showIntro(function () {
-      renderQuestion();
-    });
+    renderQuestion();
 
     return {
       destroy: function () {
         timers.forEach(function (id) {
           window.clearTimeout(id);
         });
+        timers = [];
         document.removeEventListener('keydown', onKeyDown);
-        raceUI.destroy();
+        if (mount && onAnswerEvent) {
+          mount.removeEventListener('km:answer', onAnswerEvent);
+        }
         if (game) {
           callGame('destroy');
           game = null;
         }
-        if (spriteHandle) {
-          spriteHandle.destroy();
-          spriteHandle = null;
-        }
-        heroHost = null;
         ctx.speech.stop();
       },
       debugState: function () {

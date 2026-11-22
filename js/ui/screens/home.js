@@ -126,7 +126,7 @@ KM.Screens.home = (function () {
     var homeTitle = el('h1', { text: tuning.appName, tabindex: '-1' });
     var header = el('header', { class: 'topbar' }, [
       el('div', { class: 'brand' }, [
-        el('span', { class: 'brand-mark', text: '🚗', 'aria-hidden': 'true' }),
+        el('span', { class: 'brand-mark', text: '📚', 'aria-hidden': 'true' }),
         el('div', { class: 'brand-copy' }, [
           homeTitle,
           el('p', { text: 'Toán lớp 1 · Tập 1 · Kết nối tri thức' })
@@ -158,14 +158,10 @@ KM.Screens.home = (function () {
     var hero = el('section', { class: 'hero' }, [
       el('div', { class: 'hero-copy' }, [
         el('span', { class: 'eyebrow', text: 'Học mà chơi · Chơi mà học' }),
-        el('h2', { text: 'Học toán cùng xe đua!' }),
+        el('h2', { text: 'Học toán cùng 21 trò vui!' }),
         el('p', {
-          text: 'Mỗi bài là một cuộc đua 1 đối 1. Trả lời đúng để McQueen ' +
-            'tăng tốc về đích và nhận sao!'
-        }),
-        el('span', {
-          class: 'race-pill',
-          text: '🏁 21 cuộc đua · 28 đối thủ'
+          text: 'Mỗi bài học là một trò chơi vui. Trả lời đúng để nhận sao ' +
+            'và mảnh ghép nhé!'
         }),
         el('div', { class: 'hero-actions' }, [
           el('button', {
@@ -178,7 +174,7 @@ KM.Screens.home = (function () {
               }
             }
           }, [
-            el('span', { class: 'btn-icon', text: allDone ? '🏁' : '▶', 'aria-hidden': 'true' }),
+            el('span', { class: 'btn-icon', text: allDone ? '⭐' : '▶', 'aria-hidden': 'true' }),
             el('span', {
               text: (allDone ? 'Ôn tập: ' : 'Học tiếp: ') + nextLesson.title
             })
@@ -214,7 +210,7 @@ KM.Screens.home = (function () {
           }, [
             el('span', { class: 'btn-icon', text: '🧩', 'aria-hidden': 'true' }),
             el('span', {
-              text: 'Bộ sưu tập McQueen · ' + collectionProgress.count + '/' +
+              text: 'Bộ sưu tập Trường vui · ' + collectionProgress.count + '/' +
                 collectionProgress.total
             })
           ])
@@ -223,12 +219,15 @@ KM.Screens.home = (function () {
       el('div', { class: 'hero-art' }, [
         el('span', { class: 'hero-spark hero-spark-a', text: '⭐', 'aria-hidden': 'true' }),
         el('span', { class: 'hero-spark hero-spark-b', text: '✨', 'aria-hidden': 'true' }),
-        el('img', {
-          class: 'hero-car',
-          src: Components.CAR_SRC,
-          alt: 'Chiếc xe đua màu đỏ tặng thưởng khi bé trả lời đúng',
-          draggable: 'false'
-        })
+        el('div', {
+          class: 'hero-badge',
+          role: 'img',
+          'aria-label': 'Ngôi trường, sách và sao phần thưởng'
+        }, [
+          el('span', { class: 'hero-badge-school', text: '🏫', 'aria-hidden': 'true' }),
+          el('span', { class: 'hero-badge-book', text: '📚', 'aria-hidden': 'true' }),
+          el('span', { class: 'hero-badge-star', text: '⭐', 'aria-hidden': 'true' })
+        ])
       ])
     ]);
 
@@ -242,8 +241,8 @@ KM.Screens.home = (function () {
         el('span', { text: 'Chạm đáp án đúng' })
       ]),
       el('div', { class: 'how-item' }, [
-        el('span', { class: 'how-icon', text: '🏎️', 'aria-hidden': 'true' }),
-        el('span', { text: 'Nhận xe và sao' })
+        el('span', { class: 'how-icon', text: '🧩', 'aria-hidden': 'true' }),
+        el('span', { text: 'Nhận sao và mảnh ghép' })
       ])
     ]);
 
@@ -299,7 +298,7 @@ KM.Screens.home = (function () {
           el('span', { class: 'lesson-name', text: lesson.title }),
           el('span', { class: 'lesson-foot' }, [
             Components.stars(stars, { small: true }),
-            el('span', { class: 'lesson-page', text: '🏁 Trang ' + lesson.page })
+            el('span', { class: 'lesson-page', text: '📖 Trang ' + lesson.page })
           ])
         ]),
         unlocked ? null : el('span', { class: 'sr-only', text: 'Chưa mở khoá.' })

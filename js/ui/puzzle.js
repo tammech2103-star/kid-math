@@ -32,11 +32,29 @@ KM.PuzzleUI = (function () {
   }
 
   /**
+   * Ảnh gốc của bộ sưu tập: luôn lấy từ service/domain puzzle.
+   * @param {object} [service]
+   * @returns {string}
+   */
+  function puzzleSrc(service) {
+    if (service && typeof service.src === 'function') {
+      return service.src();
+    }
+    if (window.KM.Puzzle && typeof KM.Puzzle.src === 'function') {
+      return KM.Puzzle.src();
+    }
+    return window.KM.Components && KM.Components.PUZZLE_SRC
+      ? KM.Components.PUZZLE_SRC
+      : 'Asset/v2/vex/school-reward.svg';
+  }
+
+  /**
    * Style cắt ảnh dự phòng nếu domain puzzle chưa được tải.
    * @param {number} index
+   * @param {object} [service]
    * @returns {object}
    */
-  function localStyle(index) {
+  function localStyle(index, service) {
     var source = window.KM.Tuning && KM.Tuning.puzzle ? KM.Tuning.puzzle : {};
     var cols = Number(source.cols) > 0 ? Math.floor(Number(source.cols)) : 7;
     var rows = Number(source.rows) > 0 ? Math.floor(Number(source.rows)) : 3;
@@ -46,7 +64,7 @@ KM.PuzzleUI = (function () {
     var x = cols > 1 ? (column / (cols - 1)) * 100 : 0;
     var y = rows > 1 ? (row / (rows - 1)) * 100 : 0;
     return {
-      'background-image': 'url("' + (KM.Components ? KM.Components.CAR_SRC : 'Asset/Mc_Queen.webp') + '")',
+      'background-image': 'url("' + puzzleSrc(service) + '")',
       'background-size': (cols * 100) + '% ' + (rows * 100) + '%',
       'background-position': Number(x.toFixed(4)) + '% ' + Number(y.toFixed(4)) + '%',
       'background-repeat': 'no-repeat'
@@ -63,7 +81,7 @@ KM.PuzzleUI = (function () {
     if (service && typeof service.styleFor === 'function') {
       return service.styleFor(index);
     }
-    return localStyle(index);
+    return localStyle(index, service);
   }
 
   /**

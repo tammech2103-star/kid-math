@@ -1,5 +1,5 @@
 /**
- * Bộ sưu tập 21 mảnh McQueen — logic thuần, không đụng DOM.
+ * Bộ sưu tập 21 mảnh ghép Trường vui — logic thuần, không đụng DOM.
  * ADR-0002: lưu trong `progress.state.puzzle`, trao theo HOÀN THÀNH bài học,
  * không phụ thuộc hạng nhất/nhì. Mọi thông số đọc từ `tuning.puzzle`
  * với default an toàn nếu tuning.js chưa cập nhật.
@@ -13,7 +13,7 @@ KM.Puzzle = (function () {
   var DEFAULT_COLS = 7;
   var DEFAULT_ROWS = 3;
   var DEFAULT_REVEAL_MS = 900;
-  var DEFAULT_SRC = 'Asset/Mc_Queen.webp';
+  var DEFAULT_SRC = 'Asset/v2/vex/school-reward.svg';
 
   /** @param {*} value @param {number} fallback @param {number} min @param {number} max */
   function clampInt(value, fallback, min, max) {
@@ -41,8 +41,8 @@ KM.Puzzle = (function () {
 
   /** @returns {string} Đường dẫn ảnh gốc, dùng chung với Components. */
   function src() {
-    return window.KM.Components && KM.Components.CAR_SRC
-      ? KM.Components.CAR_SRC
+    return window.KM.Components && KM.Components.PUZZLE_SRC
+      ? KM.Components.PUZZLE_SRC
       : DEFAULT_SRC;
   }
 

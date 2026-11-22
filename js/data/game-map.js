@@ -376,18 +376,18 @@ KM.GameMap = (function () {
     {
       gameId: 'mario-kart',
       tribute: 'Mario Kart 8',
-      title: 'Đua xe về đích',
+      title: 'Đường về trường',
       palette: { sky: '#8DD9FF', accent: '#FFD84D', ink: '#243B5A' },
       bg: 'Asset/hd/b20.webp',
-      mechanic: 'Đua 1 đối 1 + bục trao thưởng',
+      mechanic: 'Xếp các ô đường tới trường',
       phase: 1,
       style: 'patchwork',
       layout: 'track',
       variant: 'a',
       cover: 'Asset/covers/b20.webp',
       sprite: 'Asset/sprites/b20.webp',
-      introText: 'Đường đua về đích đang chờ bé!',
-      inputHint: 'Chạm đáp án để xe tăng tốc.',
+      introText: 'Xếp đường tới trường đang chờ bé!',
+      inputHint: 'Chạm đáp án để xếp ô đường.',
       motionMs: 140
     }
   ];

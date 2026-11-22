@@ -99,13 +99,9 @@ window.KM = window.KM || {};
     questions: KM.Questions,
     lessonSession: KM.LessonSession,
     gameMap: KM.GameMap || null,
-    games: KM.GameRegistry || null,
     puzzle: KM.Puzzle && typeof KM.Puzzle.create === 'function'
       ? KM.Puzzle.create({ progress: progress, curriculum: KM.Curriculum, tuning: tuning })
       : null,
-    racers: KM.Racers,
-    race: KM.Race,
-    raceUI: KM.RaceUI,
     navigate: navigate,
     setSetting: setSetting
   };
@@ -116,17 +112,13 @@ window.KM = window.KM || {};
       el('span', { class: 'splash-eyebrow', text: 'Toán lớp 1 · Tập 1' }),
       el('h1', { class: 'splash-title', text: tuning.appName }),
       el('p', { class: 'splash-sub', text: 'Kết nối tri thức với cuộc sống' }),
-      el('div', { class: 'splash-car-wrap' }, [
+      el('div', { class: 'splash-badge', role: 'img', 'aria-label': 'Ngôi trường, sách và sao phần thưởng' }, [
+        el('span', { class: 'splash-badge-school', text: '🏫', 'aria-hidden': 'true' }),
+        el('span', { class: 'splash-badge-book', text: '📚', 'aria-hidden': 'true' }),
         el('span', { class: 'splash-spark splash-spark-a', text: '⭐', 'aria-hidden': 'true' }),
-        el('span', { class: 'splash-spark splash-spark-b', text: '✨', 'aria-hidden': 'true' }),
-        el('img', {
-          class: 'splash-car',
-          src: Components.CAR_SRC,
-          alt: 'Chiếc xe đua phần thưởng',
-          draggable: 'false'
-        })
+        el('span', { class: 'splash-spark splash-spark-b', text: '✨', 'aria-hidden': 'true' })
       ]),
-      el('p', { class: 'splash-note', text: 'Trả lời đúng, xe đua sẽ xuất hiện và tặng bé những ngôi sao!' }),
+      el('p', { class: 'splash-note', text: 'Trả lời đúng để nhận sao và mảnh ghép!' }),
       el('button', {
         class: 'btn btn-primary btn-xl splash-start',
         type: 'button',

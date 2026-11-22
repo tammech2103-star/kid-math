@@ -1,5 +1,6 @@
 /**
- * Màn hình kết quả: xe thưởng cỡ lớn, sao, confetti và các bước tiếp theo.
+ * Màn hình kết quả: sao, mảnh ghép thưởng, confetti và các bước tiếp theo.
+ * Không có hạng/nhất nhì hay bục trao thưởng — chỉ dựa trên số sao.
  * @namespace KM.Screens
  */
 window.KM = window.KM || {};
@@ -30,7 +31,7 @@ KM.Screens.result = (function () {
       return { destroy: function () {} };
     }
     /*
-     * ADR-0002: mảnh thưởng theo HOÀN THÀNH, không theo hạng nhất/nhì.
+     * ADR-0002: mảnh thưởng theo HOÀN THÀNH, không theo số sao.
      * award() idempotent nên chơi lại không tăng số mảnh. ctx.puzzle chưa wired
      * thì bỏ qua êm để các đợt trước vẫn chạy.
      */
@@ -49,17 +50,12 @@ KM.Screens.result = (function () {
 
     var stars = Math.max(1, Math.min(3, record.stars || summary.stars || 1));
     var runStars = Math.max(1, Math.min(3, summary.stars || 1));
-    var race = params.race || null;
-    var place = race ? race.playerPlace : 0;
-    var lost = place > 1;
     var canReplay = ctx.progress.settings().allowRetry !== false;
-    var title = race
-      ? (lost
-        ? 'Bé về đích thứ hai!'
-        : 'Vô địch! Bé giỏi quá!')
-      : (stars === 3
-        ? 'Tuyệt vời! Bé giỏi quá!'
-        : (stars === 2 ? 'Giỏi lắm! Bé cố thêm chút nữa nhé!' : 'Bé đã hoàn thành bài!'));
+    var title = stars === 3
+      ? 'Tuyệt vời! Bé giỏi lắm!'
+      : (stars === 2
+        ? 'Bé làm tốt lắm!'
+        : 'Bé đã hoàn thành bài!');
 
     var screen = el('div', { class: 'screen result' });
     var nextLesson = record.nextLessonId ? ctx.curriculum.getLesson(record.nextLessonId) : null;
@@ -115,47 +111,10 @@ KM.Screens.result = (function () {
     }
 
     var titleNode = el('h1', {
-      class: 'result-title' + (lost ? ' is-loss' : ''),
+      class: 'result-title',
       tabindex: '-1',
       text: title
     });
-
-    var podium = null;
-    if (race) {
-      var ordered = race.racers.slice().sort(function (a, b) {
-        return a.place - b.place;
-      });
-      var stage = el('div', { class: 'podium-stage' }, ordered.map(function (racer) {
-        var step = el('div', {
-          class: 'podium-step' + (racer.place === 1 ? ' is-first' : ' is-second') +
-            (racer.isPlayer ? ' is-player' : '')
-        }, [
-          racer.place === 1
-            ? el('span', { class: 'podium-crown', text: '🏆', 'aria-hidden': 'true' })
-            : null,
-          el('img', {
-            class: 'podium-thumb',
-            src: racer.src,
-            alt: '',
-            loading: 'eager',
-            draggable: 'false'
-          }),
-          el('div', { class: 'podium-block' }, [
-            racer.isPlayer
-              ? el('span', { class: 'podium-you', text: 'BÉ', 'aria-hidden': 'true' })
-              : null,
-            el('span', { class: 'podium-place', text: String(racer.place) })
-          ]),
-          el('span', { class: 'podium-name', text: racer.name })
-        ]);
-        step.setAttribute('aria-label', racer.name + ', hạng ' + racer.place);
-        return step;
-      }));
-      podium = el('div', { class: 'result-podium' }, [
-        el('span', { class: 'result-podium-title', text: 'Bục trao thưởng' }),
-        stage
-      ]);
-    }
 
     var revealHandle = null;
     var puzzleStrip = award && award.index >= 0
@@ -169,47 +128,14 @@ KM.Screens.result = (function () {
       ])
       : null;
 
-    var card = el('div', { class: 'result-card' + (lost ? ' is-loss' : '') }, [
+    var card = el('div', { class: 'result-card' }, [
       el('span', { class: 'result-eyebrow', text: lesson.label + ' · Trang ' + lesson.page }),
-      race
-        ? el('span', {
-          class: 'result-place' + (lost ? ' is-second' : ''),
-          text: lost ? '🥈 Hạng hai' : '🏆 Hạng nhất'
-        })
-        : null,
       titleNode,
       el('p', { class: 'result-lesson', text: lesson.title }),
-      el('div', { class: 'result-car-wrap' + (lost ? ' is-loss' : '') }, [
-        lost ? null : el('span', { class: 'speed-line speed-line-a', 'aria-hidden': 'true' }),
-        lost ? null : el('span', { class: 'speed-line speed-line-b', 'aria-hidden': 'true' }),
-        lost ? null : el('span', { class: 'speed-line speed-line-c', 'aria-hidden': 'true' }),
-        lost ? el('span', {
-          class: 'loss-puff loss-puff-a',
-          text: '💨',
-          'aria-hidden': 'true'
-        }) : null,
-        lost ? el('span', {
-          class: 'loss-puff loss-puff-b',
-          text: '💨',
-          'aria-hidden': 'true'
-        }) : null,
-        el('img', {
-          class: 'result-car',
-          src: Components.CAR_SRC,
-          alt: lost
-            ? 'Chiếc xe của bé vừa về đích thứ hai'
-            : 'Chiếc xe đua chúc mừng bé hoàn thành bài',
-          draggable: 'false'
-        })
+      el('div', { class: 'result-reward', role: 'img', 'aria-label': 'Phần thưởng sao và huy chương' }, [
+        el('span', { class: 'result-reward-icon', text: '⭐', 'aria-hidden': 'true' }),
+        el('span', { class: 'result-reward-icon', text: '🏅', 'aria-hidden': 'true' })
       ]),
-      lost
-        ? el('p', {
-          class: 'result-cheer',
-          text: canReplay
-            ? 'Cố lên nhé! Bé bấm "Chơi lại" để đua lại nào.'
-            : 'Cố lên nhé! Lần sau bé sẽ nhanh hơn.'
-        })
-        : null,
       el('div', { class: 'result-stars' }, [
         Components.stars(stars, { animate: true })
       ]),
@@ -227,7 +153,6 @@ KM.Screens.result = (function () {
       record.isNewBest
         ? el('span', { class: 'result-record', text: '🏆 Kỷ lục mới của bé!' })
         : null,
-      podium,
       puzzleStrip,
       el('div', { class: 'result-actions' }, actions),
       el('p', {
@@ -253,29 +178,20 @@ KM.Screens.result = (function () {
       });
     }
 
-    ctx.audio[lost ? 'lose' : 'win']();
-    if (!lost) {
-      Components.confetti(
-        screen,
-        Math.min(ctx.tuning.confetti.maxCount, Math.round(ctx.tuning.confetti.count * 1.3)),
-        3200
-      );
-    }
+    ctx.audio.win();
+    Components.confetti(
+      screen,
+      Math.min(ctx.tuning.confetti.maxCount, Math.round(ctx.tuning.confetti.count * 1.3)),
+      3200
+    );
 
-    var message;
-    if (race) {
-      message = lost
-        ? 'Bé về đích thứ hai. Cố lên nhé, lần sau bé sẽ nhanh hơn!'
-        : 'Vô địch! Bé về đích hạng nhất. Giỏi quá!';
-    } else {
-      message = runStars === stars
-        ? (stars === 3
-          ? 'Tuyệt vời! Bé đạt ba sao. Bé giỏi quá!'
-          : (stars === 2
-            ? 'Giỏi lắm! Bé đạt hai sao. Cố thêm chút nữa nhé!'
-            : 'Bé đã hoàn thành bài học. Giỏi lắm!'))
-        : 'Bé đã hoàn thành bài. Kỷ lục của bé là ' + stars + ' sao. Cố thêm nhé!';
-    }
+    var message = runStars === stars
+      ? (stars === 3
+        ? 'Tuyệt vời! Bé giỏi lắm!'
+        : (stars === 2
+          ? 'Bé làm tốt lắm!'
+          : 'Bé đã hoàn thành bài!'))
+      : 'Bé đã hoàn thành bài. Kỷ lục của bé là ' + stars + ' sao. Cố thêm nhé!';
     var speechTimer = window.setTimeout(function () {
       ctx.speech.speak(message);
     }, ctx.tuning.timing.resultSpeakDelayMs);

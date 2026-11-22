@@ -1,5 +1,5 @@
 /**
- * DOM helpers và thành phần dùng chung: sao, confetti, xe thưởng, toast.
+ * DOM helpers và thành phần dùng chung: sao, confetti, mảnh ghép, toast.
  * @namespace KM.Components
  */
 window.KM = window.KM || {};
@@ -7,7 +7,7 @@ window.KM = window.KM || {};
 KM.Components = (function () {
   'use strict';
 
-  var CAR_SRC = 'Asset/Mc_Queen.webp';
+  var PUZZLE_SRC = 'Asset/v2/vex/school-reward.svg';
   var CONFETTI_COLORS = ['#FFD84D', '#FF6B5B', '#6FE3B8', '#7ED3F7', '#9C7BF5', '#FF9F1C'];
   var SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -161,41 +161,6 @@ KM.Components = (function () {
   }
 
   /**
-   * Màn ăn mừng ngắn: xe + sao + thông điệp, không chặn thao tác.
-   * @param {HTMLElement} host
-   * @param {{title?: string, sub?: string, duration?: number}} [options]
-   * @returns {HTMLElement}
-   */
-  function carCelebration(host, options) {
-    var opts = options || {};
-    var duration = opts.duration || 1300;
-    var overlay = el('div', { class: 'celebrate', role: 'status', 'aria-live': 'polite' }, [
-      el('div', { class: 'celebrate-card' }, [
-        el('div', { class: 'celebrate-copy' }, [
-          el('strong', { class: 'celebrate-title', text: opts.title || 'Đúng rồi!' }),
-          el('span', { class: 'celebrate-sub', text: opts.sub || '+1 ⭐' })
-        ]),
-        el('img', {
-          class: 'celebrate-car',
-          src: CAR_SRC,
-          alt: 'Chiếc xe đua phần thưởng',
-          draggable: 'false'
-        })
-      ])
-    ]);
-    host.appendChild(overlay);
-    window.setTimeout(function () {
-      overlay.classList.add('is-leaving');
-    }, Math.max(200, duration - 220));
-    window.setTimeout(function () {
-      if (overlay.parentNode) {
-        overlay.parentNode.removeChild(overlay);
-      }
-    }, duration);
-    return overlay;
-  }
-
-  /**
    * Thông báo nhỏ ở đầu màn hình.
    * @param {string} message
    * @param {{tone?: string, duration?: number}} [options]
@@ -282,14 +247,13 @@ KM.Components = (function () {
   }
 
   return {
-    CAR_SRC: CAR_SRC,
+    PUZZLE_SRC: PUZZLE_SRC,
     el: el,
     append: append,
     clear: clear,
     svg: svg,
     stars: stars,
     confetti: confetti,
-    carCelebration: carCelebration,
     toast: toast,
     dismissToast: dismissToast,
     shake: shake,
