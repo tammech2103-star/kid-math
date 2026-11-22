@@ -10,6 +10,62 @@ KM.Screens.home = (function () {
 
   var el = KM.Components.el;
   var Components = KM.Components;
+  var INTRO_PREFIX = 'km_game_intro_v1_';
+
+  // Dùng chung bộ nhớ fallback với gameIntro nếu sessionStorage bị chặn.
+  KM._introFlags = KM._introFlags || Object.create(null);
+
+  /**
+   * Cờ intro có thể do gameIntro quản lý; fallback cho trường hợp script chưa tải.
+   * @param {string} lessonId
+   * @returns {boolean}
+   */
+  function introSeen(lessonId) {
+    if (!lessonId) {
+      return false;
+    }
+    if (KM.Screens.gameIntro && typeof KM.Screens.gameIntro.hasSeen === 'function') {
+      return KM.Screens.gameIntro.hasSeen(lessonId);
+    }
+    try {
+      return window.sessionStorage.getItem(INTRO_PREFIX + lessonId) === '1';
+    } catch (error) {
+      return KM._introFlags[lessonId] === '1';
+    }
+  }
+
+  /**
+   * Ảnh cover trang trí cho thẻ bài. Lỗi ảnh → thử bg → ẩn, không log 404.
+   * @param {object} entry
+   * @returns {HTMLElement|null}
+   */
+  function coverImage(entry) {
+    if (!entry || !entry.cover) {
+      return null;
+    }
+    var fallback = entry.bg && entry.bg !== entry.cover ? entry.bg : null;
+    var img = document.createElement('img');
+
+    img.className = 'lesson-cover';
+    img.alt = '';
+    img.setAttribute('aria-hidden', 'true');
+    img.setAttribute('loading', 'lazy');
+    img.setAttribute('decoding', 'async');
+    img.setAttribute('width', '160');
+    img.setAttribute('height', '90');
+    img.setAttribute('draggable', 'false');
+    img.addEventListener('error', function onError() {
+      if (fallback) {
+        fallback = null;
+        img.src = entry.bg;
+        return;
+      }
+      img.style.display = 'none';
+      img.removeEventListener('error', onError);
+    });
+    img.src = entry.cover;
+    return img;
+  }
 
   /**
    * @param {object} ctx
@@ -51,6 +107,21 @@ KM.Screens.home = (function () {
     }
 
     var collectionProgress = puzzleProgress();
+
+    /**
+     * Một điểm điều hướng cho cả thẻ bài và nút "Học tiếp" (ADR-0003 §2).
+     * Deep link tới `lesson` vẫn vào thẳng bài, không bị chèn intro.
+     * @param {string} lessonId
+     */
+    function goToLesson(lessonId) {
+      var showIntro = !introSeen(lessonId) &&
+        KM.Screens.gameIntro && typeof KM.Screens.gameIntro === 'function';
+      if (showIntro) {
+        ctx.navigate('gameIntro', { lessonId: lessonId, reason: 'first' });
+      } else {
+        ctx.navigate('lesson', { lessonId: lessonId });
+      }
+    }
 
     var homeTitle = el('h1', { text: tuning.appName, tabindex: '-1' });
     var header = el('header', { class: 'topbar' }, [
@@ -103,7 +174,7 @@ KM.Screens.home = (function () {
             on: {
               click: function () {
                 ctx.audio.tap();
-                ctx.navigate('lesson', { lessonId: nextLesson.id });
+                goToLesson(nextLesson.id);
               }
             }
           }, [
@@ -202,6 +273,10 @@ KM.Screens.home = (function () {
     function lessonCard(lesson) {
       var unlocked = progress.isUnlocked(lesson.id);
       var stars = progress.starsFor(lesson.id);
+      var entry = KM.GameMap && typeof KM.GameMap.forLesson === 'function'
+        ? KM.GameMap.forLesson(lesson.id)
+        : null;
+      var cover = coverImage(entry);
       var card = el('button', {
         class: 'lesson-card' + (unlocked ? '' : ' is-locked'),
         type: 'button',
@@ -213,10 +288,11 @@ KM.Screens.home = (function () {
               return;
             }
             ctx.audio.tap();
-            ctx.navigate('lesson', { lessonId: lesson.id });
+            goToLesson(lesson.id);
           }
         }
       }, [
+        cover,
         el('span', { class: 'lesson-icon', text: unlocked ? lesson.icon : '🔒', 'aria-hidden': 'true' }),
         el('span', { class: 'lesson-body' }, [
           el('span', { class: 'lesson-label', text: lesson.label }),

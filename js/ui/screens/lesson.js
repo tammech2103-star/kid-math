@@ -40,6 +40,8 @@ KM.Screens.lesson = (function () {
     var finished = false;
     var questionSpeakTimer = null;
     var game = null;
+    var spriteHandle = null;
+    var heroHost = null;
 
     var screen = el('div', { class: 'screen lesson' });
     var attempt = ctx.progress.entryFor(lesson.id).plays;
@@ -99,6 +101,22 @@ KM.Screens.lesson = (function () {
         game[method](arg);
       } catch (error) {
         console.error('[KM] game.' + method + ' failed:', error);
+      }
+    }
+
+    /**
+     * Đổi frame feel của sprite do lesson shell sở hữu. Game vẫn có thể gọi trực tiếp
+     * qua `options.sprite`; helper này chỉ áp trạng thái bắt buộc của màn học.
+     * @param {string} name idle|move|action|cheer
+     */
+    function setSpriteState(name) {
+      if (!spriteHandle || typeof spriteHandle.setState !== 'function') {
+        return;
+      }
+      try {
+        spriteHandle.setState(name);
+      } catch (error) {
+        console.error('[KM] sprite.setState failed:', error);
       }
     }
 
@@ -243,10 +261,31 @@ KM.Screens.lesson = (function () {
         };
       }
       var mount = el('div', mountAttrs);
+      // ADR-0003: shell riêng theo entry, vẫn chỉ là một .game-stage duy nhất.
+      mount.classList.add(gameEntry.layout ? 'stage--' + gameEntry.layout : 'stage--scene');
+      if (gameEntry.style) {
+        mount.classList.add('style--' + gameEntry.style);
+      }
+      mount.setAttribute('data-variant', gameEntry.variant || 'a');
+
       // OBS-01: đánh dấu màn có minigame để CSS nén bố cục, giữ nút đáp án
       // nằm trong viewport (không đổi cấu trúc .choices / .choice).
       screen.classList.add('has-minigame', 'minigame-' + gameEntry.gameId);
       var palette = gameEntry.palette || {};
+
+      // Lesson shell tạo và sở hữu sprite handle; game chỉ nhận qua options.sprite.
+      heroHost = el('div', { class: 'km-hero-sprite', 'aria-hidden': 'true' });
+      mount.insertBefore(heroHost, mount.firstChild);
+      if (gameEntry.sprite && KM.Sprite && typeof KM.Sprite.create === 'function') {
+        spriteHandle = KM.Sprite.create({
+          mount: heroHost,
+          src: gameEntry.sprite,
+          state: 'idle',
+          reducedMotion: prefersReducedMotion(),
+          motionMs: gameEntry.motionMs || 240,
+          frameSize: 96
+        });
+      }
       if (palette.sky) {
         mount.style.setProperty('--game-sky', palette.sky);
       }
@@ -270,7 +309,8 @@ KM.Screens.lesson = (function () {
           question: session.current(),
           mount: mount,
           onAnswer: onGameAnswer,
-          reducedMotion: prefersReducedMotion()
+          reducedMotion: prefersReducedMotion(),
+          sprite: spriteHandle
         });
         if (KM.GameContract && typeof KM.GameContract.assert === 'function') {
           KM.GameContract.assert(game);
@@ -278,6 +318,13 @@ KM.Screens.lesson = (function () {
       } catch (error) {
         console.error('[KM] game init failed:', error);
         game = null;
+        if (spriteHandle) {
+          spriteHandle.destroy();
+          spriteHandle = null;
+        }
+        if (heroHost && heroHost.parentNode) {
+          heroHost.parentNode.removeChild(heroHost);
+        }
         if (mount.parentNode) {
           mount.parentNode.removeChild(mount);
         }
@@ -359,6 +406,7 @@ KM.Screens.lesson = (function () {
         return;
       }
       locked = false;
+      setSpriteState('idle');
       questionCard.classList.remove('is-correct');
       choicesNode.classList.remove('is-locked');
       questionText.textContent = question.text;
@@ -432,6 +480,7 @@ KM.Screens.lesson = (function () {
 
       if (!result.correct) {
         callGame('onWrong', choice);
+        setSpriteState('idle');
         race.wrong();
         raceUI.update();
         ctx.audio.wrong();
@@ -451,6 +500,7 @@ KM.Screens.lesson = (function () {
 
       locked = true;
       callGame('onCorrect', result);
+      setSpriteState('cheer');
       choicesNode.classList.add('is-locked');
       Components.dismissToast();
       choiceButtons.forEach(function (item) {
@@ -549,6 +599,11 @@ KM.Screens.lesson = (function () {
           callGame('destroy');
           game = null;
         }
+        if (spriteHandle) {
+          spriteHandle.destroy();
+          spriteHandle = null;
+        }
+        heroHost = null;
         ctx.speech.stop();
       },
       debugState: function () {

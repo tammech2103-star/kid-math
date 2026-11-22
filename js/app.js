@@ -64,9 +64,11 @@ window.KM = window.KM || {};
     document.body.dataset.screen = name;
     var screenTitle = name === 'lesson'
       ? 'Đang học'
-      : (name === 'result'
-        ? 'Kết quả'
-        : (name === 'collection' ? 'Bộ sưu tập' : 'Phụ huynh'));
+      : (name === 'gameIntro'
+        ? 'Giới thiệu bài học'
+        : (name === 'result'
+          ? 'Kết quả'
+          : (name === 'collection' ? 'Bộ sưu tập' : 'Phụ huynh')));
     document.title = name === 'home'
       ? tuning.appName
       : tuning.appName + ' · ' + screenTitle;
