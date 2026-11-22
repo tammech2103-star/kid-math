@@ -1,10 +1,16 @@
 # Deploy lên Render — Bé Vui Học Toán 1
 
-**Trạng thái:** đã deploy tại **https://be-vui-hoc-toan-1.onrender.com**
-(static site, commit `245b283`, deploy 2026-11-21 13:13 GMT+7). Bản này là
-**cuộc đua 1 đối 1** với đường đua 2 làn có hai xe cỡ lớn chạy bám đuổi, **bục trao
-thưởng 2 bậc** ở màn kết quả, hiệu ứng thua khi về đích thứ hai và công tắc
-**“Cho bé chơi lại bài”** (tắt là mất nút “Chơi lại” ở mọi màn kết quả).
+**Trạng thái (cập nhật 2026-11-22):** đang live tại
+**https://be-vui-hoc-toan-1.onrender.com** — bản **redesign 21 trò chơi riêng**
+(GitHub `main` HEAD `4ffccef`; Render deploy `dep-dc1csbvf3r2c73cc1rng`,
+**Deploy succeeded | Live**, 9.8s, 18:12 GMT+7). Mỗi bài là một minigame riêng
+lấy cảm hứng Nintendo (ghi tên cảm hứng trong UI, art tự sinh), có màn intro riêng,
+sprite HD và nhận 1/21 mảnh ghép McQueen (7×3); riêng Bài 20 giữ cuộc đua 1 đối 1
++ bục trao thưởng. Lõi học tập (sao, RNG, speech, parent gate, `localStorage
+kidmath.v1`) giữ nguyên.
+
+> Bản trước (Đợt 1, commit `245b283`/`2c901b9`) là cuộc đua chung cho cả 21 bài;
+> đã bị thay bởi bản redesign ở trên.
 
 Mục tiêu: có một link HTTPS dạng `https://be-vui-hoc-toan-1.onrender.com` để mở trên tablet.
 Đây là **static site** — không backend, không database, không thu dữ liệu trẻ em.

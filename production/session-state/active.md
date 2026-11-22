@@ -1,12 +1,28 @@
 # Session State — Bé Vui Học Toán 1
 
-**Cập nhật**: 2026-11-22 — **Redesign 21 bài HOÀN TẤT local, FINAL GATE PASS, chưa deploy đợt 2.**
-**Trạng thái deploy**: Live site vẫn là **Đợt 1** — commit `2c901b9` trên `main`,
-Render deploy `dep-dc18iebl550s73dpa3hg` (Deploy succeeded), URL
-`https://be-vui-hoc-toan-1.onrender.com`. Đợt redesign này **chỉ có trên local**;
-chưa commit/push/deploy theo yêu cầu "xin phép riêng trước khi deploy".
+**Cập nhật**: 2026-11-22 — **Redesign 21 bài HOÀN TẤT + ĐÃ DEPLOY LIVE.**
+**Trạng thái deploy**: Render deploy từ commit `4ffccef` trên `main`
+(3 commit: `7822bd6` asset → `0d8ce76` code/CSS/JS → `4ffccef` QA/Render config).
+Sau đó có thêm commit tài liệu cập nhật trạng thái live — không đổi code build.
+Render Manual Deploy `dep-dc1csbvf3r2c73cc1rng` từ `4ffccef` —
+**Deploy succeeded | Live**, 9.8s, 2026-11-22 18:12 GMT+7.
+URL: `https://be-vui-hoc-toan-1.onrender.com`.
 
-## Việc đang làm (đã xong code+QA, chờ phép deploy)
+## Live verification sau deploy (2026-11-22)
+
+- Trang chủ load OK: title `Bé Vui Học Toán 1`, 50 script, 4 stylesheet.
+- Console **0 error**; **0 response HTTP ≥400** (các request `ERR_ABORTED` là 63 lượt
+  `fetch HEAD` preload tự bắn, status đều 200 — không phải lỗi server).
+- **63/63 ảnh** `Asset/{hd,covers,sprites}/…` HEAD OK.
+- `KM.GameMap.all()` → **21 entry**, `gameId`/`style`/`tribute`/asset path đúng.
+- Luồng `home → gameIntro → lesson` chạy: intro bài mở đầu hiện cảm hứng
+  "Super Mario Bros." + sprite `intro.webp` 640×360; bài 1 minigame
+  `minigame-mario-bros`, đồng xu + trả lời đúng/sai (sai nhắc nhẹ, không trừ sao),
+  **stage 165px ≤170px** (OBS-01 giữ live), sprite xe 570×244/1000×477 load OK.
+- Bài 20 (unlockAll để test): intro "Đua xe về đích" — cảm hứng "Mario Kart 8";
+  race `minigame-mario-kart` với đối thủ Mater, 10 câu, **stage 104px**, console sạch.
+
+## Việc đã làm (redesign + deploy hoàn tất)
 
 Chuyển 21 bài từ một màn chơi chung sang **21 trò chơi riêng** lấy cảm hứng Nintendo
 (ghi rõ tên cảm hứng trong UI, art HD tự sinh, không copy tài sản Nintendo).
@@ -92,8 +108,10 @@ Cuộc đua 1 đối 1 + bục trao thưởng được giữ làm game Bài 20 v
 ## Rủi ro còn lại
 
 - **Chưa có manual playtest với trẻ em 6 tuổi** cho redesign 21 bài. Automation +
-  evidence (117 unit, 84 layout, 88 screenshot) KHÔNG thay thế sign-off Visual/Feel.
-- Live site vẫn là Đợt 1; mọi thay đổi đợt này chưa lên GitHub/Render.
+  evidence (117 unit, 84 layout, 88 screenshot, live verify) KHÔNG thay thế
+  sign-off Visual/Feel.
+- Live verify đã sample bài mở đầu + bài 20; 19 bài còn lại tin tưởng unit + smoke
+  local (đã chạy 21/21 stage). Nếu muốn, có thể click từng bài trên live để soi riêng.
 - Máy phụ huynh đã cài giọng tiếng Việt chưa? (không đọc giọng sai ngôn ngữ)
 - Có muốn thu âm lời khen giọng người thật thay TTS không?
 
@@ -101,8 +119,10 @@ Cuộc đua 1 đối 1 + bục trao thưởng được giữ làm game Bài 20 v
 
 1. [x] Giai đoạn A thiết kế + B 63 ảnh + C code + QA package.
 2. [x] FINAL GATE PASS + BUG-001 Closed + QA report chốt.
-3. [ ] Rebuild `public/` + `deploy/kid-math-render.zip` từ source local mới nhất.
-4. [ ] **Xin phép riêng** trước khi commit/push GitHub hoặc deploy Render đợt redesign.
-      (Không có `git`/`gh`/token trong session; lần trước upload bằng web UI.)
-5. [ ] Sau khi có phép: upload, Manual Deploy, verify live 21 game + intro + sprite.
-6. [ ] Manual playtest với trẻ em — xếp lịch riêng, không chặn deploy kỹ thuật.
+3. [x] Rebuild `public/` + `deploy/kid-math-render.zip` từ source local mới nhất.
+4. [x] Upload GitHub 3 commit (`7822bd6`/`0d8ce76`/`4ffccef`) qua web UI (không có
+      `git`/`gh`/token; dùng custom file input + DataTransfer giữ path thư mục).
+5. [x] Render Manual Deploy `dep-dc1csbvf3r2c73cc1rng` — Deploy succeeded | Live.
+6. [x] Verify live: console 0, HTTP ≥400 = 0, 63 ảnh, 21 GameMap, luồng intro → lesson.
+7. [ ] Manual playtest với trẻ em 6 tuổi — xếp lịch riêng (không chặn deploy).
+8. [ ] Hỏi phụ huynh: giọng Việt TTS đã cài chưa; có thu lời khen giọng người thật.
