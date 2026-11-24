@@ -739,7 +739,7 @@ KM.App = (function () {
     var np = netplay();
     if (!np) return;
     np.name = (netplayMode === 'host') ? 'Host' : 'Guest';
-    var sid = 'S-' + Math.random().toString(36).substring(2) + Date.now();
+    var sid = netplayRoomCode;
     var pid = 'P-' + Math.random().toString(36).substring(2) + Date.now();
     np.playerID = pid;
     np.players = {};
@@ -791,7 +791,7 @@ KM.App = (function () {
         var tryJoin = function () {
           np.socket.emit('join-room', { extra: np.extra, password: '' }, function (err, users) {
             if (err) {
-              if (netplayStatusEl) netplayStatusEl.textContent = 'Dang cho host...';
+              if (netplayStatusEl) netplayStatusEl.textContent = 'Dang cho host... ' + (err || '');
               setHostStatus('chua co host, dang cho...');
               setTimeout(tryJoin, 2000);
               return;
