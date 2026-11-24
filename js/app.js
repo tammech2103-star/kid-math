@@ -217,31 +217,7 @@ KM.App = (function () {
         setTimeout(disableEmulatorAutoMenu, 1500);
 
         if (netplayMode !== 'single') {
-          var np = netplay();
-          if (np) {
-            np.name = (netplayMode === 'host') ? 'Host' : 'Guest';
-            var startNetplay = function () {
-              try {
-                if (netplayMode === 'host') {
-                  np.openRoom(netplayRoomCode, 2, netplayPassword);
-                } else {
-                  np.joinRoom(netplayRoomCode, netplayRoomCode, 2, netplayPassword);
-                }
-              } catch (err) {
-                if (netplayStatusEl) netplayStatusEl.textContent = 'Netplay loi: ' + err.message;
-              }
-              setTimeout(bindNetplayHandlers, 1000);
-              setTimeout(function () {
-                if (netplayStatusEl) {
-                  netplayStatusEl.textContent = (netplayMode === 'host')
-                    ? 'Phong: ' + netplayRoomCode + (netplayPassword ? ' | Mat khau: ' + netplayPassword : '')
-                    : 'Da vao phong ' + netplayRoomCode;
-                }
-              }, 1500);
-            };
-            if (np.socket && np.socket.connected) startNetplay();
-            else np.startSocketIO(startNetplay);
-          }
+          startNetplayAfterLoad();
         }
       };
       document.body.appendChild(script);
@@ -712,6 +688,78 @@ KM.App = (function () {
     });
   }
 
+  function startNetplayAfterLoad() {
+    var np = netplay();
+    if (!np) return;
+    np.name = (netplayMode === 'host') ? 'Host' : 'Guest';
+    var sid = 'S-' + Math.random().toString(36).substring(2) + Date.now();
+    var pid = 'P-' + Math.random().toString(36).substring(2) + Date.now();
+    np.playerID = pid;
+    np.players = {};
+    np.maxPlayers = 2;
+    np.extra = {
+      domain: window.location.host,
+      game_id: netplayGameId,
+      room_name: netplayRoomCode,
+      player_name: np.name,
+      userid: pid,
+      sessionid: sid
+    };
+    np.players[pid] = np.extra;
+
+    var finishBind = function () {
+      setTimeout(bindNetplayHandlers, 1000);
+      setTimeout(function () {
+        if (netplayStatusEl) {
+          netplayStatusEl.textContent = (netplayMode === 'host')
+            ? 'Da tao phong tu dong. Dang cho nguoi choi thu 2...'
+            : 'Da vao phong tu dong.';
+        }
+      }, 1500);
+    };
+
+    var start = function () {
+      if (netplayMode === 'host') {
+        np.socket.emit('open-room', { extra: np.extra, maxPlayers: 2, password: '' }, function (err) {
+          if (err) {
+            np.owner = false;
+            np.socket.emit('join-room', { extra: np.extra, password: '' }, function (err2, users) {
+              if (err2) {
+                if (netplayStatusEl) netplayStatusEl.textContent = 'Netplay loi: ' + err2;
+                return;
+              }
+              np.players = users || np.players;
+              np.roomJoined(false, netplayRoomCode, '', sid);
+              finishBind();
+            });
+          } else {
+            np.owner = true;
+            np.roomJoined(true, netplayRoomCode, '', sid);
+            finishBind();
+          }
+        });
+      } else {
+        var tryJoin = function () {
+          np.socket.emit('join-room', { extra: np.extra, password: '' }, function (err, users) {
+            if (err) {
+              if (netplayStatusEl) netplayStatusEl.textContent = 'Dang cho host...';
+              setTimeout(tryJoin, 2000);
+              return;
+            }
+            np.owner = false;
+            np.players = users || np.players;
+            np.roomJoined(false, netplayRoomCode, '', sid);
+            finishBind();
+          });
+        };
+        tryJoin();
+      }
+    };
+
+    if (np.socket && np.socket.connected) start();
+    else np.startSocketIO(start);
+  }
+
   function uploadRomToRelay(file, cb) {
     if (!netplayRelayUrl) { cb(); return; }
     var reader = new FileReader();
@@ -790,7 +838,7 @@ KM.App = (function () {
   }
 
   function createHostRoomAuto(file, core) {
-    netplayRoomCode = 'AUTO-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+    netplayRoomCode = 'KM-AUTO';
     netplayPassword = '';
     netplayMode = 'host';
     netplayGameId = NETPLAY_AUTO_GAME_ID;
@@ -800,7 +848,7 @@ KM.App = (function () {
   }
 
   function joinGuestRoomAuto(roomCode, file, core) {
-    netplayRoomCode = roomCode;
+    netplayRoomCode = 'KM-AUTO';
     netplayPassword = '';
     netplayMode = 'guest';
     netplayGameId = NETPLAY_AUTO_GAME_ID;
