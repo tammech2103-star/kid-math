@@ -25,7 +25,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
 HOST = os.environ.get("ROM_RELAY_HOST", "0.0.0.0")
-PORT = int(os.environ.get("ROM_RELAY_PORT", "8790"))
+PORT = int(os.environ.get("ROM_RELAY_PORT") or os.environ.get("PORT") or "8790")
 TTL = int(os.environ.get("ROM_RELAY_TTL_SECONDS", "900"))
 MAX_BYTES = int(os.environ.get("ROM_RELAY_MAX_BYTES", str(150 * 1024 * 1024)))
 

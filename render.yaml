@@ -8,3 +8,21 @@ services:
       - path: /*
         name: Cache-Control
         value: no-cache
+
+  - type: web
+    name: kid-math-netplay
+    runtime: docker
+    dockerfilePath: ./netplay/Dockerfile
+    dockerContext: ./netplay
+    envVars:
+      - key: ALLOWED_ORIGIN
+        value: "*"
+
+  - type: web
+    name: kid-math-rom-relay
+    runtime: python
+    buildCommand: "python -m py_compile server/rom_relay.py"
+    startCommand: "python server/rom_relay.py"
+    envVars:
+      - key: PORT
+        value: "10000"
