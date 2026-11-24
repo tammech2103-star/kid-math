@@ -1,0 +1,20 @@
+{
+ "name": "felt_cloth",
+ "size": 256,
+ "normal": "gl",
+ "depth": 0.012,
+ "seam": {
+  "worst": 0.85,
+  "map": "rough"
+ },
+ "maps": {
+  "albedo": "felt_cloth_albedo.png",
+  "normal": "felt_cloth_normal.png",
+  "height": "felt_cloth_height.png",
+  "roughness": "felt_cloth_roughness.png",
+  "metallic": "felt_cloth_metallic.png",
+  "ao": "felt_cloth_ao.png",
+  "orm": "felt_cloth_orm.png",
+  "emissive": null
+ }
+}

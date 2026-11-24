@@ -1,0 +1,233 @@
+2026-11-20T08-58-07 | Plugin loaded
+2026-11-20T09-13-10 | session.created fired
+2026-11-20T10-01-50 | Plugin loaded
+2026-11-20T10-08-13 | Agent invoked: general
+2026-11-20T10-08-13 | Agent completed: general
+2026-11-20T10-08-13 | session.created fired
+2026-11-20T10-20-05 | Agent invoked: unknown
+2026-11-20T10-20-12 | Agent invoked: general
+2026-11-20T10-20-12 | Agent completed: general
+2026-11-21T01-40-40 | Plugin loaded
+2026-11-21T02-48-37 | Plugin loaded
+2026-11-21T07-48-06 | Plugin loaded
+2026-11-21T14-28-53 | Plugin loaded
+2026-11-22T04-42-51 | Plugin loaded
+2026-11-22T05-01-56 | Agent invoked: lead-programmer
+2026-11-22T05-01-56 | Agent invoked: ui-programmer
+2026-11-22T05-01-57 | Agent invoked: gameplay-programmer
+2026-11-22T05-01-57 | Agent invoked: art-director
+2026-11-22T05-01-57 | session.created fired
+2026-11-22T05-01-57 | session.created fired
+2026-11-22T05-01-57 | session.created fired
+2026-11-22T05-01-57 | session.created fired
+2026-11-22T05-03-45 | Agent completed: art-director
+2026-11-22T05-11-21 | Agent completed: lead-programmer
+2026-11-22T05-12-25 | Agent completed: ui-programmer
+2026-11-22T05-14-45 | Agent completed: gameplay-programmer
+2026-11-22T05-19-49 | Agent invoked: qa-lead
+2026-11-22T05-19-49 | session.created fired
+2026-11-22T05-37-30 | Agent completed: qa-lead
+2026-11-22T06-50-53 | Agent invoked: art-director
+2026-11-22T06-50-53 | Agent invoked: game-designer
+2026-11-22T06-50-53 | session.created fired
+2026-11-22T06-50-54 | session.created fired
+2026-11-22T06-50-54 | Agent invoked: technical-director
+2026-11-22T06-50-54 | session.created fired
+2026-11-22T06-54-24 | Agent completed: technical-director
+2026-11-22T06-56-26 | Agent completed: game-designer
+2026-11-22T06-57-12 | Agent completed: art-director
+2026-11-22T06-58-04 | Agent invoked: art-director
+2026-11-22T06-58-04 | Agent invoked: game-designer
+2026-11-22T06-58-04 | session.created fired
+2026-11-22T06-58-04 | session.created fired
+2026-11-22T06-58-04 | Agent invoked: technical-director
+2026-11-22T06-58-04 | session.created fired
+2026-11-22T07-01-14 | Agent completed: technical-director
+2026-11-22T07-02-15 | Agent completed: game-designer
+2026-11-22T07-07-21 | Agent completed: art-director
+2026-11-22T07-29-23 | Agent invoked: lead-programmer
+2026-11-22T07-29-23 | session.created fired
+2026-11-22T07-37-47 | Agent completed: lead-programmer
+2026-11-22T07-38-02 | Agent invoked: gameplay-programmer
+2026-11-22T07-38-02 | session.created fired
+2026-11-22T07-56-04 | Agent completed: gameplay-programmer
+2026-11-22T07-58-01 | Agent invoked: ui-programmer
+2026-11-22T07-58-01 | Agent invoked: qa-lead
+2026-11-22T07-58-01 | Agent completed: ui-programmer
+2026-11-22T07-58-01 | session.created fired
+2026-11-22T07-58-01 | Agent completed: qa-lead
+2026-11-22T07-58-01 | session.created fired
+2026-11-22T07-59-30 | Agent invoked: ui-programmer
+2026-11-22T07-59-30 | Agent invoked: qa-lead
+2026-11-22T07-59-30 | Agent completed: ui-programmer
+2026-11-22T07-59-30 | Agent completed: qa-lead
+2026-11-22T08-03-45 | Agent invoked: qa-lead
+2026-11-22T08-34-28 | Agent completed: qa-lead
+2026-11-22T08-34-51 | Agent invoked: qa-lead
+2026-11-22T08-39-57 | Agent completed: qa-lead
+2026-11-22T08-40-41 | Agent invoked: ui-programmer
+2026-11-22T08-48-14 | Agent completed: ui-programmer
+2026-11-22T08-49-45 | Agent invoked: qa-lead
+2026-11-22T08-55-09 | Agent completed: qa-lead
+2026-11-22T12-41-36 | Agent invoked: game-designer
+2026-11-22T12-41-36 | Agent invoked: technical-director
+2026-11-22T12-41-36 | Agent invoked: art-director
+2026-11-22T12-41-36 | session.created fired
+2026-11-22T12-41-36 | session.created fired
+2026-11-22T12-41-37 | session.created fired
+2026-11-22T12-41-54 | === Skill Modified: kiln ===
+2026-11-22T12-41-54 | Run /skill-test static kiln to validate structural compliance.
+2026-11-22T12-41-54 | === Skill Modified: pxl ===
+2026-11-22T12-41-54 | Run /skill-test static pxl to validate structural compliance.
+2026-11-22T12-41-54 | === Skill Modified: loom ===
+2026-11-22T12-41-54 | Run /skill-test static loom to validate structural compliance.
+2026-11-22T12-41-54 | === Skill Modified: chirp ===
+2026-11-22T12-41-54 | Run /skill-test static chirp to validate structural compliance.
+2026-11-22T12-41-54 | === Skill Modified: vex ===
+2026-11-22T12-41-54 | Run /skill-test static vex to validate structural compliance.
+2026-11-22T12-42-27 | === Skill Modified: chirp ===
+2026-11-22T12-42-27 | Run /skill-test static chirp to validate structural compliance.
+2026-11-22T12-42-27 | === Skill Modified: pxl ===
+2026-11-22T12-42-27 | Run /skill-test static pxl to validate structural compliance.
+2026-11-22T12-42-45 | === Skill Modified: pxl ===
+2026-11-22T12-42-45 | Run /skill-test static pxl to validate structural compliance.
+2026-11-22T12-42-45 | === Skill Modified: vex ===
+2026-11-22T12-42-45 | Run /skill-test static vex to validate structural compliance.
+2026-11-22T12-42-45 | === Skill Modified: kiln ===
+2026-11-22T12-42-45 | Run /skill-test static kiln to validate structural compliance.
+2026-11-22T12-42-45 | === Skill Modified: loom ===
+2026-11-22T12-42-45 | Run /skill-test static loom to validate structural compliance.
+2026-11-22T12-42-45 | === Skill Modified: chirp ===
+2026-11-22T12-42-45 | Run /skill-test static chirp to validate structural compliance.
+2026-11-22T12-44-36 | Agent completed: technical-director
+2026-11-22T12-44-48 | Agent completed: art-director
+2026-11-22T12-46-58 | Agent completed: game-designer
+2026-11-22T12-49-11 | Agent invoked: ui-programmer
+2026-11-22T12-49-11 | Agent invoked: ui-programmer
+2026-11-22T12-49-11 | Agent invoked: ui-programmer
+2026-11-22T12-49-12 | Agent invoked: ui-programmer
+2026-11-22T12-49-12 | session.created fired
+2026-11-22T12-49-12 | session.created fired
+2026-11-22T12-49-12 | session.created fired
+2026-11-22T12-49-12 | session.created fired
+2026-11-22T12-49-12 | Agent invoked: technical-artist
+2026-11-22T12-49-12 | Agent invoked: tools-programmer
+2026-11-22T12-49-12 | session.created fired
+2026-11-22T12-49-13 | session.created fired
+2026-11-22T12-49-25 | === Skill Modified: vex ===
+2026-11-22T12-49-25 | Run /skill-test static vex to validate structural compliance.
+2026-11-22T12-49-25 | === Skill Modified: pxl ===
+2026-11-22T12-49-25 | Run /skill-test static pxl to validate structural compliance.
+2026-11-22T12-49-25 | === Skill Modified: kiln ===
+2026-11-22T12-49-25 | Run /skill-test static kiln to validate structural compliance.
+2026-11-22T12-49-25 | === Skill Modified: loom ===
+2026-11-22T12-49-25 | Run /skill-test static loom to validate structural compliance.
+2026-11-22T12-49-25 | === Skill Modified: chirp ===
+2026-11-22T12-49-25 | Run /skill-test static chirp to validate structural compliance.
+2026-11-22T12-49-46 | === Skill Modified: pxl ===
+2026-11-22T12-49-46 | Run /skill-test static pxl to validate structural compliance.
+2026-11-22T12-49-46 | === Skill Modified: vex ===
+2026-11-22T12-49-46 | Run /skill-test static vex to validate structural compliance.
+2026-11-22T12-49-52 | === Skill Modified: kiln ===
+2026-11-22T12-49-52 | Run /skill-test static kiln to validate structural compliance.
+2026-11-22T12-49-52 | === Skill Modified: loom ===
+2026-11-22T12-49-52 | Run /skill-test static loom to validate structural compliance.
+2026-11-22T12-49-52 | === Skill Modified: chirp ===
+2026-11-22T12-49-52 | Run /skill-test static chirp to validate structural compliance.
+2026-11-22T12-51-07 | === Skill Modified: pxl ===
+2026-11-22T12-51-07 | Run /skill-test static pxl to validate structural compliance.
+2026-11-22T12-51-12 | === Skill Modified: pxl ===
+2026-11-22T12-51-12 | Run /skill-test static pxl to validate structural compliance.
+2026-11-22T12-51-18 | === Skill Modified: pxl ===
+2026-11-22T12-51-18 | Run /skill-test static pxl to validate structural compliance.
+2026-11-22T12-51-37 | === Skill Modified: pxl ===
+2026-11-22T12-51-37 | Run /skill-test static pxl to validate structural compliance.
+2026-11-22T12-53-00 | === Skill Modified: pxl ===
+2026-11-22T12-53-00 | Run /skill-test static pxl to validate structural compliance.
+2026-11-22T12-53-28 | === Skill Modified: pxl ===
+2026-11-22T12-53-28 | Run /skill-test static pxl to validate structural compliance.
+2026-11-22T12-53-34 | === Skill Modified: pxl ===
+2026-11-22T12-53-34 | Run /skill-test static pxl to validate structural compliance.
+2026-11-22T12-55-06 | Agent invoked: general
+2026-11-22T12-55-38 | === Skill Modified: vex ===
+2026-11-22T12-55-38 | Run /skill-test static vex to validate structural compliance.
+2026-11-22T12-55-48 | === Skill Modified: vex ===
+2026-11-22T12-55-48 | Run /skill-test static vex to validate structural compliance.
+2026-11-22T12-55-53 | === Skill Modified: vex ===
+2026-11-22T12-55-53 | Run /skill-test static vex to validate structural compliance.
+2026-11-22T12-56-55 | Agent completed: ui-programmer
+2026-11-22T12-57-03 | === Skill Modified: kiln ===
+2026-11-22T12-57-03 | Run /skill-test static kiln to validate structural compliance.
+2026-11-22T12-57-11 | === Skill Modified: kiln ===
+2026-11-22T12-57-11 | Run /skill-test static kiln to validate structural compliance.
+2026-11-22T12-57-57 | Agent completed: ui-programmer
+2026-11-22T12-58-40 | Agent completed: ui-programmer
+2026-11-22T12-58-40 | Agent completed: ui-programmer
+2026-11-22T12-59-28 | === Skill Modified: loom ===
+2026-11-22T12-59-28 | Run /skill-test static loom to validate structural compliance.
+2026-11-22T12-59-34 | === Skill Modified: loom ===
+2026-11-22T12-59-34 | Run /skill-test static loom to validate structural compliance.
+2026-11-22T13-00-15 | === Skill Modified: loom ===
+2026-11-22T13-00-15 | Run /skill-test static loom to validate structural compliance.
+2026-11-22T13-00-20 | === Skill Modified: loom ===
+2026-11-22T13-00-20 | Run /skill-test static loom to validate structural compliance.
+2026-11-22T13-01-42 | === Skill Modified: chirp ===
+2026-11-22T13-01-42 | Run /skill-test static chirp to validate structural compliance.
+2026-11-22T13-02-36 | Agent completed: technical-artist
+2026-11-22T13-11-30 | Agent completed: tools-programmer
+2026-11-22T13-28-40 | Agent invoked: ui-programmer
+2026-11-22T13-28-40 | Agent invoked: tools-programmer
+2026-11-22T13-28-40 | Agent invoked: qa-lead
+2026-11-22T13-28-40 | session.created fired
+2026-11-22T13-28-40 | session.created fired
+2026-11-22T13-28-41 | session.created fired
+2026-11-22T13-28-47 | === Skill Modified: vex ===
+2026-11-22T13-28-47 | Run /skill-test static vex to validate structural compliance.
+2026-11-22T13-28-56 | === Skill Modified: vex ===
+2026-11-22T13-28-56 | Run /skill-test static vex to validate structural compliance.
+2026-11-22T13-28-56 | === Skill Modified: vex ===
+2026-11-22T13-28-56 | Run /skill-test static vex to validate structural compliance.
+2026-11-22T13-29-02 | === Skill Modified: vex ===
+2026-11-22T13-29-02 | Run /skill-test static vex to validate structural compliance.
+2026-11-22T13-29-06 | === Skill Modified: vex ===
+2026-11-22T13-29-06 | Run /skill-test static vex to validate structural compliance.
+2026-11-22T13-29-15 | === Skill Modified: vex ===
+2026-11-22T13-29-15 | Run /skill-test static vex to validate structural compliance.
+2026-11-22T13-30-07 | === Skill Modified: vex ===
+2026-11-22T13-30-07 | Run /skill-test static vex to validate structural compliance.
+2026-11-22T13-30-20 | === Skill Modified: vex ===
+2026-11-22T13-30-20 | Run /skill-test static vex to validate structural compliance.
+2026-11-22T13-30-20 | === Skill Modified: vex ===
+2026-11-22T13-30-20 | Run /skill-test static vex to validate structural compliance.
+2026-11-22T13-30-28 | === Skill Modified: vex ===
+2026-11-22T13-30-28 | Run /skill-test static vex to validate structural compliance.
+2026-11-22T13-30-41 | === Skill Modified: vex ===
+2026-11-22T13-30-41 | Run /skill-test static vex to validate structural compliance.
+2026-11-22T13-31-11 | === Skill Modified: vex ===
+2026-11-22T13-31-11 | Run /skill-test static vex to validate structural compliance.
+2026-11-22T13-35-18 | Agent completed: tools-programmer
+2026-11-22T13-36-00 | Agent completed: ui-programmer
+2026-11-22T13-59-32 | Agent completed: qa-lead
+2026-11-22T14-41-46 | Agent invoked: ui-programmer
+2026-11-22T14-41-46 | Agent invoked: technical-artist
+2026-11-22T14-41-46 | session.created fired
+2026-11-22T14-41-46 | session.created fired
+2026-11-22T14-44-06 | Agent completed: technical-artist
+2026-11-22T14-48-15 | Agent completed: ui-programmer
+2026-11-22T15-14-07 | Agent invoked: art-director
+2026-11-22T15-14-07 | Agent invoked: lead-programmer
+2026-11-22T15-14-07 | session.created fired
+2026-11-22T15-14-07 | session.created fired
+2026-11-23T11-37-22 | Plugin loaded
+2026-11-23T11-37-56 | Agent invoked: lead-programmer
+2026-11-23T11-37-56 | Agent completed: lead-programmer
+2026-11-23T11-37-56 | session.created fired
+2026-11-23T12-03-00 | Plugin loaded
+2026-11-23T14-02-22 | Plugin loaded
+2026-11-23T16-15-23 | Plugin loaded
+2026-11-24T01-22-05 | Plugin loaded
+2026-11-24T07-22-01 | Plugin loaded
+2026-11-24T08-40-35 | Plugin loaded
+2026-11-24T08-45-46 | Plugin loaded
+2026-11-24T08-46-52 | Plugin loaded
+2026-11-24T08-51-35 | Plugin loaded

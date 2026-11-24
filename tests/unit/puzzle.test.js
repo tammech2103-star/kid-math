@@ -1,5 +1,5 @@
 /**
- * Test bộ sưu tập mảnh ghép McQueen (ADR-0002).
+ * Test bộ sưu tập mảnh ghép Trường vui (ADR-0002).
  * Chạy cùng framework KMTest, không cần Node. Phủ normalize state cũ,
  * trao mảnh idempotent, lưới 7×3, CSS cắt ảnh và reset tiến độ.
  */
@@ -45,7 +45,7 @@
       T.eq(puzzle.count(), 0);
       T.eq(puzzle.isComplete(), false);
       T.eq(puzzle.revealMs(), 900);
-      T.ok(/Mc_Queen\.webp$/.test(puzzle.src()), 'ảnh gốc sai: ' + puzzle.src());
+      T.ok(/school-reward\.svg$/.test(puzzle.src()), 'ảnh gốc sai: ' + puzzle.src());
     });
 
     T.test('indexFor theo đúng thứ tự curriculum', function () {
@@ -71,7 +71,7 @@
       T.eq(midRow['background-position'], '0% 50%');
       T.eq(last['background-position'], '100% 100%');
       T.eq(last['background-repeat'], 'no-repeat');
-      T.ok(last['background-image'].indexOf('Mc_Queen.webp') !== -1);
+      T.ok(last['background-image'].indexOf('school-reward.svg') !== -1);
     });
 
     T.test('styleFor index ngoài lề về mảnh đầu', function () {

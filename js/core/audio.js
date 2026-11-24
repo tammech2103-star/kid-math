@@ -109,6 +109,35 @@ KM.Audio = (function () {
       tone(1318.5, 0.32, 0.18, 'triangle', 0.22);
     }
 
+    /** Tiếng nhặt đồng xu: nốt cao ngắn, sáng. */
+    function coin() {
+      tone(987.77, 0, 0.06, 'sine', 0.18);
+      tone(1318.5, 0.05, 0.1, 'sine', 0.16);
+    }
+
+    /** Tiếng nhặt trái tim: hai nốt ấm, morbido. */
+    function heart() {
+      tone(523.25, 0, 0.1, 'sine', 0.2);
+      tone(659.25, 0.1, 0.14, 'sine', 0.18);
+    }
+
+    /** Tiếng nhảy: whoosh ngắn. */
+    function jump() {
+      slide(200, 400, 0.08, 'sine', 0.08);
+    }
+
+    /** Tiếng đáp đất: thud nhẹ. */
+    function land() {
+      tone(120, 0, 0.06, 'sine', 0.12);
+    }
+
+    /** Tiếng mở cửa tri thức: chime. */
+    function gateOpen() {
+      tone(659.25, 0, 0.08, 'triangle', 0.2);
+      tone(783.99, 0.08, 0.1, 'triangle', 0.18);
+      tone(1046.5, 0.16, 0.16, 'triangle', 0.16);
+    }
+
     function engine() {
       slide(90, 190, 0.42, 'sawtooth', 0.1);
       tone(320, 0.1, 0.08, 'square', 0.05);
@@ -151,6 +180,11 @@ KM.Audio = (function () {
       correct: correct,
       wrong: wrong,
       star: star,
+      coin: coin,
+      heart: heart,
+      jump: jump,
+      land: land,
+      gateOpen: gateOpen,
       engine: engine,
       startRace: startRace,
       win: win,

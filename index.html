@@ -1,67 +1,29 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="description" content="Bé Vui Học Toán 1 — game học Toán lớp 1 Tập 1 bám sách Kết nối tri thức với cuộc sống. Trả lời đúng để nhận sao và mảnh ghép!">
-  <meta name="theme-color" content="#E6F8FF">
-  <title>Bé Vui Học Toán 1</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%9A%80%3C/text%3E%3C/svg%3E">
-  <link rel="stylesheet" href="css/tokens.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0a1a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Kid Math Retro">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="Asset/v2/vex/intro-tribute-scene.svg">
+  <title>Kid Math Retro — Chơi game, học toán</title>
+  <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="css/app.css">
-  <link rel="stylesheet" href="css/games.css">
-  <link rel="stylesheet" href="css/puzzle.css">
 </head>
 <body>
-  <a class="skip-link" href="#app">Tới nội dung chính</a>
-  <main id="app" aria-label="Bé Vui Học Toán 1" tabindex="-1"></main>
-  <noscript>
-    <p style="padding:24px;font-family:sans-serif">Bé cần bật JavaScript để chơi game này.</p>
-  </noscript>
+  <div id="app"></div>
+  <div id="emulator" style="display:none;"></div>
 
-  <script src="js/core/rng.js"></script>
+  <!-- App core -->
   <script src="js/core/vi-numbers.js"></script>
-  <script src="js/core/audio.js"></script>
-  <script src="js/core/speech.js"></script>
-  <script src="js/core/storage.js"></script>
   <script src="js/data/tuning.js"></script>
+  <script src="js/core/audio.js"></script>
   <script src="js/data/curriculum.js"></script>
-  <script src="js/data/game-map.js"></script>
   <script src="js/domain/questions.js"></script>
-  <script src="js/domain/lesson-session.js"></script>
-  <script src="js/domain/progress.js"></script>
-  <script src="js/domain/puzzle.js"></script>
-  <script src="js/ui/components.js"></script>
-  <script src="js/ui/visuals.js"></script>
-  <script src="js/ui/games/mario-bros.js"></script>
-  <script src="js/ui/games/animal-crossing.js"></script>
-  <script src="js/ui/games/mario-kart.js"></script>
-  <script src="js/ui/games/kit.js"></script>
-  <script src="js/ui/games/mario-odyssey.js"></script>
-  <script src="js/ui/games/donkey-kong-country.js"></script>
-  <script src="js/ui/games/pokemon.js"></script>
-  <script src="js/ui/games/zelda.js"></script>
-  <script src="js/ui/games/mario-party.js"></script>
-  <script src="js/ui/games/dr-mario.js"></script>
-  <script src="js/ui/games/mario-maker.js"></script>
-  <script src="js/ui/games/mario-paint.js"></script>
-  <script src="js/ui/games/yoshi-island.js"></script>
-  <script src="js/ui/games/luigis-mansion.js"></script>
-  <script src="js/ui/games/brain-age.js"></script>
-  <script src="js/ui/games/mario-and-luigi.js"></script>
-  <script src="js/ui/games/pikmin.js"></script>
-  <script src="js/ui/games/kirby.js"></script>
-  <script src="js/ui/games/warioware.js"></script>
-  <script src="js/ui/games/super-smash-bros.js"></script>
-  <script src="js/ui/games/fire-emblem.js"></script>
-  <script src="js/ui/games/splatoon.js"></script>
-  <script src="js/ui/puzzle.js"></script>
-  <script src="js/ui/screens/game-intro.js"></script>
-  <script src="js/ui/screens/home.js"></script>
-  <script src="js/ui/screens/lesson.js"></script>
-  <script src="js/ui/screens/result.js"></script>
-  <script src="js/ui/screens/collection.js"></script>
-  <script src="js/ui/screens/parent.js"></script>
+  <script src="js/data/game-map.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

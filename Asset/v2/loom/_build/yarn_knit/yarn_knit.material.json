@@ -1,0 +1,20 @@
+{
+ "name": "yarn_knit",
+ "size": 256,
+ "normal": "gl",
+ "depth": 0.025,
+ "seam": {
+  "worst": 1.01,
+  "map": "normal"
+ },
+ "maps": {
+  "albedo": "yarn_knit_albedo.png",
+  "normal": "yarn_knit_normal.png",
+  "height": "yarn_knit_height.png",
+  "roughness": "yarn_knit_roughness.png",
+  "metallic": "yarn_knit_metallic.png",
+  "ao": "yarn_knit_ao.png",
+  "orm": "yarn_knit_orm.png",
+  "emissive": null
+ }
+}

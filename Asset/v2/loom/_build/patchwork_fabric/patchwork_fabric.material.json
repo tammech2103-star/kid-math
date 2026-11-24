@@ -1,0 +1,20 @@
+{
+ "name": "patchwork_fabric",
+ "size": 256,
+ "normal": "gl",
+ "depth": 0.018,
+ "seam": {
+  "worst": 0.87,
+  "map": "height"
+ },
+ "maps": {
+  "albedo": "patchwork_fabric_albedo.png",
+  "normal": "patchwork_fabric_normal.png",
+  "height": "patchwork_fabric_height.png",
+  "roughness": "patchwork_fabric_roughness.png",
+  "metallic": "patchwork_fabric_metallic.png",
+  "ao": "patchwork_fabric_ao.png",
+  "orm": "patchwork_fabric_orm.png",
+  "emissive": null
+ }
+}

@@ -23,10 +23,12 @@ OUT = ROOT / "public"
 DIRS = ["css", "js", "Asset"]
 REQUIRED = [
     "index.html",
+    "manifest.json",
+    "sw.js",
     "css/tokens.css",
     "css/app.css",
     "js/app.js",
-    "Asset/Mc_Queen.webp",
+    "Asset/v2/vex/school-reward.svg",
 ]
 
 
@@ -36,6 +38,9 @@ def main() -> int:
     OUT.mkdir(parents=True)
 
     shutil.copy2(ROOT / "index.html", OUT / "index.html")
+    for name in ["manifest.json", "sw.js"]:
+        if (ROOT / name).is_file():
+            shutil.copy2(ROOT / name, OUT / name)
     for name in DIRS:
         shutil.copytree(ROOT / name, OUT / name)
 

@@ -238,47 +238,289 @@
   pointer-events: none;
 }
 
-/* 01 · intro · Hàng xu một chiều */
+/* 01 · intro · Bé Khám Phá · Platformer + Question-Gate · Hang động xanh */
 .kmg-mario-bros {
-  --ui-bg: #e7f5ff;
-  --ui-accent: #f4c443;
-  --ui-ink: #14304a;
-  --ui-btn-bg: #fff7d9;
-  --ui-panel: rgba(255, 255, 255, 0.86);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  --ui-bg: #1A5C5C;
+  --ui-accent: #4DD0E1;
+  --ui-ink: #E0F7FA;
+  --mp-tile: 32px;
+  display: block;
+  min-height: 320px;
+  color: var(--ui-ink);
+  position: relative;
 }
-.kmg-mario-bros .kmg-coinline {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 132px;
-  padding: 10px;
-  overflow-x: auto;
-  border: 2px dashed #3c78a8;
-  border-radius: 14px;
-  background: linear-gradient(180deg, #d9efff, #f6fbff);
+.game-mount > .kmg-mario-bros {
+  background: transparent;
 }
-.kmg-mario-bros .kmg-coin {
-  flex: 0 0 64px;
-  width: 64px;
-  height: 64px;
-  border: 3px solid #8a5a00;
-  border-radius: 50%;
-  background: #ffd85e;
-  box-shadow: inset 0 0 0 8px rgba(255, 255, 255, 0.45);
-  font-size: 1.7rem;
-  line-height: 54px;
+/* Viewport: khung nhìn game, nền SVG Công viên ống nước */
+.kmg-mario-bros .mp-viewport {
+  position: relative;
+  width: 100%;
+  height: 320px;
+  overflow: hidden;
+  border: 4px solid #2F5FA8;
+  border-radius: 18px;
+  background-image: url('../Asset/v2/vex/teal-cave-bg.svg');
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  box-shadow: 0 8px 0 rgba(10, 40, 40, 0.5);
+  touch-action: none;
+}
+/* World layer: chứa tiles + player, transform cho camera */
+.kmg-mario-bros .mp-world-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  will-change: transform;
+}
+/* Tiles */
+.kmg-mario-bros .mp-tile {
+  position: absolute;
+  box-sizing: border-box;
+}
+.kmg-mario-bros .mp-tile-ground {
+  background: #5A4010;
+  border: 2px solid #3A2808;
+  border-radius: 2px;
+}
+.kmg-mario-bros .mp-tile-platform {
+  background: #8B6914;
+  border: 2px solid #5A4010;
+  border-radius: 4px;
+}
+.kmg-mario-bros .mp-tile-hazard {
+  background: #CC3333;
+  border: 2px solid #991111;
+}
+.kmg-mario-bros .mp-tile-coin {
+  background: transparent;
+  font-size: 20px;
+  line-height: 32px;
   text-align: center;
 }
-.kmg-mario-bros .kmg-pad {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(64px, 1fr));
-  gap: 8px;
-  align-self: stretch;
+.kmg-mario-bros .mp-tile-gate {
+  background: rgba(255, 216, 77, 0.3);
+  border: 2px dashed #FFD84D;
+  border-radius: 4px;
+  font-size: 20px;
+  line-height: 64px;
+  text-align: center;
 }
-/* QA: dải ngang cuộn được; ba ô số nằm cuối dải và giữ ≥64 px. */
+.kmg-mario-bros .mp-tile-exit {
+  background: transparent;
+  font-size: 24px;
+  line-height: 32px;
+  text-align: center;
+}
+/* Player: Bé Khám Phá (sprite sheet) */
+.kmg-mario-bros .mp-player {
+  position: absolute;
+  width: 32px;
+  height: 48px;
+  background-image: url('../Asset/v2/explorer_sprites.png');
+  background-size: 256px 240px;
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  z-index: 5;
+  image-rendering: pixelated;
+}
+/* Collectibles */
+.kmg-mario-bros .mp-collectible {
+  position: absolute;
+  font-size: 20px;
+  line-height: 1;
+  text-align: center;
+  z-index: 3;
+  animation: mp-coin-spin 1.2s linear infinite;
+}
+.kmg-mario-bros .mp-collectible-heart {
+  animation: mp-heart-pulse 0.8s ease-in-out infinite;
+}
+.kmg-mario-bros .mp-collectible-star {
+  animation: mp-star-twinkle 1s ease-in-out infinite;
+}
+@keyframes mp-coin-spin {
+  0% { transform: scaleX(1); }
+  50% { transform: scaleX(0.3); }
+  100% { transform: scaleX(1); }
+}
+@keyframes mp-heart-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+@keyframes mp-star-twinkle {
+  0%, 100% { opacity: 1; transform: scale(1) rotate(0deg); }
+  50% { opacity: 0.7; transform: scale(1.1) rotate(15deg); }
+}
+/* Floating score text */
+.kmg-mario-bros .mp-float-text {
+  position: absolute;
+  font-size: 14px;
+  font-weight: 900;
+  color: #FFD84D;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  pointer-events: none;
+  z-index: 6;
+  animation: mp-float-up 0.8s ease-out forwards;
+}
+@keyframes mp-float-up {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(-30px); opacity: 0; }
+}
+/* Gate door */
+.kmg-mario-bros .mp-gate {
+  position: absolute;
+  font-size: 24px;
+  line-height: 1;
+  text-align: center;
+  z-index: 4;
+}
+/* Exit flag */
+.kmg-mario-bros .mp-exit {
+  position: absolute;
+  font-size: 24px;
+  line-height: 1;
+  text-align: center;
+  z-index: 4;
+}
+/* Virtual buttons (touch only) */
+.kmg-mario-bros .mp-vpad {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  display: flex;
+  gap: 4px;
+  z-index: 10;
+}
+.kmg-mario-bros .mp-vbtn {
+  width: 64px;
+  height: 64px;
+  min-width: 64px;
+  min-height: 64px;
+  border: 3px solid #2F5FA8;
+  border-radius: 12px;
+  background: rgba(255, 253, 240, 0.85);
+  color: #3A2317;
+  font-size: 1.6rem;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+.kmg-mario-bros .mp-vbtn:active {
+  transform: scale(0.92);
+  background: rgba(255, 216, 77, 0.9);
+}
+.kmg-mario-bros .mp-vbtn-jump {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  z-index: 10;
+}
+/* Question-gate modal overlay */
+.kmg-mario-bros .mp-modal {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 20;
+  padding: 12px;
+}
+.kmg-mario-bros .mp-modal-card {
+  background: rgba(255, 253, 240, 0.97);
+  border: 4px solid #2F5FA8;
+  border-radius: 18px;
+  padding: 16px 20px;
+  max-width: 360px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 8px 0 rgba(24, 63, 110, 0.35);
+}
+.kmg-mario-bros .mp-modal-question {
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: #3A2317;
+  margin: 0 0 12px;
+  line-height: 1.3;
+}
+.kmg-mario-bros .mp-modal-choices {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.kmg-mario-bros .mp-modal-choice {
+  min-width: 64px;
+  min-height: 64px;
+  border: 3px solid #8A4E1E;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #FFF3C4, #FFD84D);
+  color: #3A2317;
+  font-size: 1.4rem;
+  font-weight: 900;
+  cursor: pointer;
+}
+.kmg-mario-bros .mp-modal-choice:active {
+  transform: scale(0.95);
+}
+.kmg-mario-bros .mp-modal-hint {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #7A2A1C;
+  margin: 8px 0;
+  min-height: 20px;
+}
+.kmg-mario-bros .mp-modal-replay {
+  background: none;
+  border: 2px solid #2F5FA8;
+  border-radius: 8px;
+  padding: 4px 12px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #2F5FA8;
+  cursor: pointer;
+  margin-top: 4px;
+}
+/* Celebration */
+.kmg-mario-bros.is-celebrate .mp-player {
+  animation: mp-celebrate 400ms ease-out;
+}
+@keyframes mp-celebrate {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.3) translateY(-8px); }
+  100% { transform: scale(1); }
+}
+/* Reduced motion */
+.kmg-mario-bros.is-reduced *,
+.kmg-mario-bros.is-reduced *::before,
+.kmg-mario-bros.is-reduced *::after {
+  animation: none !important;
+  transition: none !important;
+}
+.kmg-mario-bros.is-reduced .mp-coin,
+.kmg-mario-bros.is-reduced .mp-collectible,
+.kmg-mario-bros.is-reduced .mp-float-text {
+  animation: none;
+}
+/* Mobile */
+@media (max-width: 620px) {
+  .kmg-mario-bros .mp-viewport {
+    height: 240px;
+  }
+  .kmg-mario-bros .mp-modal-choices {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .kmg-mario-bros .mp-modal-choice {
+    min-height: 64px;
+  }
+}
 
 /* 02 · b1 · Vòng cung ném khăn */
 .kmg-mario-odyssey {
@@ -1375,5 +1617,142 @@
     background: #ffe9a8;
     outline: 4px solid #ff6b00;
     outline-offset: 2px;
+  }
+}
+
+/* 01-intro · Màn giới thiệu dùng chung thế giới "Công viên ống nước" với bài học. */
+.screen.game-intro[data-lesson-id="intro"] {
+  --intro-sky: #5C94FC;
+  --intro-gold: #FFD84D;
+  --intro-ink: #3A2317;
+  --intro-panel: rgba(255, 253, 240, 0.94);
+  --mp-leaf: #3FA235;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+  grid-template-areas:
+    "cover copy"
+    "actions actions";
+  align-items: center;
+  gap: clamp(16px, 2.4vw, 30px);
+  overflow: hidden;
+  border-radius: 26px;
+  background:
+    radial-gradient(circle at 12% 12%, rgba(255,255,255,0.8) 0 22px, transparent 23px),
+    radial-gradient(circle at 22% 8%, rgba(255,255,255,0.65) 0 14px, transparent 15px),
+    linear-gradient(180deg, var(--intro-sky) 0%, #9CD8FF 58%, #BCE98A 58%, #86C94F 100%);
+  box-shadow: 0 10px 0 rgba(31, 80, 143, 0.3), 0 18px 36px rgba(20, 50, 90, 0.2);
+}
+.screen.game-intro[data-lesson-id="intro"]::before,
+.screen.game-intro[data-lesson-id="intro"]::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  width: 62px;
+  height: 104px;
+  border: 5px solid #245C2A;
+  border-top: 0;
+  border-radius: 0 0 14px 14px;
+  background: linear-gradient(90deg, #4CC347 0 22%, #8FE486 22% 78%, #36A834 78%);
+  opacity: 0.7;
+  pointer-events: none;
+}
+.screen.game-intro[data-lesson-id="intro"]::before { left: 18px; }
+.screen.game-intro[data-lesson-id="intro"]::after { right: 18px; height: 78px; }
+
+.screen.game-intro[data-lesson-id="intro"] .game-intro-cover {
+  grid-area: cover;
+  position: relative;
+  z-index: 1;
+  height: clamp(260px, 42vh, 420px);
+  overflow: hidden;
+  border: 6px solid var(--intro-ink);
+  border-radius: 20px;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  box-shadow: 0 8px 0 rgba(58, 35, 23, 0.35), inset 0 0 0 4px rgba(255, 216, 77, 0.8);
+}
+.screen.game-intro[data-lesson-id="intro"] .game-cover {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  image-rendering: pixelated;
+}
+.screen.game-intro[data-lesson-id="intro"] .game-intro-copy {
+  grid-area: copy;
+  position: relative;
+  z-index: 1;
+  padding: clamp(16px, 2.2vw, 26px);
+  border: 4px solid var(--intro-ink);
+  border-radius: 18px;
+  background: var(--intro-panel);
+  box-shadow: 0 7px 0 rgba(58, 35, 23, 0.28);
+}
+.screen.game-intro[data-lesson-id="intro"] .game-intro-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--intro-gold);
+  color: var(--intro-ink);
+  font-weight: 900;
+  box-shadow: 0 3px 0 #C78B16;
+}
+.screen.game-intro[data-lesson-id="intro"] .game-intro-title {
+  margin: 10px 0 8px;
+  color: #2E6B2F;
+  font-size: clamp(1.7rem, 3.4vw, 2.7rem);
+  line-height: 1.1;
+  text-shadow: 2px 2px 0 #fff, 4px 4px 0 rgba(58, 35, 23, 0.25);
+}
+.screen.game-intro[data-lesson-id="intro"] .game-intro-text {
+  margin: 0 0 10px;
+  font-size: clamp(1rem, 1.8vw, 1.2rem);
+  font-weight: 700;
+}
+.screen.game-intro[data-lesson-id="intro"] .game-intro-tribute {
+  margin: 0 0 6px;
+  font-size: 0.92rem;
+  opacity: 0.85;
+}
+.screen.game-intro[data-lesson-id="intro"] .game-intro-hint {
+  margin: 0;
+  padding: 10px 12px;
+  border-left: 5px solid var(--mp-leaf, #3FA235);
+  border-radius: 8px;
+  background: rgba(63, 162, 53, 0.12);
+  font-weight: 700;
+}
+.screen.game-intro[data-lesson-id="intro"] .game-intro-actions {
+  grid-area: actions;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+@media (max-width: 820px) {
+  .screen.game-intro[data-lesson-id="intro"] {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "cover" "copy" "actions";
+  }
+  .screen.game-intro[data-lesson-id="intro"] .game-intro-cover {
+    height: clamp(220px, 34vh, 320px);
+  }
+}
+@media (max-width: 520px) {
+  .screen.game-intro[data-lesson-id="intro"] {
+    padding: 16px 12px 24px;
+    border-radius: 18px;
+  }
+  .screen.game-intro[data-lesson-id="intro"] .game-intro-copy {
+    padding: 14px;
+  }
+  .screen.game-intro[data-lesson-id="intro"] .game-intro-actions {
+    flex-direction: column;
+    align-items: stretch;
   }
 }

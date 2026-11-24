@@ -1,6 +1,6 @@
 /**
- * Test bản đồ 21 minigame, registry và hợp đồng game (ADR-0002).
- * Đợt 1 chỉ có 3 factory mẫu; các bài còn lại dùng fallback theo thiết kế.
+ * Test bản đồ 21 minigame và registry KM.Games (ADR-0002/ADR-0004).
+ * Mọi bài đều có module riêng, không còn contract/registry dùng chung.
  */
 (function () {
   'use strict';
@@ -83,42 +83,72 @@
     });
   });
 
-  T.suite('GameRegistry & GameContract — ADR-0002', function () {
-    T.test('3 factory Đợt 1 đã tự đăng ký', function () {
-      phase1Ids().forEach(function (gameId) {
-        T.eq(typeof KM.GameRegistry.get(gameId), 'function', 'thiếu factory ' + gameId);
-        T.eq(KM.GameRegistry.has(gameId), true);
+  T.suite('KM.Games — 21 module độc lập', function () {
+    function gameIds() {
+      return KM.GameMap.all().map(function (entry) { return entry.gameId; });
+    }
+
+    function fixture() {
+      return {
+        text: 'Có bao nhiêu quả?',
+        kind: 'count',
+        answer: 2,
+        choices: [{ value: 1, label: '1' }, { value: 2, label: '2' }],
+        visual: { groups: [{ name: 'quả', glyph: '🍎', count: 2 }], values: [1, 2] },
+        equation: { tokens: [], alt: '2 + 1 = ?' }
+      };
+    }
+
+    function mountFor(gameId) {
+      var mount = document.createElement('div');
+      mount.style.position = 'absolute';
+      mount.style.left = '-9999px';
+      document.body.appendChild(mount);
+      var game = KM.Games[gameId]({
+        mount: mount, question: fixture(), audio: {}, reducedMotion: true
+      });
+      return { mount: mount, game: game };
+    }
+
+    T.test('cả 21 gameId đều có factory trong KM.Games', function () {
+      gameIds().forEach(function (gameId) {
+        T.eq(typeof KM.Games[gameId], 'function', 'thiếu factory ' + gameId);
       });
     });
 
-    T.test('registry.get trả null cho id lạ', function () {
-      T.eq(KM.GameRegistry.get('khong-ton-tai'), null);
-      T.eq(KM.GameRegistry.get(''), null);
-      T.eq(KM.GameRegistry.has('khong-ton-tai'), false);
+    T.test('id lạ không có factory và không rơi về fallback', function () {
+      T.eq(KM.Games['khong-ton-tai'], undefined);
+      T.eq(KM.Games[''], undefined);
+      T.eq(KM.Games['race'], undefined);
     });
 
-    T.test('GameContract chấp nhận factory và instance đủ 5 method', function () {
-      T.eq(KM.GameContract.assert(function () {}), true);
-      var instance = {};
-      KM.GameContract.methods.forEach(function (name) {
-        instance[name] = function () {};
+    T.test('mỗi factory dựng root kmg-* và không render .choices', function () {
+      gameIds().forEach(function (gameId) {
+        var handle = mountFor(gameId);
+        var root = handle.mount.firstElementChild;
+        T.ok(root, gameId + ' không tạo root');
+        T.ok(/^kmg-/.test(root.className), gameId + ' sai class root: ' + root.className);
+        T.eq(handle.mount.querySelectorAll('.choices, .choice, .game-stage').length, 0,
+          gameId + ' vẫn render hàng đáp án dùng chung');
+        handle.game.destroy();
+        if (handle.mount.parentNode) {
+          handle.mount.parentNode.removeChild(handle.mount);
+        }
       });
-      T.eq(KM.GameContract.assert(instance), true);
-      T.deepEq(KM.GameContract.methods,
-        ['render', 'onCorrect', 'onWrong', 'celebrate', 'destroy']);
     });
 
-    T.test('GameContract chặn instance thiếu method', function () {
-      T.throws(function () { KM.GameContract.assert(null); });
-      T.throws(function () { KM.GameContract.assert({}); });
-      KM.GameContract.methods.forEach(function (missing) {
-        var broken = {};
-        KM.GameContract.methods.forEach(function (name) {
-          broken[name] = function () {};
+    T.test('instance đủ 6 method và destroy gỡ root khỏi mount', function () {
+      var methods = ['render', 'onWrong', 'onCorrect', 'celebrate', 'destroy', 'handleKey'];
+      gameIds().forEach(function (gameId) {
+        var handle = mountFor(gameId);
+        methods.forEach(function (name) {
+          T.eq(typeof handle.game[name], 'function', gameId + ' thiếu ' + name + '()');
         });
-        delete broken[missing];
-        T.throws(function () { KM.GameContract.assert(broken); },
-          'phải chặn instance thiếu ' + missing + '()');
+        handle.game.destroy();
+        T.eq(handle.mount.children.length, 0, gameId + ' destroy không gỡ root');
+        if (handle.mount.parentNode) {
+          handle.mount.parentNode.removeChild(handle.mount);
+        }
       });
     });
   });

@@ -1,16 +1,16 @@
 # Deploy lên Render — Bé Vui Học Toán 1
 
 **Trạng thái (cập nhật 2026-11-22):** đang live tại
-**https://be-vui-hoc-toan-1.onrender.com** — bản **redesign 21 trò chơi riêng**
-(GitHub `main` HEAD `4ffccef`; Render deploy `dep-dc1csbvf3r2c73cc1rng`,
-**Deploy succeeded | Live**, 9.8s, 18:12 GMT+7). Mỗi bài là một minigame riêng
-lấy cảm hứng Nintendo (ghi tên cảm hứng trong UI, art tự sinh), có màn intro riêng,
-sprite HD và nhận 1/21 mảnh ghép McQueen (7×3); riêng Bài 20 giữ cuộc đua 1 đối 1
-+ bục trao thưởng. Lõi học tập (sao, RNG, speech, parent gate, `localStorage
-kidmath.v1`) giữ nguyên.
+**https://be-vui-hoc-toan-1.onrender.com** — bản **UI v2: 21 giao diện riêng, không đua xe**
+(GitHub `main` HEAD `a2a680c`; Render deploy `dep-dc1fkoqjnfac738l5hd0`,
+**Deploy succeeded | Live**, 8.7s, Manual Deploy). Mỗi bài là một minigame riêng
+(cấu trúc / bố cục / động tác khác nhau) do 5 skill authoring tự sinh; phần thưởng
+là `Asset/v2/vex/school-reward.svg` (trường học 7×3, 21 mảnh). Không còn đua xe,
+đối thủ, bục trao thưởng, xe thưởng hay hàng đáp án `.choices` trong runtime.
+Lõi học tập (sao, RNG, speech, parent gate, `localStorage kidmath.v1`) giữ nguyên.
 
-> Bản trước (Đợt 1, commit `245b283`/`2c901b9`) là cuộc đua chung cho cả 21 bài;
-> đã bị thay bởi bản redesign ở trên.
+> Bản redesign có đua xe (`4ffccef`) đã bị thay bởi UI v2 ở trên.
+> Bản Đợt 1 (`245b283`/`2c901b9`) là cuộc đua chung cho cả 21 bài.
 
 Mục tiêu: có một link HTTPS dạng `https://be-vui-hoc-toan-1.onrender.com` để mở trên tablet.
 Đây là **static site** — không backend, không database, không thu dữ liệu trẻ em.
@@ -23,13 +23,24 @@ Mục tiêu: có một link HTTPS dạng `https://be-vui-hoc-toan-1.onrender.com
 
 - `render.yaml` — Render Blueprint: build `public/` rồi publish.
 - `tools/build_public.py` — build tĩnh thủ công (chỉ copy file runtime).
-- `deploy/kid-math-render.zip` — bản sạch để upload GitHub (tạo bằng
-  `python tools/pack_deploy.py`; file ZIP không commit vào repo).
+- `deploy/kid-math-render.zip` — bản sạch đầy đủ để upload GitHub (tạo bằng
+  `python tools/pack_deploy.py`; file ZIP không commit vào repo). Lần deploy UI v2
+  chỉ đẩy **35 file runtime cần thiết** qua GitHub web, không dùng ZIP này.
 - `public/` — bản build đã kiểm tra cục bộ (không cần commit; Render tự build lại).
 
 Gói ZIP đã được kiểm tra end-to-end: giải nén → `python tools/build_public.py` →
-Chrome mở 21 bài, ảnh xe tải, localStorage hoạt động, **0 lỗi console/404**
+Chrome mở 21 bài, ảnh phần thưởng tải, localStorage hoạt động, **0 lỗi console/404**
 (ảnh `production/qa/screenshots/14-render-build.png`).
+
+### Kiểm chứng bản live UI v2 (2026-11-22)
+
+- Màn chính: *Học toán cùng 21 trò vui!*, **21/21 thẻ bài**, không `.choices`,
+  không từ ngữ đua xe/đối thủ/podium/McQueen.
+- Trong bài: chạm đáp án làm câu hỏi tiến triển (1/5 → 2/5), sao cập nhật;
+  `KM.Games` có 21 module, 22 request script game đều HTTP 200.
+- Bộ sưu tập: *Bộ sưu tập Trường vui*, 21 mảnh; `Asset/v2/vex/school-reward.svg`
+  trả 200 (`image/svg+xml`, 44.709 B).
+- Console 0 lỗi/cảnh báo; network 0 request ≥400 / failed.
 
 ## Cách 1 — Upload bằng GitHub web (không cần cài Git)
 
@@ -94,7 +105,7 @@ Bấm **Create Static Site**. Không cần biến môi trường, không cần d
 
 1. Mở link Render bằng Safari (iPad) hoặc Chrome (Android).
 2. Bấm **Bấm để bắt đầu** — thao tác này mở khoá âm thanh/giọng đọc của trình duyệt.
-3. Chơi thử Bài 1; kiểm tra xe + sao + confetti khi trả lời đúng.
+3. Chơi thử Bài 1; kiểm tra giao diện riêng, sao + mảnh ghép trường học khi trả lời đúng.
 4. Thêm vào màn hình chính:
    - iPad/Safari: **Chia sẻ → Thêm vào MH chính**.
    - Android/Chrome: **⋮ → Thêm vào màn hình chính**.
@@ -120,7 +131,7 @@ Bấm **Create Static Site**. Không cần biến môi trường, không cần d
 | Hiện tượng | Nguyên nhân / cách sửa |
 |------------|------------------------|
 | 404 hoặc trang trắng | Publish Directory phải là `public`; xem Build Log có copy đủ `index.html`, `css`, `js`, `Asset` |
-| Không thấy ảnh xe | Thiếu thư mục `Asset/` (phân biệt hoa/thường trên Linux) |
+| Không thấy ảnh phần thưởng | Thiếu `Asset/v2/vex/school-reward.svg` (phân biệt hoa/thường trên Linux) |
 | Không có tiếng | Bấm nút bắt đầu trước; kiểm tra âm lượng/silent mode; cài giọng Việt |
 | Deploy lỗi tên service | Đổi `name:` trong `render.yaml` sang tên chưa ai dùng |
 | Sửa code mà web không đổi | Kiểm tra commit đã push; Render → Manual Deploy → Clear build cache |
@@ -133,4 +144,4 @@ python -m http.server 8766 --bind 127.0.0.1 --directory public
 # mở http://127.0.0.1:8766
 ```
 
-Bản `public/` đã được kiểm tra: 21 bài, ảnh xe, chuyển bài, localStorage, không lỗi console.
+Bản `public/` đã được kiểm tra: 21 bài, ảnh phần thưởng trường học, chuyển bài, localStorage, không lỗi console.

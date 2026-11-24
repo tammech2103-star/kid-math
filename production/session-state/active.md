@@ -1,128 +1,172 @@
 # Session State — Bé Vui Học Toán 1
 
-**Cập nhật**: 2026-11-22 — **Redesign 21 bài HOÀN TẤT + ĐÃ DEPLOY LIVE.**
-**Trạng thái deploy**: Render deploy từ commit `4ffccef` trên `main`
-(3 commit: `7822bd6` asset → `0d8ce76` code/CSS/JS → `4ffccef` QA/Render config).
-Sau đó có thêm commit tài liệu cập nhật trạng thái live — không đổi code build.
-Render Manual Deploy `dep-dc1csbvf3r2c73cc1rng` từ `4ffccef` —
-**Deploy succeeded | Live**, 9.8s, 2026-11-22 18:12 GMT+7.
-URL: `https://be-vui-hoc-toan-1.onrender.com`.
+**Cập nhật**: 2026-11-23 — Thêm bản chỉnh **thị giác local** cho bài `intro`
+(đồng bộ nền gameplay với màn intro). UI redesign v2 bên dưới vẫn **ĐÃ DEPLOY LIVE**;
+bản chỉnh mới **chưa deploy / chưa commit / chưa push**.
+**Trạng thái deploy**: `https://be-vui-hoc-toan-1.onrender.com` chạy commit
+`a2a680c` trên `main` (Render deploy `dep-dc1fkoqjnfac738l5hd0`,
+**Deploy succeeded | Live**, 8.7s, Manual Deploy). Bản cũ `4ffccef` đã bị thay.
+Lần này đẩy 35 file runtime cần thiết qua GitHub web (máy không có `git`/`gh`);
+không đẩy ZIP 477 file, không push thêm sau khi live.
 
-## Live verification sau deploy (2026-11-22)
+## Đợt 2026-11-23b — Prototype Platformer "Bé Khám Phá" + Question-Gate (LOCAL-ONLY)
 
-- Trang chủ load OK: title `Bé Vui Học Toán 1`, 50 script, 4 stylesheet.
-- Console **0 error**; **0 response HTTP ≥400** (các request `ERR_ABORTED` là 63 lượt
-  `fetch HEAD` preload tự bắn, status đều 200 — không phải lỗi server).
-- **63/63 ảnh** `Asset/{hd,covers,sprites}/…` HEAD OK.
-- `KM.GameMap.all()` → **21 entry**, `gameId`/`style`/`tribute`/asset path đúng.
-- Luồng `home → gameIntro → lesson` chạy: intro bài mở đầu hiện cảm hứng
-  "Super Mario Bros." + sprite `intro.webp` 640×360; bài 1 minigame
-  `minigame-mario-bros`, đồng xu + trả lời đúng/sai (sai nhắc nhẹ, không trừ sao),
-  **stage 165px ≤170px** (OBS-01 giữ live), sprite xe 570×244/1000×477 load OK.
-- Bài 20 (unlockAll để test): intro "Đua xe về đích" — cảm hứng "Mario Kart 8";
-  race `minigame-mario-kart` với đối thủ Mater, 10 câu, **stage 104px**, console sạch.
+- [x] **Spec**: `design/quick-specs/intro-platformer-question-gate.md` (đã duyệt, không chỉnh).
+- [x] **Prototype Phase 2**: `js/ui/games/mario-bros.js` viết lại hoàn toàn:
+  - Physics đơn giản: gravity 1200, speed 180, jump -420, coyote 80ms, jump buffer 100ms.
+  - Collision AABB (X rồi Y), one-way platform.
+  - Tilemap 40×10, ground + platform + gate (x5) + exit + collectibles.
+  - Camera follow với dead zone, lerp 0.15.
+  - Question-gate: modal overlay khóa input, hiện câu hỏi + đáp án 2 cột, đúng → đóng + gate mở, sai → hint.
+  - Điều khiển: ← → ↑/Space (desktop) + nút ảo (touch, ≥64px).
+  - `handleKey` 1-9 cho đáp án trong modal.
+  - `render/onWrong/onCorrect/celebrate/destroy` tích hợp `km:answer`.
+- [x] **Sprite sheet**: `Asset/v2/explorer_sprites.png` (288×240, 9×5 frames, 32×48px mỗi frame). Trích từ sprite người dùng cung cấp, xóa nền xám, chuẩn hóa kích thước.
+- [x] **Animation**: 4 trạng thái (idle/run/jump/fall), 9 frame mỗi trạng thái, cycle 0.1s/frame, reset khi đổi state.
+- [x] **CSS**: Block `01 · intro` viết lại: viewport, tiles, player (sprite sheet), coin, gate, exit, vpad, vbtn, modal, celebration, reduced-motion, mobile.
+- [x] **game-map.js**: entry đầu đổi title/introText/inputHint/mechanic cho "Bé Khám Phá".
+- [x] **Kiểm chứng**: auto-play 5 gate → 5 câu → kết quả. Di chuyển, nhảy, gate, modal, đáp án đúng/sai, phím 1-9, sprite animation, console (chỉ AudioContext headless).
+- [x] **Map redesign**: Map mới 50×10 với platforms, 15 collectibles (coin/heart/star/gem), 2 gates, hazards. Dựa trên layout từ ảnh tham khảo.
+- [x] **Audio**: Thêm `coin()`, `heart()`, `jump()`, `land()`, `gateOpen()` vào audio.js. Collectible phát sound theo type. Floating text (+1, +❤, +2, +3) khi nhặt.
+- [x] **CSS**: Collectible styles (coin spin, heart pulse, star twinkle), floating text animation.
 
-## Việc đã làm (redesign + deploy hoàn tất)
+## Đợt 2026-11-23 — Đồng bộ nền gameplay bài `intro` (LOCAL-ONLY)
 
-Chuyển 21 bài từ một màn chơi chung sang **21 trò chơi riêng** lấy cảm hứng Nintendo
-(ghi rõ tên cảm hứng trong UI, art HD tự sinh, không copy tài sản Nintendo).
-Mỗi bài xong nhận **1/21 mảnh ghép McQueen** (lưới 7×3); đủ 21 mảnh hiện ảnh full.
-Cuộc đua 1 đối 1 + bục trao thưởng được giữ làm game Bài 20 và màn tổng kết chung.
+Vấn đề: màn intro dùng "Công viên ống nước" còn màn chơi lại vẽ nền/CSS riêng →
+hai thế giới không ăn khớp. Chọn phương án **dùng chung ảnh SVG** + chỉnh copy
+cho khớp thao tác của bé; người dùng đã duyệt ("đồng ý").
 
-## Redesign 21 bài — tiến độ đầy đủ
+- [x] **Asset mới**: `Asset/v2/vex/pipe-park-gameplay-bg.svg` (1200×600, tự sinh,
+      XML hợp lệ). Cùng palette/thế giới với `intro-tribute-scene.svg`; có Bé Thợ
+      (x≈120–262), ống xanh, bàn gỗ **trống** (x410–800), vùng biển số bên phải
+      trống (x820–1160); **không** trái cây/biển số/chữ số có sẵn, không asset Nintendo.
+- [x] `js/ui/games/mario-bros.js`: comment trỏ nền SVG dùng chung; bỏ hẳn
+      `buildHero()` / `hero` / `world.appendChild(hero)` (SVG đã vẽ Bé Thợ).
+      Giữ nguyên hợp đồng, `km:answer`, gating, phím 1–9, hint, cleanup, ES5.
+- [x] `css/games.css`: **chỉ** block `01 · intro`; `.mp-world` dùng
+      `url('../Asset/v2/vex/pipe-park-gameplay-bg.svg')` + `center/cover/no-repeat`;
+      bỏ gradient/pipe giả/`.mp-hero*`; grid `17/45/38` (gutter trống / bàn / biển số);
+      rule `.game-mount > .kmg-mario-bros { background: transparent }` để panel chung
+      không phủ nền; mobile `background-position: left center`, deck 3 cột ≥64px.
+- [x] `js/data/game-map.js`: **chỉ** entry đầu — `bg` → SVG mới; `cover` giữ nguyên;
+      `introText`/`inputHint` theo wording đã duyệt. 21 entry, 20 bài khác không đổi.
+- [x] Rebuild `public/` (`python tools/build_public.py`, 464 mục); mirror có đủ 4 file.
 
-- [x] **Giai đoạn A — thiết kế** (5 file):
-      `design/quick-specs/all-21-distinct-games.md` (21 cơ chế, 21 động tác, 42 edge
-      case, 21 AC), `design/art/art-bible-hd.md` + `design/art/sprite-style-guide.md`
-      (21 style id canonical, 21 prompt), `docs/architecture/ADR-0003-...md` +
-      `docs/architecture/game-module-interface.md` (GameMap v2 8 field, route
-      `gameIntro`, `KM.Sprite`, 8 archetype layout/variant, cover `alt=""`).
-- [x] **Chuẩn chốt**: style theo art bible, layout/variant theo ADR-0003, asset path
-      `Asset/{hd,covers,sprites}/{lessonId}.webp` (không dùng `{gameId}`).
-- [x] **Giai đoạn B — 63/63 ảnh procedural** (AI bị chặn bởi `Invalid credential` của
-      `opencode/grok-imagine-image-2.0`; user chọn Pillow): 21 sprite 384×384 RGBA
-      4×4, 21 cover 640×360, 21 nền HD 1280×720. Tổng **984.600 B (0,94 MB)** /
-      63 file. 0 cặp sprite/cover trùng, 21/21 sheet idle≠cheer, mọi file ≤ ngân sách.
-      User đã duyệt contact sheet trực quan.
-- [x] **Giai đoạn C — core**: GameMap v2 (8 field, freeze + identity), `KM.Sprite.create`
-      (rAF dùng chung, reduced-motion, destroy do shell sở hữu), `KM.Screens.gameIntro`
-      (flag `km_game_intro_v1_<lessonId>` trong sessionStorage + fallback `KM._introFlags`),
-      route `home → gameIntro(lessonId) → lesson`, cover trên thẻ bài + intro,
-      shell `lesson.js` nối sprite, script order trong `index.html`.
-- [x] **Giai đoạn C — gameplay**: `js/ui/games/kit.js` + 18 module mới; 18/18 contract
-      hợp lệ, smoke fake-DOM trả lời 18/18. 3 module cũ giữ nguyên; `b20/mario-kart`
-      vẫn KHÔNG gọi `onAnswer` (giữ race 1v1 + bục).
-- [x] **Sửa regression splatoon**: câu `position` có 4 đáp án (`js/domain/questions.js:704`)
-      nhưng module chỉ có 3 vị trí → đáp án 4 đè lên đáp án 1. Thêm `TARGET_SPOTS_4`
-      (dải ngang 2%/26%/50%/74%, target 76px khi >3 đáp án), phủ bởi
-      `tests/unit/splatoon.test.js`.
-- [x] **Giai đoạn C — CSS archetype**: `css/games.css` append-only đến 1784 dòng;
-      21 style id unique, 8 archetype × b/c/d, cover/sprite/intro responsive,
-      OBS-01 compression (root `min-height:0 !important`, `.mario-scene`,
-      `.ac-scene`/`.ac-garden`/`.ac-bed`). 0 rule `.choices`/`.choice` mới, 0
-      `position:fixed|sticky` mới, 0 rule nén nhắm trực tiếp `.game-stage`.
-- [x] **Giai đoạn C — QA package**: 4 test file mới (game-map-v2 10, game-intro 7,
-      sprite 7, splatoon 1); `tests/test-runner.html` với `<base href="../">`, rAF stub,
-      script order đúng; `tools/smoke_test.py` phủ 63 ảnh, luồng intro, 21 stage,
-      21×4 OBS-01 measurement, 88 screenshot. `EXPECTED_UNIT_TESTS=117`.
-- [x] **FINAL GATE PASS** (QA tự rerun, không chỉ tin self-audit):
-      unit **117/117 PASS**, ảnh **63/63** load OK, console **0** / HTTP **0** ≥400,
-      **OBS-01: 0 failures / 84 measurements**, stage cao nhất **166.0px ≤170px**,
-      dòng cuối `PASS — smoke test hoàn tất`.
-      Log: `C:\Users\2103\AppData\Local\Temp\opencode\phase-c-final-gate.log`.
-      BUG-001 **Resolved/Closed** (39/84 → 0/84).
-      Báo cáo: `production/qa/phase-c-qa-report.md`.
+### Kiểm chứng local (2026-11-23, browser + `http://127.0.0.1:8766`)
 
-## Quyết định quan trọng (giữ nguyên từ Đợt 1)
+| Hạng mục | Kết quả |
+|----------|---------|
+| Asset/phục vụ | SVG well-formed; index/css/js/svg đều HTTP 200 |
+| Intro → gameplay | Copy mới hiện đúng ("Bé Khám Phá phiêu lưu..."); vào bài hiện platformer |
+| Platformer | Nhân vật 🧭 di chuyển ← →, nhảy ↑, camera follow; gravity + collision hoạt động |
+| Question-gate | Chạm cửa 🚪 → modal overlay khóa màn hình; hiện câu hỏi + đáp án; đúng → đóng modal + gate mở; sai → hint + modal giữ mở |
+| Hợp đồng | `km:answer` bubbles, `detail.value` đúng; phím 1-9 trong modal chọn đáp án; phím ← → ↑ điều khiển game |
+| Wrong answer | Hint "Thử lại nhé!" hiện đúng; sau 3 lần sai hint đổi "Bé đếm lại từ đầu nhé!" |
+| Celebration | `is-celebrate` class + animation khi trả lời đúng |
+| Mobile (iframe 390px) | Viewport 240px, CSS media query hoạt động |
+| Reduced motion | `.is-reduced` class applied; animation/transition tắt |
+| Console | Chỉ lỗi `AudioContext` (headless, không có thiết bị âm) — không liên quan game |
+| Phạm vi | Chỉ `mario-bros.js` + `games.css` block 01 + `game-map.js` entry đầu + spec mới |
 
-1. **Giữ lõi học tập**: `Question`, `LessonSession`, tính sao, RNG, speech, audio,
-   parent gate, localStorage `kidmath.v1` không đổi. Minigame chỉ gọi `onAnswer(value)`;
-   `b20` không gọi (race là luật riêng).
-2. **Hợp đồng game**: `createGame({ctx, question, mount, onAnswer, reducedMotion})`
-   → `{render, onCorrect, onWrong, celebrate, destroy}`.
-3. **Bản quyền**: ghi tên game cảm hứng + art tự sinh/procedural; không copy
-   sprite/logo/nhạc/nhân vật Nintendo.
-4. **Mảnh ghép**: 1 mảnh/bài, nhận tự động, **thua vẫn nhận**, chơi lại không tăng;
-   cắt ảnh bằng CSS `background-position`, không sinh 21 file.
-5. **OBS-01**: `.choices`/`.choice` giữ nguyên cấu trúc, không `position:fixed|sticky`
-   mới; chỉ nén lớp trang trí CON của `.screen.lesson.has-minigame .game-stage`;
-   nút đáp án thấy được không cần cuộn ở 4 viewport.
-6. Web tĩnh offline `file://`, không backend, không Node runtime, chạm ≥64px,
-   bàn phím 1–9/R/Esc, `prefers-reduced-motion`.
+**Chưa làm**: deploy/push/commit, test files, đổi bài khác. Chờ người dùng review thị
+giác trên local rồi mới có chỉ thị publish. Tab browser đang mở sẵn để review.
 
-## Kết quả kiểm thử hiện tại (local, đợt redesign)
+## Đợt này — Thiết kế lại 21 bài, bỏ đua xe
 
-| Hạng mục | Kết quả | Bằng chứng |
-|----------|---------|------------|
-| Unit test | **117/117 PASS** (92 cũ + 25 mới) | `tests/test-runner.html`, smoke log |
-| Smoke E2E | **PASS** | `phase-c-final-gate.log` |
-| 63 ảnh HD/cover/sprite | 63/63 load OK, ≤ ngân sách | smoke log |
-| Luồng `home → gameIntro → lesson` + flag | PASS | smoke, `game-intro.test.js` |
-| 21 bài × 1 `.game-stage` + sprite | PASS 21/21 | smoke |
-| Console / HTTP ≥400 | 0 / 0 | smoke log |
-| OBS-01 21 bài × 4 viewport | **0 fail / 84**, max 166.0px | smoke log, 88 screenshot |
-| Race b20 + bục + vòng đời mảnh 21/21 | PASS | smoke |
-| Offline `file://` + reduced-motion + keyboard | PASS | smoke |
-| BUG-001 OBS-01 stage height | **Resolved/Closed** | `production/qa/bugs/BUG-001-...md` |
+Mục tiêu: mỗi bài 1 giao diện riêng (cấu trúc / bố cục / động tác khác nhau,
+không chỉ đổi màu); bỏ hoàn toàn đua xe, đối thủ, bục trao thưởng, xe thưởng,
+podium, `race-*`, `kart-*` trong runtime; bỏ cụm đáp án `.choices`/`.choice`
+dưới game — mỗi module tự chứa điều khiển trả lời. Vẫn giữ ý nghĩa toán học.
 
-## Rủi ro còn lại
+- [x] **Docs chốt**: `design/quick-specs/ui-redesign-21-distinct-screens.md`
+      (bảng 21 giao diện), `docs/architecture/ADR-0004-independent-game-modules-
+      and-skill-asset-pipeline.md`, `design/art/skill-asset-pipeline.md`.
+      Spec cũ `all-21-distinct-games.md` bị SUPERSEDED.
+- [x] **Shell mới**: `js/ui/screens/lesson.js` nghe `CustomEvent('km:answer',
+      {bubbles:true, detail:{value}})` từ module, gọi `session.answer(value)`;
+      không render `.choices`. `home.js`, `result.js`, `collection.js`,
+      `js/app.js`, `index.html` dọn sạch ngôn ngữ đua xe / McQueen.
+- [x] **21 module độc lập** trong `js/ui/games/` — mỗi file 1 root `.kmg-<gameId>`,
+      không dùng `GameMap`/`GameRegistry`/`onAnswer` chung, không archetype dùng lại.
+      Bài 20 `mario-kart` thành "Đường vải tới trường" — không xe, không đối thủ.
+- [x] **CSS** `css/games.css` viết lại thành 21 theme `.kmg-*` riêng;
+      `css/app.css`/`css/puzzle.css` xóa race/car/choices. Ảnh ghép 4:3 →
+      `.puzzle-piece aspect-ratio: 0.571` (đã sửa từ 0.898 của ảnh cũ 1000×477).
+- [x] **Asset thưởng**: `Asset/v2/vex/school-reward.svg` (1200×900, 44.709 B,
+      21/21 ô lưới 7×3 có nội dung) thay `Asset/Mc_Queen.webp`;
+      `components.js`/`js/domain/puzzle.js`/`js/ui/puzzle.js` dùng `PUZZLE_SRC`.
+      `collection.js` title/alt "Bộ sưu tập Trường vui".
+- [x] **Build**: `tools/build_public.py` REQUIRED đổi `Asset/Mc_Queen.webp` →
+      `Asset/v2/vex/school-reward.svg`; đã rebuild `public/` (462 mục, 13.9 MB).
+- [x] **QA**: `tests/test-runner.html`, `tests/unit/game-map.test.js`,
+      `tests/unit/puzzle.test.js`, `tests/unit/km-answer-contract.test.js` mới;
+      `tools/smoke_test.py` viết lại; bỏ race/sprite khỏi runner.
+      `EXPECTED_UNIT_TESTS = 105`.
 
-- **Chưa có manual playtest với trẻ em 6 tuổi** cho redesign 21 bài. Automation +
-  evidence (117 unit, 84 layout, 88 screenshot, live verify) KHÔNG thay thế
-  sign-off Visual/Feel.
-- Live verify đã sample bài mở đầu + bài 20; 19 bài còn lại tin tưởng unit + smoke
-  local (đã chạy 21/21 stage). Nếu muốn, có thể click từng bài trên live để soi riêng.
-- Máy phụ huynh đã cài giọng tiếng Việt chưa? (không đọc giọng sai ngôn ngữ)
-- Có muốn thu âm lời khen giọng người thật thay TTS không?
+## Pipeline asset 5 skill (authoring-time)
 
-## Bước tiếp theo
+Cài global tại `C:\Users\2103\.config\opencode\ocgs\.agents\skills\{pxl,vex,kiln,loom,chirp}`.
+Node portable `v22.18.0` (dùng `npm.cmd`, `npm.ps1` bị execution policy chặn).
+DSL build trong `tools/asset-pipeline/`, deliverable commit trong `Asset/v2/`.
 
-1. [x] Giai đoạn A thiết kế + B 63 ảnh + C code + QA package.
-2. [x] FINAL GATE PASS + BUG-001 Closed + QA report chốt.
-3. [x] Rebuild `public/` + `deploy/kid-math-render.zip` từ source local mới nhất.
-4. [x] Upload GitHub 3 commit (`7822bd6`/`0d8ce76`/`4ffccef`) qua web UI (không có
-      `git`/`gh`/token; dùng custom file input + DataTransfer giữ path thư mục).
-5. [x] Render Manual Deploy `dep-dc1csbvf3r2c73cc1rng` — Deploy succeeded | Live.
-6. [x] Verify live: console 0, HTTP ≥400 = 0, 63 ảnh, 21 GameMap, luồng intro → lesson.
-7. [ ] Manual playtest với trẻ em 6 tuổi — xếp lịch riêng (không chặn deploy).
-8. [ ] Hỏi phụ huynh: giọng Việt TTS đã cài chưa; có thu lời khen giọng người thật.
+- **71 asset deliverable** (+ `school-reward.svg`): `pxl` lint OK; `kiln` 160–212 tris;
+  `loom` 6/6 seamless; `chirp` 7/7 pitch OK, peak −12.03…−7.96 dBFS, không CLIPPED.
+- Runtime **không fetch** asset ngoài; phần lớn asset v2 chỉ là sản phẩm authoring.
+  `pikmin.js` có đường dẫn `Asset/v2/kiln/yarn_block.png` (đã sửa từ path sai)
+  nhưng vẫn bị gate bởi `KM.Assets`/`KM.AssetManifest` (không tồn tại) → không load,
+  không 404. Bật dùng asset là quyết định riêng, chưa làm.
+
+## Kiểm chứng (local, 2026-11-22)
+
+| Hạng mục | Kết quả |
+|----------|---------|
+| Unit test | **105/105 PASS** |
+| Smoke desktop | home / 21 module / answer / result / collection / reload **OK** |
+| Smoke mobile | home / lesson tap **OK** |
+| Reduced motion | module `.is-reduced` **OK** |
+| Offline `file://` | splash **OK** |
+| Build mirror | `python tools/build_public.py` exit 0, 462 mục |
+
+### Kiểm chứng trên production (2026-11-22, sau deploy `a2a680c`)
+
+| Hạng mục | Kết quả |
+|----------|---------|
+| Render | Deploy 14 · `dep-dc1fkoqjnfac738l5hd0` · Live · 8.7s |
+| Màn chính | *Học toán cùng 21 trò vui!* · 21/21 thẻ bài · không `.choices` · không từ ngữ đua xe |
+| Trong bài | Chạm đáp án → câu 1/5 sang 2/5, sao cập nhật; `KM.Games` 21 module |
+| Script/asset | 22 request `/js/ui/games/*` HTTP 200; `school-reward.svg` HTTP 200 (44.709 B) |
+| Bộ sưu tập | *Bộ sưu tập Trường vui* · 21 ô lưới; puzzle src đúng đường dẫn SVG |
+| Console/network | 0 lỗi/cảnh báo; 0 request ≥400 hoặc failed |
+
+Log: `C:\Users\2103\AppData\Local\Temp\km-smoke-final.log`.
+Screenshot: `production/qa/screenshots/`.
+
+## Quyết định giữ nguyên
+
+1. **Lõi học tập**: `Questions`, `LessonSession`, `Curriculum`, `tuning`, speech/TTS
+   tiếng Việt, progress/localStorage `kidmath.v1` là nguồn chân lý — không đổi.
+2. **Kênh trả lời duy nhất**: `km:answer` CustomEvent trên `options.mount`;
+   module không export `onAnswer`, shell gọi `session.answer`.
+3. **Web tĩnh offline** `file://`, không backend, không Node runtime phía người chơi;
+   ES5-ish `KM.*`; trẻ 6 tuổi, tiếng Việt, chạm ≥64px, phím 1–9/R/Esc,
+   `prefers-reduced-motion`.
+4. **Bản quyền**: art tự sinh/procedural qua 5 skill; không copy tài sản Nintendo
+   hay nhân vật đua xe có bản quyền.
+5. **Deploy UI v2** đã thực hiện theo chỉ thị "deploy bản mới" của người dùng;
+   không publish thêm khi chưa có chỉ thị mới.
+
+## Việc còn lại / rủi ro
+
+- [x] **Deploy UI v2** — live `a2a680c` / Render `dep-dc1fkoqjnfac738l5hd0`.
+- [ ] Cập nhật 2 file doc (`DEPLOY-RENDER.md`, file này) lên GitHub **nếu** người
+      dùng yêu cầu; hiện chỉ ghi local, không push thêm.
+- [ ] **Playtest với trẻ 6 tuổi** vẫn defer — automation không thay thế sign-off
+      Visual/Feel.
+- [ ] Cân nhắc có bật consume asset v2 trong runtime không (pxl/vex/kiln/loom/chirp
+      mới dùng ở mức authoring, trừ `school-reward.svg`).
+- File cũ không còn nạp vẫn nằm trên đĩa: `js/ui/race.js`, `js/domain/race.js`,
+  `js/data/racers.js`, `js/ui/games/{kit,contract,registry}.js`, `js/ui/sprite.js`,
+  `Asset/Mc_Queen.webp`, `Asset/Flo.webp`. Không ảnh hưởng runtime; có thể dọn vật lý
+  trong đợt vệ sinh repo riêng (cần xác nhận vì là xóa file).
+- Máy phụ huynh đã cài giọng tiếng Việt chưa? Có muốn thu lời khen giọng thật
+  thay TTS không?

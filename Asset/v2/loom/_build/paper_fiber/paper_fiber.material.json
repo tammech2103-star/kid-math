@@ -1,0 +1,20 @@
+{
+ "name": "paper_fiber",
+ "size": 256,
+ "normal": "gl",
+ "depth": 0.004,
+ "seam": {
+  "worst": 0.97,
+  "map": "rough"
+ },
+ "maps": {
+  "albedo": "paper_fiber_albedo.png",
+  "normal": "paper_fiber_normal.png",
+  "height": "paper_fiber_height.png",
+  "roughness": "paper_fiber_roughness.png",
+  "metallic": "paper_fiber_metallic.png",
+  "ao": "paper_fiber_ao.png",
+  "orm": "paper_fiber_orm.png",
+  "emissive": null
+ }
+}

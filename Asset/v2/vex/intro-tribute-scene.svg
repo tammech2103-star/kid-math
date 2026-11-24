@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-labelledby="pipeParkTitle pipeParkDesc">
+  <title id="pipeParkTitle">Công viên ống nước</title>
+  <desc id="pipeParkDesc">Original self-generated 8-bit inspired learning scene with a young repair kid counting fruit. No copyrighted assets.</desc>
+
+  <defs>
+    <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5C94FC"/>
+      <stop offset="1" stop-color="#A9D2FF"/>
+    </linearGradient>
+    <radialGradient id="sunGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#FFF6C2" stop-opacity="0.95"/>
+      <stop offset="0.55" stop-color="#FFD84D" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#FFD84D" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="goldGrad" cx="0.32" cy="0.28" r="0.75">
+      <stop offset="0" stop-color="#FFF3B0"/>
+      <stop offset="0.52" stop-color="#FFD84D"/>
+      <stop offset="1" stop-color="#E0A021"/>
+    </radialGradient>
+    <linearGradient id="pipeGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#1C7A38"/>
+      <stop offset="0.30" stop-color="#2FA84F"/>
+      <stop offset="0.62" stop-color="#5BD070"/>
+      <stop offset="1" stop-color="#1C7A38"/>
+    </linearGradient>
+    <linearGradient id="rimGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6BDB7C"/>
+      <stop offset="1" stop-color="#2FA84F"/>
+    </linearGradient>
+    <pattern id="brickPattern" width="120" height="44" patternUnits="userSpaceOnUse">
+      <rect x="0" y="0" width="120" height="44" fill="#8A4521"/>
+      <rect x="2" y="2" width="56" height="18" rx="2" fill="#C86A35"/>
+      <rect x="62" y="2" width="56" height="18" rx="2" fill="#C86A35"/>
+      <rect x="-28" y="24" width="56" height="18" rx="2" fill="#C86A35"/>
+      <rect x="32" y="24" width="56" height="18" rx="2" fill="#C86A35"/>
+      <rect x="92" y="24" width="56" height="18" rx="2" fill="#C86A35"/>
+      <path d="M5 5 H55 M65 5 H115 M9 27 H55 M37 27 H85 M97 27 H117" fill="none" stroke="#E59B66" stroke-width="2" opacity="0.55"/>
+    </pattern>
+    <g id="cloudShape">
+      <path d="M0 36 V22 H16 V12 H34 V0 H82 V10 H100 V22 H120 V36 Z" fill="#F8FCFF" stroke="#D3E7FF" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M5 36 H115" fill="none" stroke="#C8DEFF" stroke-width="4" stroke-linecap="round"/>
+    </g>
+    <g id="coinShape">
+      <circle cx="0" cy="0" r="23" fill="url(#goldGrad)" stroke="#3A2317" stroke-width="4"/>
+      <circle cx="0" cy="0" r="14" fill="none" stroke="#FFF0A3" stroke-width="4" opacity="0.9"/>
+      <path d="M-10 -7 A13 13 0 0 1 1 -12" fill="none" stroke="#FFFBEA" stroke-width="3" stroke-linecap="round" opacity="0.9"/>
+    </g>
+    <g id="sparkShape">
+      <path d="M0 -14 L3 -4 L13 0 L3 4 L0 14 L-3 4 L-13 0 L-3 -4 Z" fill="#FFF3B0" stroke="#E5A323" stroke-width="1.5" stroke-linejoin="round"/>
+    </g>
+  </defs>
+
+  <!-- SKY -->
+  <rect x="0" y="0" width="1200" height="900" fill="url(#skyGrad)"/>
+
+  <!-- Sun and stepped rays -->
+  <circle cx="1040" cy="186" r="118" fill="url(#sunGlow)"/>
+  <g fill="#FFE980" opacity="0.85">
+    <rect x="1032" y="80" width="16" height="22" rx="3"/>
+    <rect x="1032" y="270" width="16" height="22" rx="3"/>
+    <rect x="934" y="178" width="22" height="16" rx="3"/>
+    <rect x="1124" y="178" width="22" height="16" rx="3"/>
+  </g>
+  <circle cx="1040" cy="186" r="57" fill="#FFD84D" stroke="#FFF0A3" stroke-width="6"/>
+
+  <!-- Blocky pixel clouds -->
+  <use href="#cloudShape" transform="translate(70 132) scale(1.15)"/>
+  <use href="#cloudShape" transform="translate(388 92) scale(0.9)"/>
+  <use href="#cloudShape" transform="translate(716 168) scale(1.05)"/>
+  <use href="#cloudShape" transform="translate(1066 306) scale(0.78)"/>
+
+  <!-- Tiny pixel birds at the top edge -->
+  <g fill="none" stroke="#3A2317" stroke-width="4" stroke-linecap="round" opacity="0.7">
+    <path d="M302 118 l10 -8 l10 8"/>
+    <path d="M334 130 l8 -6 l8 6"/>
+    <path d="M598 210 l9 -7 l9 7"/>
+  </g>
+
+  <!-- SOFT ROLLING HILLS -->
+  <path d="M0 470 C120 418 214 392 330 432 C448 472 522 482 642 440 C762 398 862 420 962 460 C1062 500 1142 470 1200 440 L1200 900 L0 900 Z" fill="#8ED96A"/>
+  <path d="M0 560 C140 510 250 542 360 570 C480 600 580 560 700 540 C820 520 930 562 1040 590 C1120 610 1170 590 1200 570 L1200 900 L0 900 Z" fill="#63C74D"/>
+  <path d="M0 652 C130 620 260 650 380 674 C500 696 620 660 740 646 C860 632 980 668 1090 686 C1140 694 1180 686 1200 678 L1200 900 L0 900 Z" fill="#3E9B35"/>
+
+  <!-- Pixel tufts on the hills -->
+  <g fill="#2F7F2A" opacity="0.55">
+    <rect x="88" y="520" width="14" height="7"/><rect x="106" y="514" width="10" height="13"/>
+    <rect x="266" y="482" width="12" height="7"/><rect x="280" y="476" width="9" height="13"/>
+    <rect x="506" y="552" width="14" height="7"/><rect x="522" y="546" width="10" height="13"/>
+    <rect x="876" y="524" width="12" height="7"/><rect x="890" y="518" width="9" height="13"/>
+    <rect x="1130" y="556" width="14" height="7"/><rect x="1148" y="550" width="10" height="13"/>
+  </g>
+
+  <!-- BRICK GROUND STRIP -->
+  <rect x="0" y="730" width="1200" height="170" fill="url(#brickPattern)"/>
+  <rect x="0" y="700" width="1200" height="34" fill="#63C74D" stroke="#2F7F2A" stroke-width="4"/>
+  <g fill="#63C74D">
+    <rect x="30" y="692" width="18" height="12"/><rect x="118" y="692" width="14" height="12"/>
+    <rect x="242" y="692" width="20" height="12"/><rect x="388" y="692" width="16" height="12"/>
+    <rect x="520" y="692" width="18" height="12"/><rect x="656" y="692" width="14" height="12"/>
+    <rect x="790" y="692" width="20" height="12"/><rect x="930" y="692" width="16" height="12"/>
+    <rect x="1064" y="692" width="18" height="12"/><rect x="1160" y="692" width="16" height="12"/>
+  </g>
+  <rect x="0" y="726" width="1200" height="8" fill="#8A4521" opacity="0.35"/>
+
+  <!-- PIPES: three original plain round pipes with rims -->
+  <g stroke="#145F2B" stroke-width="5" stroke-linejoin="round">
+    <ellipse cx="360" cy="702" rx="52" ry="9" fill="#2F7F2A" stroke="none" opacity="0.4"/>
+    <rect x="330" y="600" width="60" height="102" rx="9" fill="url(#pipeGrad)"/>
+    <rect x="316" y="578" width="88" height="36" rx="9" fill="url(#rimGrad)"/>
+    <rect x="342" y="616" width="9" height="72" rx="4" fill="#C6F2C0" stroke="none" opacity="0.55"/>
+
+    <ellipse cx="816" cy="702" rx="40" ry="7" fill="#2F7F2A" stroke="none" opacity="0.4"/>
+    <rect x="794" y="652" width="46" height="50" rx="7" fill="url(#pipeGrad)"/>
+    <rect x="783" y="637" width="68" height="25" rx="7" fill="url(#rimGrad)"/>
+    <rect x="803" y="665" width="7" height="30" rx="3" fill="#C6F2C0" stroke="none" opacity="0.5"/>
+
+    <ellipse cx="1170" cy="702" rx="60" ry="10" fill="#2F7F2A" stroke="none" opacity="0.4"/>
+    <rect x="1140" y="404" width="62" height="298" rx="10" fill="url(#pipeGrad)"/>
+    <rect x="1126" y="378" width="90" height="38" rx="10" fill="url(#rimGrad)"/>
+    <rect x="1153" y="424" width="10" height="250" rx="5" fill="#C6F2C0" stroke="none" opacity="0.5"/>
+  </g>
+
+  <!-- Floating plain coin rings -->
+  <use href="#coinShape" transform="translate(300 252)"/>
+  <use href="#coinShape" transform="translate(356 198) scale(0.8)"/>
+  <use href="#coinShape" transform="translate(638 178) scale(0.9)"/>
+  <use href="#coinShape" transform="translate(852 232) scale(0.72)"/>
+  <use href="#coinShape" transform="translate(1010 214) scale(0.88)"/>
+  <use href="#coinShape" transform="translate(1102 300) scale(0.6)"/>
+
+  <!-- Star sparkles, kept at edges and high sky -->
+  <use href="#sparkShape" transform="translate(168 316) scale(1.1)"/>
+  <use href="#sparkShape" transform="translate(472 264) scale(0.8)"/>
+  <use href="#sparkShape" transform="translate(742 332) scale(0.9)"/>
+  <use href="#sparkShape" transform="translate(928 156) scale(1)"/>
+  <use href="#sparkShape" transform="translate(1160 348) scale(0.75)"/>
+  <use href="#sparkShape" transform="translate(56 470) scale(0.7)"/>
+
+  <!-- ORIGINAL CHARACTER: Bé Thợ, young repair kid with cap, glasses, apron and wrench -->
+  <g id="be-tho">
+    <ellipse cx="176" cy="702" rx="76" ry="10" fill="#2F7F2A" opacity="0.35" stroke="none"/>
+
+    <!-- boots and legs -->
+    <g stroke="#3A2317" stroke-width="5" stroke-linejoin="round">
+      <rect x="140" y="620" width="24" height="54" fill="#4A7FB5"/>
+      <rect x="190" y="620" width="24" height="54" fill="#4A7FB5"/>
+      <rect x="130" y="670" width="40" height="30" rx="7" fill="#6B3B22"/>
+      <rect x="184" y="670" width="40" height="30" rx="7" fill="#6B3B22"/>
+    </g>
+
+    <!-- shirt -->
+    <rect x="122" y="528" width="108" height="102" rx="18" fill="#7EC8E3" stroke="#3A2317" stroke-width="5"/>
+
+    <!-- orange apron with straps and pocket -->
+    <path d="M150 538 L158 512 M202 538 L194 512" fill="none" stroke="#3A2317" stroke-width="14" stroke-linecap="round"/>
+    <path d="M150 538 L158 512 M202 538 L194 512" fill="none" stroke="#F39334" stroke-width="8" stroke-linecap="round"/>
+    <path d="M142 536 L210 536 L216 630 L136 630 Z" fill="#F39334" stroke="#3A2317" stroke-width="5" stroke-linejoin="round"/>
+    <rect x="140" y="534" width="72" height="13" rx="5" fill="#D96F22" stroke="#3A2317" stroke-width="4"/>
+    <rect x="154" y="578" width="44" height="31" rx="5" fill="#FFB35C" stroke="#3A2317" stroke-width="4"/>
+
+    <!-- left arm and hand -->
+    <rect x="96" y="546" width="28" height="66" rx="13" fill="#7EC8E3" stroke="#3A2317" stroke-width="5"/>
+    <circle cx="110" cy="616" r="14" fill="#F6C89F" stroke="#3A2317" stroke-width="4"/>
+
+    <!-- raised right arm and hand -->
+    <path d="M228 552 L258 510" fill="none" stroke="#3A2317" stroke-width="30" stroke-linecap="round"/>
+    <path d="M228 552 L258 510" fill="none" stroke="#7EC8E3" stroke-width="22" stroke-linecap="round"/>
+    <circle cx="262" cy="505" r="15" fill="#F6C89F" stroke="#3A2317" stroke-width="4"/>
+
+    <!-- open-end wrench, original simple tool shape -->
+    <g transform="rotate(18 264 468)" stroke-linecap="round" fill="none">
+      <path d="M264 500 L264 448 M264 448 L250 430 M264 448 L278 430" stroke="#3A2317" stroke-width="18"/>
+      <path d="M264 500 L264 448 M264 448 L250 430 M264 448 L278 430" stroke="#B9C6CC" stroke-width="11"/>
+      <rect x="258" y="490" width="12" height="14" rx="3" fill="#B9C6CC" stroke="#3A2317" stroke-width="3"/>
+    </g>
+
+    <!-- ears, head, hair -->
+    <circle cx="122" cy="476" r="11" fill="#F6C89F" stroke="#3A2317" stroke-width="4"/>
+    <circle cx="230" cy="476" r="11" fill="#F6C89F" stroke="#3A2317" stroke-width="4"/>
+    <circle cx="176" cy="470" r="54" fill="#F6C89F" stroke="#3A2317" stroke-width="5"/>
+    <path d="M126 446 Q130 418 152 412 L202 412 Q224 420 226 446 Q206 434 186 438 Q158 430 126 446 Z" fill="#4A2E1D" stroke="#3A2317" stroke-width="4" stroke-linejoin="round"/>
+
+    <!-- green mechanic cap with a plain sun badge (no letter, no logo) -->
+    <path d="M122 440 Q124 382 176 382 Q228 382 230 440 Z" fill="#2FA84F" stroke="#3A2317" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M112 438 Q176 424 240 438 Q240 452 176 451 Q112 452 112 438 Z" fill="#1C7A38" stroke="#3A2317" stroke-width="5" stroke-linejoin="round"/>
+    <circle cx="176" cy="406" r="12" fill="#FFD84D" stroke="#3A2317" stroke-width="4"/>
+    <path d="M176 398 V400 M176 412 V414 M168 406 H170 M182 406 H184" stroke="#3A2317" stroke-width="3" stroke-linecap="round"/>
+
+    <!-- round glasses -->
+    <path d="M124 466 L138 464 M214 464 L228 466" fill="none" stroke="#3A2317" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="156" cy="470" r="19" fill="#FFFFFF" fill-opacity="0.35" stroke="#3A2317" stroke-width="5"/>
+    <circle cx="196" cy="470" r="19" fill="#FFFFFF" fill-opacity="0.35" stroke="#3A2317" stroke-width="5"/>
+    <path d="M175 467 Q176 464 177 467" fill="none" stroke="#3A2317" stroke-width="4"/>
+    <circle cx="156" cy="472" r="4.5" fill="#3A2317" stroke="none"/>
+    <circle cx="196" cy="472" r="4.5" fill="#3A2317" stroke="none"/>
+
+    <!-- friendly face -->
+    <circle cx="140" cy="490" r="9" fill="#F08A8A" opacity="0.55" stroke="none"/>
+    <circle cx="212" cy="490" r="9" fill="#F08A8A" opacity="0.55" stroke="none"/>
+    <circle cx="176" cy="486" r="4" fill="#E8A87C" stroke="#3A2317" stroke-width="2"/>
+    <path d="M158 496 Q176 514 194 496" fill="none" stroke="#3A2317" stroke-width="4" stroke-linecap="round"/>
+  </g>
+
+  <!-- MIDDLE: five simple fruit tokens on a small wooden table (count 1-5) -->
+  <g id="fruitTable">
+    <rect x="448" y="658" width="372" height="26" rx="5" fill="#C86A35" stroke="#3A2317" stroke-width="5"/>
+    <rect x="474" y="684" width="18" height="24" fill="#8A4521" stroke="#3A2317" stroke-width="4"/>
+    <rect x="776" y="684" width="18" height="24" fill="#8A4521" stroke="#3A2317" stroke-width="4"/>
+    <path d="M456 664 H812" stroke="#E59B66" stroke-width="3" opacity="0.6"/>
+
+    <!-- 1: apple -->
+    <g stroke="#3A2317" stroke-width="4" stroke-linejoin="round">
+      <rect x="489" y="598" width="6" height="16" rx="2" fill="#6B3B22"/>
+      <path d="M495 604 Q512 592 518 606 Q506 614 495 604 Z" fill="#3E9B35" stroke-width="3"/>
+      <circle cx="492" cy="632" r="26" fill="#E8453C"/>
+    </g>
+    <ellipse cx="483" cy="622" rx="7" ry="10" fill="#FFFFFF" opacity="0.35" stroke="none"/>
+
+    <!-- 2: banana -->
+    <path d="M536 618 C536 646 558 660 584 652 C562 650 548 638 550 620 C548 622 542 622 536 618 Z" fill="#FFD84D" stroke="#3A2317" stroke-width="4" stroke-linejoin="round"/>
+    <circle cx="582" cy="651" r="3" fill="#6B3B22" stroke="none"/>
+
+    <!-- 3: orange -->
+    <g stroke="#3A2317" stroke-width="4" stroke-linejoin="round">
+      <path d="M628 608 Q640 598 648 608 Q638 614 628 608 Z" fill="#3E9B35" stroke-width="3"/>
+      <circle cx="624" cy="632" r="25" fill="#F5A623"/>
+    </g>
+    <ellipse cx="615" cy="623" rx="7" ry="9" fill="#FFFFFF" opacity="0.35" stroke="none"/>
+
+    <!-- 4: strawberry -->
+    <path d="M690 606 C712 606 716 626 706 644 L690 662 L674 644 C664 626 668 606 690 606 Z" fill="#E8453C" stroke="#3A2317" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M674 612 L690 620 L706 612 M690 620 L690 608" fill="none" stroke="#3E9B35" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <g fill="#FFE08A" stroke="none">
+      <circle cx="682" cy="632" r="2.5"/><circle cx="698" cy="632" r="2.5"/>
+      <circle cx="674" cy="642" r="2.5"/><circle cx="690" cy="642" r="2.5"/><circle cx="706" cy="642" r="2.5"/>
+      <circle cx="682" cy="652" r="2.5"/><circle cx="698" cy="652" r="2.5"/>
+    </g>
+
+    <!-- 5: grape cluster -->
+    <path d="M756 608 V596" stroke="#6B3B22" stroke-width="5" stroke-linecap="round"/>
+    <path d="M758 600 Q774 590 780 602 Q768 610 758 600 Z" fill="#3E9B35" stroke="#2F7F2A" stroke-width="2"/>
+    <g fill="#8E5BC7" stroke="#3A2317" stroke-width="3">
+      <circle cx="756" cy="610" r="9"/><circle cx="744" cy="624" r="9"/><circle cx="768" cy="624" r="9"/>
+      <circle cx="756" cy="636" r="9"/><circle cx="744" cy="648" r="9"/><circle cx="768" cy="648" r="9"/>
+      <circle cx="756" cy="656" r="8"/>
+    </g>
+  </g>
+
+  <!-- RIGHT EDGE: three wooden answer signs with simple rectangle-stroke digits 1, 3, 5 -->
+  <g id="answerSigns" stroke="#3A2317" stroke-width="5" stroke-linejoin="round">
+    <!-- sign 1 -->
+    <rect x="884" y="580" width="12" height="122" fill="#8A4521"/>
+    <rect x="846" y="500" width="88" height="80" rx="8" fill="#C86A35"/>
+    <rect x="854" y="508" width="72" height="64" rx="5" fill="#E7B173" stroke="#8A4521" stroke-width="3"/>
+    <g fill="#3A2317" stroke="none">
+      <rect x="887" y="521" width="9" height="19" rx="2"/>
+      <rect x="887" y="543" width="9" height="19" rx="2"/>
+      <rect x="879" y="520" width="17" height="7" rx="2"/>
+    </g>
+
+    <!-- sign 3 -->
+    <rect x="986" y="530" width="12" height="172" fill="#8A4521"/>
+    <rect x="948" y="450" width="88" height="80" rx="8" fill="#C86A35"/>
+    <rect x="956" y="458" width="72" height="64" rx="5" fill="#E7B173" stroke="#8A4521" stroke-width="3"/>
+    <g fill="#3A2317" stroke="none">
+      <rect x="970" y="470" width="42" height="8" rx="2"/>
+      <rect x="970" y="491" width="42" height="8" rx="2"/>
+      <rect x="970" y="512" width="42" height="8" rx="2"/>
+      <rect x="1004" y="476" width="8" height="16" rx="2"/>
+      <rect x="1004" y="497" width="8" height="16" rx="2"/>
+    </g>
+
+    <!-- sign 5 -->
+    <rect x="1088" y="602" width="12" height="100" fill="#8A4521"/>
+    <rect x="1050" y="522" width="88" height="80" rx="8" fill="#C86A35"/>
+    <rect x="1058" y="530" width="72" height="64" rx="5" fill="#E7B173" stroke="#8A4521" stroke-width="3"/>
+    <g fill="#3A2317" stroke="none">
+      <rect x="1072" y="542" width="42" height="8" rx="2"/>
+      <rect x="1072" y="563" width="42" height="8" rx="2"/>
+      <rect x="1072" y="584" width="42" height="8" rx="2"/>
+      <rect x="1072" y="548" width="8" height="16" rx="2"/>
+      <rect x="1106" y="569" width="8" height="16" rx="2"/>
+    </g>
+  </g>
+
+  <!-- Small edge bushes and flowers, away from the playable middle-right -->
+  <g stroke="#2F7F2A" stroke-width="4">
+    <circle cx="62" cy="682" r="22" fill="#3E9B35"/>
+    <circle cx="92" cy="690" r="17" fill="#63C74D"/>
+    <circle cx="406" cy="686" r="18" fill="#3E9B35"/>
+    <circle cx="430" cy="692" r="14" fill="#63C74D"/>
+    <circle cx="1184" cy="684" r="22" fill="#3E9B35"/>
+  </g>
+  <g stroke="#3A2317" stroke-width="2">
+    <g fill="#F8FCFF"><circle cx="56" cy="660" r="5"/><circle cx="68" cy="660" r="5"/><circle cx="62" cy="652" r="5"/><circle cx="62" cy="668" r="5"/></g>
+    <circle cx="62" cy="660" r="3.5" fill="#FFD84D" stroke="none"/>
+    <g fill="#FF9FB2"><circle cx="410" cy="670" r="5"/><circle cx="422" cy="670" r="5"/><circle cx="416" cy="662" r="5"/><circle cx="416" cy="678" r="5"/></g>
+    <circle cx="416" cy="670" r="3.5" fill="#FFD84D" stroke="none"/>
+    <g fill="#F8FCFF"><circle cx="1178" cy="660" r="5"/><circle cx="1190" cy="660" r="5"/><circle cx="1184" cy="652" r="5"/><circle cx="1184" cy="668" r="5"/></g>
+    <circle cx="1184" cy="660" r="3.5" fill="#FFD84D" stroke="none"/>
+  </g>
+</svg>

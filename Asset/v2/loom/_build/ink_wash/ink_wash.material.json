@@ -1,0 +1,20 @@
+{
+ "name": "ink_wash",
+ "size": 256,
+ "normal": "gl",
+ "depth": 0.006,
+ "seam": {
+  "worst": 1.13,
+  "map": "height"
+ },
+ "maps": {
+  "albedo": "ink_wash_albedo.png",
+  "normal": "ink_wash_normal.png",
+  "height": "ink_wash_height.png",
+  "roughness": "ink_wash_roughness.png",
+  "metallic": "ink_wash_metallic.png",
+  "ao": "ink_wash_ao.png",
+  "orm": "ink_wash_orm.png",
+  "emissive": null
+ }
+}
