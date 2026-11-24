@@ -70,6 +70,7 @@ KM.App = (function () {
   var netplayHandlersBound = false;
   var netplayStatusEl = null;
   var netplayHostStatusEl = null;
+  var fastForwardOn = false;
 
   function isNetplayActive() {
     return netplayMode !== 'single' && window.EJS_emulator && window.EJS_emulator.isNetplay;
@@ -563,7 +564,32 @@ KM.App = (function () {
     var emu = window.EJS_emulator;
     if (!emu) return;
     try {
+      if (emu.frontend && emu.frontend.menu && typeof emu.frontend.menu.open === 'function') {
+        emu.frontend.menu.open(true);
+        return;
+      }
+    } catch (e) { /* ignore */ }
+    try {
       if (emu.elements && emu.elements.menuToggle) emu.elements.menuToggle.click();
+    } catch (e) { /* ignore */ }
+  }
+
+  function toggleFastForward() {
+    var emu = window.EJS_emulator;
+    if (!emu || !emu.gameManager) return;
+    try {
+      fastForwardOn = !fastForwardOn;
+      if (typeof emu.gameManager.setFastForwardRatio === 'function') {
+        emu.gameManager.setFastForwardRatio(fastForwardOn ? 3 : 0);
+      }
+      if (typeof emu.gameManager.toggleFastForward === 'function') {
+        emu.gameManager.toggleFastForward(fastForwardOn ? 1 : 0);
+      }
+      var btn = document.getElementById('ff-toggle');
+      if (btn) {
+        btn.textContent = fastForwardOn ? '1x' : 'FF';
+        btn.classList.toggle('active', fastForwardOn);
+      }
     } catch (e) { /* ignore */ }
   }
 
@@ -1044,7 +1070,10 @@ KM.App = (function () {
 
     var gameScreen = el('div', { id: 'game-screen', class: 'screen game-screen', style: { display: 'none' } }, [
       el('div', { id: 'top-bar', class: 'top-bar' }, [
-        el('button', { class: 'icon-btn', text: '☰', on: { click: function () { openEmulatorMenu(); } } }),
+        el('div', { class: 'top-bar-actions' }, [
+          el('button', { class: 'icon-btn', text: '☰', title: 'Mo menu', on: { click: function () { openEmulatorMenu(); } } }),
+          el('button', { id: 'ff-toggle', class: 'icon-btn', text: 'FF', title: 'Tua nhanh', on: { click: function () { toggleFastForward(); } } })
+        ]),
         el('span', { id: 'timer', class: 'timer', text: '5:00' }),
         el('span', { id: 'level', class: 'level', text: 'Level 1' })
       ]),
