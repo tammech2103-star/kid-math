@@ -548,6 +548,9 @@ KM.App = (function () {
     } catch (e) { /* ignore */ }
   }
 
+  var selectedRomFile = null;
+  var selectedConsoleCore = null;
+
   function setupRomPicker() {
     var input = document.getElementById('rom-input');
     if (!input) return;
@@ -555,15 +558,33 @@ KM.App = (function () {
       unlockAudio();
       var file = e.target.files[0];
       if (!file) return;
-      var core = detectConsole(file);
-      if (!core) {
+      selectedRomFile = file;
+      selectedConsoleCore = detectConsole(file);
+      if (!selectedConsoleCore) {
         showConsolePicker(file);
-        return;
-      }
-      if (netplayMode === 'single') {
-        hashRomFile(file, function (id) { netplayGameId = id; loadRom(file, core); });
+        setNetplayStatus('Khong nhan dien duoc console. Hay chon thu cong.');
+      } else {
+        setNetplayStatus('Da chon: ' + file.name);
       }
     }, false);
+  }
+
+  function getSelectedRom() {
+    var input = document.getElementById('rom-input');
+    if (selectedRomFile) return selectedRomFile;
+    if (input && input.files && input.files[0]) {
+      selectedRomFile = input.files[0];
+      selectedConsoleCore = selectedConsoleCore || detectConsole(selectedRomFile);
+      return selectedRomFile;
+    }
+    return null;
+  }
+
+  function getSelectedCore(file) {
+    if (selectedConsoleCore) return selectedConsoleCore;
+    var select = document.getElementById('console-select');
+    if (select && select.value) return select.value;
+    return detectConsole(file);
   }
 
   function showConsolePicker(file) {
@@ -900,13 +921,31 @@ KM.App = (function () {
     }
   }
 
-  function autoConnectOnline() {
-    var input = document.getElementById('rom-input');
-    var file = input && input.files && input.files[0];
+  function playSingle() {
+    var file = getSelectedRom();
+    if (!file) {
+      setNetplayStatus('Chon file ROM truoc.');
+      return;
+    }
+    var core = getSelectedCore(file);
     var select = document.getElementById('console-select');
+    if (!core && select) core = select.value;
+    if (!core) {
+      setNetplayStatus('Khong nhan dien duoc console.');
+      return;
+    }
+    netplayMode = 'single';
+    hashRomFile(file, function (id) { netplayGameId = id; loadRom(file, core); });
+  }
+
+  function autoConnectOnline() {
+    var file = getSelectedRom();
+    var core = file ? getSelectedCore(file) : null;
+    var select = document.getElementById('console-select');
+    if (!core && select) core = select.value;
 
     if (file) {
-      var core = detectConsole(file);
+      if (!core) core = detectConsole(file);
       if (!core && select) core = select.value;
       if (!core) {
         setNetplayStatus('Khong nhan dien duoc console.');
@@ -949,10 +988,11 @@ KM.App = (function () {
         el('p', { text: 'Khong nhan dang duoc console. Chon thu cong:' }),
         el('select', { id: 'console-select' }),
         el('button', { class: 'btn btn-primary', text: 'OK', on: { click: function () {
-          var core = document.getElementById('console-select').value;
+          selectedConsoleCore = document.getElementById('console-select').value;
           var file = document.getElementById('rom-input').files[0];
           if (file) {
-            hashRomFile(file, function (id) { netplayGameId = id; loadRom(file, core); });
+            selectedRomFile = file;
+            setNetplayStatus('Da chon: ' + file.name);
           }
         } } })
       ]),
@@ -960,6 +1000,7 @@ KM.App = (function () {
         el('h2', { text: 'Choi online 2 nguoi (tu dong)' }),
         el('p', { text: 'Khong can ma phong/mat khau. Host chon ROM roi bam nut; may kia bam cung nut de tu dong ket noi. Neu co relay, host se gui ROM.' }),
         el('div', { class: 'netplay-row' }, [
+          el('button', { class: 'btn btn-primary', text: 'Choi don', on: { click: playSingle } }),
           el('button', { class: 'btn btn-primary', text: 'Choi online tu dong', on: { click: autoConnectOnline } }),
           el('button', { class: 'btn btn-ghost', text: 'Kiem tra server', on: { click: testNetplayServer } })
         ]),
