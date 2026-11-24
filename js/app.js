@@ -69,6 +69,7 @@ KM.App = (function () {
   var netplayGuestAnswerLocked = false;
   var netplayHandlersBound = false;
   var netplayStatusEl = null;
+  var netplayHostStatusEl = null;
 
   function isNetplayActive() {
     return netplayMode !== 'single' && window.EJS_emulator && window.EJS_emulator.isNetplay;
@@ -639,6 +640,22 @@ KM.App = (function () {
     if (netplayStatusEl) netplayStatusEl.textContent = text;
   }
 
+  function setHostStatus(text) {
+    if (netplayHostStatusEl) netplayHostStatusEl.textContent = 'Host: ' + text;
+  }
+
+  function testNetplayServer() {
+    setNetplayStatus('Dang kiem tra server...');
+    var url = netplayServerUrl + '/list?domain=' + encodeURIComponent(window.location.host) + '&game_id=' + encodeURIComponent(String(NETPLAY_AUTO_GAME_ID));
+    fetch(url).then(function (res) {
+      return res.text().then(function (text) {
+        setNetplayStatus('Server phan hoi HTTP ' + res.status + ': ' + text.slice(0, 160));
+      });
+    }).catch(function (err) {
+      setNetplayStatus('Server khong phan hoi: ' + err.message);
+    });
+  }
+
   function bindNetplayHandlers() {
     if (netplayHandlersBound) return;
     var np = netplay();
@@ -730,11 +747,13 @@ KM.App = (function () {
               }
               np.players = users || np.players;
               np.roomJoined(false, netplayRoomCode, '', sid);
+              setHostStatus('da ket noi voi host');
               finishBind();
             });
           } else {
             np.owner = true;
             np.roomJoined(true, netplayRoomCode, '', sid);
+            setHostStatus('dang online - dang cho nguoi choi 2');
             finishBind();
           }
         });
@@ -743,12 +762,14 @@ KM.App = (function () {
           np.socket.emit('join-room', { extra: np.extra, password: '' }, function (err, users) {
             if (err) {
               if (netplayStatusEl) netplayStatusEl.textContent = 'Dang cho host...';
+              setHostStatus('chua co host, dang cho...');
               setTimeout(tryJoin, 2000);
               return;
             }
             np.owner = false;
             np.players = users || np.players;
             np.roomJoined(false, netplayRoomCode, '', sid);
+            setHostStatus('da ket noi voi host');
             finishBind();
           });
         };
@@ -903,6 +924,7 @@ KM.App = (function () {
       netplayMode = 'guest';
       netplayGameId = NETPLAY_AUTO_GAME_ID;
       setNetplayStatus('Dang tim host tu dong...');
+      setHostStatus('dang tim host...');
       waitForHostRoom(function (roomCode) {
         joinGuestRoomAuto(roomCode, null, null);
       });
@@ -938,12 +960,16 @@ KM.App = (function () {
         el('h2', { text: 'Choi online 2 nguoi (tu dong)' }),
         el('p', { text: 'Khong can ma phong/mat khau. Host chon ROM roi bam nut; may kia bam cung nut de tu dong ket noi. Neu co relay, host se gui ROM.' }),
         el('div', { class: 'netplay-row' }, [
-          el('button', { class: 'btn btn-primary', text: 'Choi online tu dong', on: { click: autoConnectOnline } })
+          el('button', { class: 'btn btn-primary', text: 'Choi online tu dong', on: { click: autoConnectOnline } }),
+          el('button', { class: 'btn btn-ghost', text: 'Kiem tra server', on: { click: testNetplayServer } })
         ]),
-        el('p', { id: 'netplay-status', class: 'netplay-status', text: '' })
+        el('p', { id: 'netplay-status', class: 'netplay-status', text: '' }),
+        el('p', { id: 'netplay-host-status', class: 'netplay-status', text: 'Host: chua ket noi' }),
+        el('p', { class: 'netplay-status', text: 'Server: ' + netplayServerUrl })
       ])
     ]);
     netplayStatusEl = romPicker.querySelector('#netplay-status');
+    netplayHostStatusEl = romPicker.querySelector('#netplay-host-status');
     app.appendChild(romPicker);
 
     var gameScreen = el('div', { id: 'game-screen', class: 'screen game-screen', style: { display: 'none' } }, [
