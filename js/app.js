@@ -177,6 +177,13 @@ KM.App = (function () {
     if (audio && typeof audio.unlock === 'function') audio.unlock();
   }
 
+  function waitForEmulator(cb, attempts) {
+    attempts = attempts || 0;
+    if (window.EJS_emulator) { cb(); return; }
+    if (attempts > 150) return;
+    setTimeout(function () { waitForEmulator(cb, attempts + 1); }, 200);
+  }
+
   // Init EmulatorJS
   function initEmulator(romFile, core) {
     var container = document.getElementById('emulator-container');
@@ -207,19 +214,21 @@ KM.App = (function () {
       var script = document.createElement('script');
       script.src = 'https://cdn.emulatorjs.org/nightly/data/loader.js';
       script.onload = function () {
-        emulator = window.EJS_emulator;
-        gameRunning = true;
+        waitForEmulator(function () {
+          emulator = window.EJS_emulator;
+          gameRunning = true;
 
-        if (netplayMode === 'single') {
-          startQuestionTimer();
-        }
+          if (netplayMode === 'single') {
+            startQuestionTimer();
+          }
 
-        disableEmulatorAutoMenu();
-        setTimeout(disableEmulatorAutoMenu, 1500);
+          disableEmulatorAutoMenu();
+          setTimeout(disableEmulatorAutoMenu, 1500);
 
-        if (netplayMode !== 'single') {
-          startNetplayAfterLoad();
-        }
+          if (netplayMode !== 'single') {
+            startNetplayAfterLoad();
+          }
+        });
       };
       document.body.appendChild(script);
     };
