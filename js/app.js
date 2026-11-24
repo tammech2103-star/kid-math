@@ -184,8 +184,28 @@ KM.App = (function () {
     setTimeout(function () { waitForEmulator(cb, attempts + 1); }, 200);
   }
 
+  function disableWakeLock() {
+    try {
+      if (navigator.wakeLock && typeof navigator.wakeLock.request === 'function') {
+        Object.defineProperty(navigator, 'wakeLock', {
+          configurable: true,
+          value: {
+            request: function () {
+              return Promise.resolve({
+                release: function () {},
+                addEventListener: function () {},
+                removeEventListener: function () {}
+              });
+            }
+          }
+        });
+      }
+    } catch (e) { /* ignore */ }
+  }
+
   // Init EmulatorJS
   function initEmulator(romFile, core) {
+    disableWakeLock();
     var container = document.getElementById('emulator-container');
     container.innerHTML = '';
 
