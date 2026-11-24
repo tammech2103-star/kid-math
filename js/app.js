@@ -753,66 +753,74 @@ KM.App = (function () {
       });
   }
 
-  function createHostRoom() {
-    var input = document.getElementById('rom-input');
-    var file = input && input.files && input.files[0];
-    if (!file) {
-      setNetplayStatus('Chon file ROM truoc khi tao phong.');
-      return;
-    }
-    var core = detectConsole(file);
-    var select = document.getElementById('console-select');
-    if (!core && select) core = select.value;
-    if (!core) {
-      setNetplayStatus('Khong nhan dien duoc console.');
-      return;
-    }
+  var NETPLAY_AUTO_GAME_ID = 999999;
 
-    netplayRoomCode = 'KM-' + Math.random().toString(36).substring(2, 6).toUpperCase();
-    var pwInput = document.getElementById('netplay-password');
-    netplayPassword = pwInput ? pwInput.value.trim() : '';
-    netplayMode = 'host';
-
-    hashRomFile(file, function (id) {
-      netplayGameId = id;
-      uploadRomToRelay(file, function () {
-        loadRom(file, core);
+  function findOpenNetplayRoom(cb) {
+    var url = netplayServerUrl + '/list?domain=' + encodeURIComponent(window.location.host) + '&game_id=' + encodeURIComponent(String(NETPLAY_AUTO_GAME_ID));
+    fetch(url).then(function (res) {
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return res.json();
+    }).then(function (data) {
+      var keys = Object.keys(data || {});
+      var openKey = null;
+      keys.forEach(function (k) {
+        if (!openKey && data[k] && Number(data[k].current || 0) < Number(data[k].max || 2)) {
+          openKey = k;
+        }
       });
+      cb(openKey);
+    }).catch(function () {
+      cb(null);
     });
   }
 
-  function joinOnlineRoom() {
-    var codeInput = document.getElementById('netplay-code');
-    var code = codeInput ? codeInput.value.trim() : '';
-    if (!code) {
-      setNetplayStatus('Nhap ma phong.');
+  function waitForHostRoom(cb, attempts) {
+    attempts = attempts || 0;
+    if (attempts > 60) {
+      setNetplayStatus('Khong tim thay host. Hay thu lai.');
       return;
     }
-    var pwInput = document.getElementById('netplay-password');
-    netplayRoomCode = code;
-    netplayPassword = pwInput ? pwInput.value.trim() : '';
-    netplayMode = 'guest';
+    findOpenNetplayRoom(function (code) {
+      if (code) cb(code);
+      else {
+        setNetplayStatus('Dang tim host tu dong... (' + (attempts + 1) + ')');
+        setTimeout(function () { waitForHostRoom(cb, attempts + 1); }, 2000);
+      }
+    });
+  }
 
+  function createHostRoomAuto(file, core) {
+    netplayRoomCode = 'AUTO-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+    netplayPassword = '';
+    netplayMode = 'host';
+    netplayGameId = NETPLAY_AUTO_GAME_ID;
+    uploadRomToRelay(file, function () {
+      loadRom(file, core);
+    });
+  }
+
+  function joinGuestRoomAuto(roomCode, file, core) {
+    netplayRoomCode = roomCode;
+    netplayPassword = '';
+    netplayMode = 'guest';
+    netplayGameId = NETPLAY_AUTO_GAME_ID;
     if (netplayRelayUrl) {
-      downloadRomFromRelay(function (file, core, gameId) {
-        if (!file) return;
+      downloadRomFromRelay(function (downloadedFile, downloadedCore, gameId) {
+        if (!downloadedFile) return;
         if (gameId) netplayGameId = gameId;
-        if (!core) core = detectConsole(file);
-        if (!core) {
+        var finalCore = downloadedCore || core || detectConsole(downloadedFile);
+        if (!finalCore) {
           setNetplayStatus('Khong nhan dien duoc console cua ROM host.');
           return;
         }
-        loadRom(file, core);
+        loadRom(downloadedFile, finalCore);
       });
     } else {
-      var input = document.getElementById('rom-input');
-      var file = input && input.files && input.files[0];
       if (!file) {
-        setNetplayStatus('Guest can chon cung file ROM (hoac cau hinh relay de host gui ROM).');
+        setNetplayStatus('Host da tao phong. Hay chon cung file ROM roi bam lai.');
         return;
       }
-      hashRomFile(file, function (id) { netplayGameId = id; });
-      var core = detectConsole(file);
+      if (!core) core = detectConsole(file);
       var select = document.getElementById('console-select');
       if (!core && select) core = select.value;
       if (!core) {
@@ -820,6 +828,36 @@ KM.App = (function () {
         return;
       }
       loadRom(file, core);
+    }
+  }
+
+  function autoConnectOnline() {
+    var input = document.getElementById('rom-input');
+    var file = input && input.files && input.files[0];
+    var select = document.getElementById('console-select');
+
+    if (file) {
+      var core = detectConsole(file);
+      if (!core && select) core = select.value;
+      if (!core) {
+        setNetplayStatus('Khong nhan dien duoc console.');
+        return;
+      }
+      setNetplayStatus('Dang tim phong tu dong...');
+      findOpenNetplayRoom(function (roomCode) {
+        if (roomCode) {
+          joinGuestRoomAuto(roomCode, file, core);
+        } else {
+          createHostRoomAuto(file, core);
+        }
+      });
+    } else {
+      netplayMode = 'guest';
+      netplayGameId = NETPLAY_AUTO_GAME_ID;
+      setNetplayStatus('Dang tim host tu dong...');
+      waitForHostRoom(function (roomCode) {
+        joinGuestRoomAuto(roomCode, null, null);
+      });
     }
   }
 
@@ -849,13 +887,10 @@ KM.App = (function () {
         } } })
       ]),
       el('div', { class: 'netplay-panel' }, [
-        el('h2', { text: 'Choi online 2 nguoi' }),
-        el('p', { text: 'Host chon ROM va tao phong. Guest nhap ma phong; neu co relay thi host gui ROM, khong thi guest chon cung ROM.' }),
+        el('h2', { text: 'Choi online 2 nguoi (tu dong)' }),
+        el('p', { text: 'Khong can ma phong/mat khau. Host chon ROM roi bam nut; may kia bam cung nut de tu dong ket noi. Neu co relay, host se gui ROM.' }),
         el('div', { class: 'netplay-row' }, [
-          el('button', { class: 'btn btn-primary', text: 'Tao phong (Host)', on: { click: createHostRoom } }),
-          el('input', { id: 'netplay-code', type: 'text', placeholder: 'Ma phong guest', style: { width: '150px' } }),
-          el('input', { id: 'netplay-password', type: 'text', placeholder: 'Mat khau (tuy chon)', style: { width: '170px' } }),
-          el('button', { class: 'btn btn-ghost', text: 'Vao phong (Guest)', on: { click: joinOnlineRoom } })
+          el('button', { class: 'btn btn-primary', text: 'Choi online tu dong', on: { click: autoConnectOnline } })
         ]),
         el('p', { id: 'netplay-status', class: 'netplay-status', text: '' })
       ])
