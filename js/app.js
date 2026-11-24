@@ -579,6 +579,7 @@ KM.App = (function () {
     if (!emu || !emu.gameManager) return;
     try {
       fastForwardOn = !fastForwardOn;
+      emu.isFastForward = fastForwardOn;
       if (typeof emu.gameManager.setFastForwardRatio === 'function') {
         emu.gameManager.setFastForwardRatio(fastForwardOn ? 3 : 0);
       }
