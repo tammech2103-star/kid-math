@@ -1,6 +1,7 @@
 /* Kid Math Retro — App shell */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; overflow: hidden; background: #0a0a1a; color: #e0f7fa; font-family: system-ui, sans-serif; }
+#app { height: 100%; }
 
 .screen { display: none; width: 100%; height: 100%; }
 .screen.active, .screen[style*="flex"] { display: flex; }
@@ -29,9 +30,6 @@ html, body { height: 100%; overflow: hidden; background: #0a0a1a; color: #e0f7fa
   display: flex; align-items: center; justify-content: space-between;
   padding: 8px 12px; background: rgba(0,0,0,0.7); z-index: 10002;
 }
-.top-bar-actions { display: flex; align-items: center; gap: 6px; }
-.top-bar .icon-btn { background: none; border: none; color: #4dd0e1; font-size: 1.2rem; cursor: pointer; min-width: 44px; min-height: 44px; }
-.top-bar .icon-btn.active { color: #ffd84d; background: rgba(255,216,77,0.15); border-radius: 8px; }
 .top-bar .timer { font-weight: 800; color: #ffd84d; }
 .top-bar .level { font-weight: 700; color: #80cbc4; }
 
@@ -45,84 +43,6 @@ html, body { height: 100%; overflow: hidden; background: #0a0a1a; color: #e0f7fa
   background: #000;
 }
 .emulator-container #emulator { width: 100%; height: 100%; }
-
-/* Virtual controls */
-.virtual-controls {
-  position: absolute; bottom: 60px; left: 0; right: 0;
-  display: flex; justify-content: space-between; align-items: flex-end;
-  padding: 0 24px; z-index: 10002; pointer-events: none;
-  min-height: 180px;
-}
-/* D-pad circle (left) */
-.virtual-controls .dpad-circle {
-  position: relative; width: 170px; height: 170px;
-  pointer-events: auto;
-}
-.virtual-controls .dpad-circle .vbtn-dpad {
-  position: absolute; width: 56px; height: 56px;
-  border-radius: 50%; font-size: 1.4rem;
-  display: flex; align-items: center; justify-content: center;
-}
-.virtual-controls .dpad-circle .vbtn-up { top: 0; left: 50%; transform: translateX(-50%); }
-.virtual-controls .dpad-circle .vbtn-left { top: 50%; left: 0; transform: translateY(-50%); }
-.virtual-controls .dpad-circle .vbtn-down { bottom: 0; left: 50%; transform: translateX(-50%); }
-.virtual-controls .dpad-circle .vbtn-right { top: 50%; right: 0; transform: translateY(-50%); }
-/* Action buttons circle (right) */
-.virtual-controls .action-circle {
-  position: relative; width: 170px; height: 170px;
-  pointer-events: auto;
-}
-.virtual-controls .action-circle .vbtn-action {
-  position: absolute; width: 56px; height: 56px;
-  border-radius: 50%; font-size: 1rem; font-weight: 900;
-  display: flex; align-items: center; justify-content: center;
-}
-.virtual-controls .action-circle .vbtn-x { top: 0; left: 50%; transform: translateX(-50%); background: rgba(255,216,77,0.3); color: #ffd84d; border-color: rgba(255,216,77,0.5); }
-.virtual-controls .action-circle .vbtn-y { top: 50%; left: 0; transform: translateY(-50%); background: rgba(129,199,132,0.3); color: #81c784; border-color: rgba(129,199,132,0.5); }
-.virtual-controls .action-circle .vbtn-a { bottom: 0; left: 50%; transform: translateX(-50%); background: rgba(255,107,107,0.3); color: #ff6b6b; border-color: rgba(255,107,107,0.5); }
-.virtual-controls .action-circle .vbtn-b { top: 50%; right: 0; transform: translateY(-50%); background: rgba(77,208,225,0.3); color: #4dd0e1; border-color: rgba(77,208,225,0.5); }
-/* Center column: Select/Start + Menu, centered between the two clusters */
-.virtual-controls .center-column {
-  position: absolute; left: 50%; top: 35%; transform: translate(-50%, -50%);
-  display: flex; flex-direction: column; align-items: center; gap: 8px;
-  pointer-events: auto; z-index: 11;
-}
-/* Right column: L/R stacked above the action circle */
-.virtual-controls .right-column {
-  display: flex; flex-direction: column; align-items: center; gap: 8px;
-  pointer-events: auto;
-}
-.virtual-controls .right-column .shoulder-row {
-  display: flex; gap: 6px; pointer-events: auto;
-}
-.virtual-controls .shoulder-row,
-.virtual-controls .system-row,
-.virtual-controls .menu-row {
-  display: flex; gap: 6px; pointer-events: auto;
-}
-.virtual-controls .menu-row { justify-content: center; }
-.virtual-controls .vbtn-shoulder { width: 56px; height: 40px; min-width: 56px; min-height: 40px; font-size: 0.95rem; border-radius: 10px; }
-.virtual-controls .vbtn-system { width: 72px; height: 40px; min-width: 72px; min-height: 40px; font-size: 0.95rem; border-radius: 10px; }
-.virtual-controls .vbtn-menu { width: 48px; height: 40px; min-width: 48px; min-height: 40px; font-size: 1.2rem; border-radius: 10px; background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3); }
-.virtual-controls .dpad, .virtual-controls .action-buttons {
-  display: flex; gap: 4px; pointer-events: auto;
-}
-.vbtn {
-  width: 56px; height: 56px; min-width: 56px; min-height: 56px;
-  border: 2px solid rgba(77, 208, 225, 0.5);
-  border-radius: 10px; background: rgba(0,0,0,0.5);
-  color: #4dd0e1; font-size: 1.2rem; font-weight: 900;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; user-select: none; touch-action: manipulation;
-}
-.vbtn:active { background: rgba(77, 208, 225, 0.3); transform: scale(0.92); }
-.vbtn-a { background: rgba(255, 107, 107, 0.3); color: #ff6b6b; border-color: rgba(255, 107, 107, 0.5); }
-.vbtn-b { background: rgba(77, 208, 225, 0.3); }
-.vbtn-x { background: rgba(255, 216, 77, 0.3); color: #ffd84d; border-color: rgba(255, 216, 77, 0.5); }
-.vbtn-y { background: rgba(129, 199, 132, 0.3); color: #81c784; border-color: rgba(129, 199, 132, 0.5); }
-.vbtn-shoulder { width: 48px; height: 40px; min-width: 48px; min-height: 40px; font-size: 0.9rem; }
-.vbtn-menu { background: rgba(255, 255, 255, 0.1); color: #fff; border-color: rgba(255, 255, 255, 0.3); }
-.system-buttons { display: flex; gap: 4px; }
 
 /* Question modal */
 .question-modal {
@@ -157,60 +77,34 @@ html, body { height: 100%; overflow: hidden; background: #0a0a1a; color: #e0f7fa
 
 /* Mobile */
 @media (max-width: 620px) {
-  .vbtn { width: 52px; height: 52px; min-width: 52px; min-height: 52px; font-size: 1.1rem; }
   .modal-card { max-width: 340px; padding: 16px; }
   .question-text { font-size: 1.2rem; }
   .question-choice { min-height: 64px; font-size: 1.2rem; }
   .top-bar { padding: 4px 8px; }
   .top-bar .timer, .top-bar .level { font-size: 0.9rem; }
-  .virtual-controls { padding: 4px 8px; bottom: 40px; }
-  .dpad-circle { width: 150px; height: 150px; }
-  .action-circle { width: 150px; height: 150px; }
-  .dpad-circle .vbtn-dpad { width: 50px; height: 50px; }
-  .action-circle .vbtn-action { width: 50px; height: 50px; }
-  .center-column { gap: 4px; }
-  .shoulder-row, .system-row, .menu-row { gap: 4px; }
 }
 @media (orientation: landscape) {
   .game-screen { flex-direction: row; }
   .emulator-container { flex: 1; height: 100vh; }
-  .virtual-controls {
-    position: fixed; bottom: 60px; left: 0; right: 0;
-    flex-direction: row; justify-content: space-between;
-    padding: 0 24px; z-index: 10;
-  }
   .top-bar { position: absolute; top: 0; left: 0; right: 0; z-index: 10; background: rgba(0,0,0,0.5); }
-}
-@media (orientation: portrait) {
-  .emulator-container { height: 60vh; }
-  .virtual-controls { position: relative; flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 12px; padding: 8px; }
-  .dpad-circle { order: 1; }
-  .center-column { order: 2; position: relative; left: auto; top: auto; transform: none; }
-  .action-circle { order: 3; }
 }
 /* Touch device optimizations */
 @media (pointer: coarse) {
-  .vbtn { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
   .btn { touch-action: manipulation; }
   /* Larger touch targets on mobile */
   .question-choice { min-height: 64px; }
 }
 /* Safe area insets for notched devices */
-@supports (padding: env(safe-area-inset-bottom)) {
-  .virtual-controls { padding-bottom: env(safe-area-inset-bottom); }
+@supports (padding: env(safe-area-inset-top)) {
   .top-bar { padding-top: env(safe-area-inset-top); }
 }
 /* Prevent text selection on game elements */
-.game-screen, .virtual-controls, .question-modal {
+.game-screen, .question-modal {
   -webkit-user-select: none; user-select: none;
   -webkit-touch-callout: none;
 }
 /* Prevent pull-to-refresh */
 body { overscroll-behavior: none; }
-/* Hide EmulatorJS auto hamburger toggle by default (we use our own top-bar button) */
-#emulator .ejs_menu_toggle { display: none !important; }
-/* Keep EmulatorJS bottom menu bar usable when our top-bar button opens it */
-#emulator .ejs_menu_bar { display: flex; }
+/* EmulatorJS manages its own menu bar, toggle and touch gamepad */
 /* Fullscreen mode */
 .fullscreen .top-bar { display: flex; }
-.fullscreen .virtual-controls { bottom: 60px; }

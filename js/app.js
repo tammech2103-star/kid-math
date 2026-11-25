@@ -70,7 +70,6 @@ KM.App = (function () {
   var netplayHandlersBound = false;
   var netplayStatusEl = null;
   var netplayHostStatusEl = null;
-  var fastForwardOn = false;
   var gamepadButtonStates = {};
   var currentRomObjectUrl = null;
 
@@ -249,9 +248,6 @@ KM.App = (function () {
           if (netplayMode === 'single') {
             startQuestionTimer();
           }
-
-          disableEmulatorAutoMenu();
-          setTimeout(disableEmulatorAutoMenu, 1500);
 
           if (netplayMode !== 'single') {
             startNetplayAfterLoad();
@@ -524,133 +520,6 @@ KM.App = (function () {
     } catch (e) { /* ignore */ }
   }
 
-  // Virtual controls
-  function setupVirtualControls() {
-    var controls = document.getElementById('virtual-controls');
-    if (!controls) return;
-    var btns = controls.querySelectorAll('[data-key]');
-    btns.forEach(function (btn) {
-      var key = btn.getAttribute('data-key');
-      btn.addEventListener('touchstart', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        pressButton(key, true);
-      }, { passive: false });
-      btn.addEventListener('touchend', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        pressButton(key, false);
-      }, { passive: false });
-      btn.addEventListener('touchcancel', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        pressButton(key, false);
-      }, { passive: false });
-      btn.addEventListener('touchmove', function (e) {
-        e.preventDefault();
-      }, { passive: false });
-      btn.addEventListener('mousedown', function (e) {
-        pressButton(key, true);
-      });
-      btn.addEventListener('mouseup', function () {
-        pressButton(key, false);
-      });
-      btn.addEventListener('mouseleave', function () {
-        pressButton(key, false);
-      });
-    });
-
-    document.addEventListener('touchmove', function (e) {
-      if (e.target && e.target.closest && e.target.closest('#virtual-controls')) {
-        e.preventDefault();
-      }
-    }, { passive: false });
-  }
-
-  function pressButton(key, pressed) {
-    var idx = {
-      'ArrowUp': 4, 'ArrowDown': 5, 'ArrowLeft': 6, 'ArrowRight': 7,
-      'x': 0, 'z': 1, 's': 2, 'a': 3,
-      'q': 8, 'e': 9,
-      'Shift': 10, 'Enter': 11
-    }[key];
-    if (idx === undefined) return;
-    var gm = window.EJS_emulator && window.EJS_emulator.gameManager;
-    if (gm && typeof gm.simulateInput === 'function') {
-      try { gm.simulateInput(0, idx, pressed ? 1 : 0); } catch (e) { /* ignore */ }
-    }
-  }
-
-  function sendKey(key, pressed) {
-    pressButton(key, pressed);
-  }
-
-  function openEmulatorMenu() {
-    var emu = window.EJS_emulator;
-    if (!emu || !emu.frontend) return;
-    try {
-      if (emu.frontend.menu && typeof emu.frontend.menu.open === 'function') {
-        emu.frontend.menu.open(true);
-      }
-      // Keep only the EmulatorJS settings entry visible; hide play/pause,
-      // restart, fullscreen, save-state and other default bottom-bar buttons.
-      var menu = emu.frontend.elements && emu.frontend.elements.menu;
-      var settingParent = emu.frontend.settingParent;
-      if (menu && settingParent) {
-        for (var i = 0; i < menu.children.length; i++) {
-          var child = menu.children[i];
-          if (child !== settingParent) child.style.display = 'none';
-        }
-        settingParent.style.display = '';
-        settingParent.style.marginLeft = 'auto';
-        settingParent.style.marginRight = '10px';
-      }
-      var settings = emu.frontend.elements && emu.frontend.elements.bottomBar
-        ? emu.frontend.elements.bottomBar.settings : null;
-      var button = settings && (settings[0] || settings[2]);
-      if (button && !emu.frontend.settingsMenuOpen) {
-        button.click();
-      }
-      return;
-    } catch (e) { /* ignore */ }
-    try {
-      if (emu.frontend.settingsMenu) {
-        emu.frontend.settingsMenuOpen = true;
-        emu.frontend.settingsMenu.style.display = '';
-      }
-    } catch (e) { /* ignore */ }
-  }
-
-  function toggleFastForward() {
-    var emu = window.EJS_emulator;
-    if (!emu || !emu.gameManager) return;
-    try {
-      fastForwardOn = !fastForwardOn;
-      emu.isFastForward = fastForwardOn;
-      if (typeof emu.gameManager.setFastForwardRatio === 'function') {
-        emu.gameManager.setFastForwardRatio(fastForwardOn ? 3 : 0);
-      }
-      if (typeof emu.gameManager.toggleFastForward === 'function') {
-        emu.gameManager.toggleFastForward(fastForwardOn ? 1 : 0);
-      }
-      var btn = document.getElementById('ff-toggle');
-      if (btn) {
-        btn.textContent = fastForwardOn ? '1x' : 'FF';
-        btn.classList.toggle('active', fastForwardOn);
-      }
-    } catch (e) { /* ignore */ }
-  }
-
-  function disableEmulatorAutoMenu() {
-    var emu = window.EJS_emulator;
-    if (!emu) return;
-    try {
-      if (emu.elements && emu.elements.menuToggle) {
-        emu.elements.menuToggle.style.display = 'none';
-      }
-    } catch (e) { /* ignore */ }
-  }
-
   var selectedRomFile = null;
   var selectedConsoleCore = null;
 
@@ -710,7 +579,6 @@ KM.App = (function () {
     document.getElementById('game-screen').style.display = 'flex';
     document.getElementById('game-screen').classList.add('active');
     initEmulator(file, core);
-    setupVirtualControls();
     if (isMobile) {
       requestFullscreen();
       lockOrientation();
@@ -1151,43 +1019,13 @@ KM.App = (function () {
 
     var gameScreen = el('div', { id: 'game-screen', class: 'screen game-screen', style: { display: 'none' } }, [
       el('div', { id: 'top-bar', class: 'top-bar' }, [
-        el('div', { class: 'top-bar-actions' }, [
-          el('button', { class: 'icon-btn', text: '☰', title: 'Mo menu', on: { click: function () { openEmulatorMenu(); } } }),
-          el('button', { id: 'ff-toggle', class: 'icon-btn', text: 'FF', title: 'Tua nhanh', on: { click: function () { toggleFastForward(); } } })
-        ]),
         el('span', { id: 'timer', class: 'timer', text: '5:00' }),
         el('span', { id: 'level', class: 'level', text: 'Level 1' })
       ]),
       el('div', { id: 'loading-overlay', class: 'loading-overlay', style: { display: 'none' } }, [
         el('p', { id: 'loading-text', text: 'Dang tai ROM va core...' })
       ]),
-      el('div', { id: 'emulator-container', class: 'emulator-container' }),
-      el('div', { id: 'virtual-controls', class: 'virtual-controls' }, [
-        el('div', { class: 'dpad-circle' }, [
-          el('button', { class: 'vbtn vbtn-dpad vbtn-up', 'data-key': 'ArrowUp', text: '↑' }),
-          el('button', { class: 'vbtn vbtn-dpad vbtn-left', 'data-key': 'ArrowLeft', text: '←' }),
-          el('button', { class: 'vbtn vbtn-dpad vbtn-down', 'data-key': 'ArrowDown', text: '↓' }),
-          el('button', { class: 'vbtn vbtn-dpad vbtn-right', 'data-key': 'ArrowRight', text: '→' })
-        ]),
-        el('div', { class: 'center-column' }, [
-          el('div', { class: 'system-row' }, [
-            el('button', { class: 'vbtn vbtn-system vbtn-select', 'data-key': 'Shift', text: 'Select' }),
-            el('button', { class: 'vbtn vbtn-system vbtn-start', 'data-key': 'Enter', text: 'Start' })
-          ]),
-        ]),
-        el('div', { class: 'right-column' }, [
-          el('div', { class: 'shoulder-row' }, [
-            el('button', { class: 'vbtn vbtn-shoulder', 'data-key': 'q', text: 'L' }),
-            el('button', { class: 'vbtn vbtn-shoulder', 'data-key': 'e', text: 'R' })
-          ]),
-          el('div', { class: 'action-circle' }, [
-            el('button', { class: 'vbtn vbtn-action vbtn-x', 'data-key': 's', text: 'X' }),
-            el('button', { class: 'vbtn vbtn-action vbtn-y', 'data-key': 'a', text: 'Y' }),
-            el('button', { class: 'vbtn vbtn-action vbtn-a', 'data-key': 'x', text: 'A' }),
-            el('button', { class: 'vbtn vbtn-action vbtn-b', 'data-key': 'z', text: 'B' })
-          ])
-        ])
-      ])
+      el('div', { id: 'emulator-container', class: 'emulator-container' })
     ]);
     app.appendChild(gameScreen);
 
