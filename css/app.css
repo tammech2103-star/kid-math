@@ -207,9 +207,10 @@ html, body { height: 100%; overflow: hidden; background: #0a0a1a; color: #e0f7fa
 }
 /* Prevent pull-to-refresh */
 body { overscroll-behavior: none; }
-/* Hide EmulatorJS auto hamburger toggle and menu bar by default (we use our own top-bar button) */
+/* Hide EmulatorJS auto hamburger toggle by default (we use our own top-bar button) */
 #emulator .ejs_menu_toggle { display: none !important; }
-#emulator .ejs_menu_bar { display: none; }
+/* Keep EmulatorJS bottom menu bar usable when our top-bar button opens it */
+#emulator .ejs_menu_bar { display: flex; }
 /* Fullscreen mode */
 .fullscreen .top-bar { display: flex; }
 .fullscreen .virtual-controls { bottom: 60px; }
