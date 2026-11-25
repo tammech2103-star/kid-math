@@ -72,6 +72,7 @@ KM.App = (function () {
   var netplayHostStatusEl = null;
   var fastForwardOn = false;
   var gamepadButtonStates = {};
+  var currentRomObjectUrl = null;
 
   function isNetplayActive() {
     return netplayMode !== 'single' && window.EJS_emulator && window.EJS_emulator.isNetplay;
@@ -179,11 +180,11 @@ KM.App = (function () {
     if (audio && typeof audio.unlock === 'function') audio.unlock();
   }
 
-  function waitForEmulator(cb, attempts) {
+  function waitForEmulator(cb, attempts, fail) {
     attempts = attempts || 0;
     if (window.EJS_emulator) { cb(); return; }
-    if (attempts > 150) return;
-    setTimeout(function () { waitForEmulator(cb, attempts + 1); }, 200);
+    if (attempts > 150) { if (fail) fail(); return; }
+    setTimeout(function () { waitForEmulator(cb, attempts + 1, fail); }, 200);
   }
 
   function disableWakeLock() {
@@ -219,6 +220,7 @@ KM.App = (function () {
     window.EJS_core = core;
     window.EJS_pathtodata = 'https://cdn.emulatorjs.org/nightly/data/';
     window.EJS_startOnLoaded = true;
+    window.EJS_fullscreenOnLoaded = false;
     window.EJS_volume = 0.5;
     window.EJS_touch = false;
     window.EJS_netplayServer = netplayServerUrl;
@@ -230,13 +232,17 @@ KM.App = (function () {
     ];
     window.EJS_gameID = netplayGameId;
 
-    var reader = new FileReader();
-    reader.onload = function (e) {
-      window.EJS_gameUrl = e.target.result;
+    var loadingOverlay = document.getElementById('loading-overlay');
+    var loadingText = document.getElementById('loading-text');
+    if (loadingOverlay) loadingOverlay.style.display = 'flex';
+    if (loadingText) loadingText.textContent = 'Dang tai ROM va core...';
+
+    var startLoader = function () {
       var script = document.createElement('script');
       script.src = 'https://cdn.emulatorjs.org/nightly/data/loader.js';
       script.onload = function () {
         waitForEmulator(function () {
+          if (loadingOverlay) loadingOverlay.style.display = 'none';
           emulator = window.EJS_emulator;
           gameRunning = true;
 
@@ -250,11 +256,29 @@ KM.App = (function () {
           if (netplayMode !== 'single') {
             startNetplayAfterLoad();
           }
+        }, 0, function () {
+          if (loadingText) loadingText.textContent = 'Khong tai duoc ROM. Vui long thu lai.';
         });
+      };
+      script.onerror = function () {
+        if (loadingText) loadingText.textContent = 'Khong tai duoc EmulatorJS. Kiem tra internet.';
       };
       document.body.appendChild(script);
     };
-    reader.readAsDataURL(romFile);
+
+    if (currentRomObjectUrl) URL.revokeObjectURL(currentRomObjectUrl);
+    if (URL && typeof URL.createObjectURL === 'function') {
+      currentRomObjectUrl = URL.createObjectURL(romFile);
+      window.EJS_gameUrl = currentRomObjectUrl;
+      startLoader();
+    } else {
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        window.EJS_gameUrl = e.target.result;
+        startLoader();
+      };
+      reader.readAsDataURL(romFile);
+    }
   }
 
   // Question timer
@@ -567,6 +591,21 @@ KM.App = (function () {
     try {
       if (emu.frontend && emu.frontend.menu && typeof emu.frontend.menu.open === 'function') {
         emu.frontend.menu.open(true);
+      }
+    } catch (e) { /* ignore */ }
+    try {
+      var settings = emu.frontend && emu.frontend.elements && emu.frontend.elements.bottomBar
+        ? emu.frontend.elements.bottomBar.settings : null;
+      var button = settings && (settings[0] || settings[2]);
+      if (button) {
+        if (!emu.frontend.settingsMenuOpen) button.click();
+        return;
+      }
+    } catch (e) { /* ignore */ }
+    try {
+      if (emu.frontend && emu.frontend.settingsMenu) {
+        emu.frontend.settingsMenuOpen = true;
+        emu.frontend.settingsMenu.style.display = '';
         return;
       }
     } catch (e) { /* ignore */ }
@@ -1111,6 +1150,9 @@ KM.App = (function () {
         ]),
         el('span', { id: 'timer', class: 'timer', text: '5:00' }),
         el('span', { id: 'level', class: 'level', text: 'Level 1' })
+      ]),
+      el('div', { id: 'loading-overlay', class: 'loading-overlay', style: { display: 'none' } }, [
+        el('p', { id: 'loading-text', text: 'Dang tai ROM va core...' })
       ]),
       el('div', { id: 'emulator-container', class: 'emulator-container' }),
       el('div', { id: 'virtual-controls', class: 'virtual-controls' }, [
