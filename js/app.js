@@ -71,6 +71,7 @@ KM.App = (function () {
   var netplayStatusEl = null;
   var netplayHostStatusEl = null;
   var fastForwardOn = false;
+  var gamepadButtonStates = {};
 
   function isNetplayActive() {
     return netplayMode !== 'single' && window.EJS_emulator && window.EJS_emulator.isNetplay;
@@ -668,8 +669,6 @@ KM.App = (function () {
       requestFullscreen();
       lockOrientation();
       document.body.classList.add('fullscreen');
-      var topBar = document.getElementById('top-bar');
-      if (topBar) topBar.style.display = 'none';
     }
   }
 
@@ -711,6 +710,39 @@ KM.App = (function () {
         }
       }
     }, false);
+  }
+
+  function setupGamepadAnswers() {
+    var buttonToChoice = [0, 1, 2, 3]; // A, B, X, Y -> choice 1..4
+    function poll() {
+      try {
+        if (modalOpen && !questionLocked && navigator.getGamepads) {
+          var pads = navigator.getGamepads();
+          var choices = document.querySelectorAll('.question-choice');
+          for (var p = 0; p < pads.length; p++) {
+            var pad = pads[p];
+            if (!pad) continue;
+            for (var c = 0; c < buttonToChoice.length; c++) {
+              var btnIndex = buttonToChoice[c];
+              var btn = pad.buttons[btnIndex];
+              if (!btn) continue;
+              var pressed = !!btn.pressed || (typeof btn.value === 'number' && btn.value > 0.5);
+              var key = p + '-' + btnIndex;
+              if (pressed && !gamepadButtonStates[key]) {
+                gamepadButtonStates[key] = true;
+                if (choices[c]) choices[c].click();
+              } else if (!pressed) {
+                gamepadButtonStates[key] = false;
+              }
+            }
+          }
+        } else {
+          gamepadButtonStates = {};
+        }
+      } catch (e) { /* ignore */ }
+      requestAnimationFrame(poll);
+    }
+    requestAnimationFrame(poll);
   }
 
   function setNetplayStatus(text) {
@@ -822,6 +854,7 @@ KM.App = (function () {
                 if (netplayStatusEl) netplayStatusEl.textContent = 'Netplay loi: ' + err2;
                 return;
               }
+              netplayMode = 'guest';
               np.players = users || np.players;
               np.roomJoined(false, netplayRoomCode, '', sid);
               setHostStatus('da ket noi voi host');
@@ -831,6 +864,7 @@ KM.App = (function () {
             np.owner = true;
             np.roomJoined(true, netplayRoomCode, '', sid);
             setHostStatus('dang online - dang cho nguoi choi 2');
+            startQuestionTimer();
             finishBind();
           }
         });
@@ -1114,6 +1148,7 @@ KM.App = (function () {
         el('div', { id: 'question-visual', class: 'question-visual' }),
         el('div', { id: 'question-choices', class: 'question-choices' }),
         el('p', { id: 'question-hint', class: 'question-hint', style: { display: 'none' } }),
+        el('p', { class: 'question-control-hint', text: 'Chon bang A/B/X/Y hoac phim 1/2/3' }),
         el('button', { class: 'btn btn-ghost', text: '🔊 Nghe lai', on: { click: function () {
           if (activeQuestion && settings.speech && window.speechSynthesis) {
             try { window.speechSynthesis.cancel(); } catch (e) {}
@@ -1128,6 +1163,7 @@ KM.App = (function () {
 
     setupRomPicker();
     setupKeyboard();
+    setupGamepadAnswers();
   }
 
   return { init: init, showQuestion: showQuestion };

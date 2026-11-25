@@ -9,15 +9,19 @@ html, body { height: 100%; overflow: hidden; background: #0a0a1a; color: #e0f7fa
 .rom-picker {
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 16px;
+  justify-content: flex-start;
+  gap: 12px;
   padding: 24px;
   text-align: center;
+  overflow-y: auto;
 }
 .rom-picker h1 { font-size: 2rem; color: #4dd0e1; }
 .rom-picker p { color: #80cbc4; }
-.rom-picker input[type="file"] { display: none; }
+.rom-picker input[type="file"] { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
 .rom-picker .btn { padding: 12px 24px; font-size: 1.2rem; border-radius: 12px; background: #4dd0e1; color: #0a0a1a; border: none; cursor: pointer; }
+.netplay-panel { width: 100%; max-width: 760px; padding: 14px; border-radius: 12px; background: rgba(255,255,255,0.06); }
+.netplay-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; }
+.netplay-status { font-size: 0.9rem; color: #80cbc4; word-break: break-word; }
 
 /* Game screen */
 .game-screen { flex-direction: column; }
@@ -140,6 +144,7 @@ html, body { height: 100%; overflow: hidden; background: #0a0a1a; color: #e0f7fa
 }
 .question-choice:active { transform: scale(0.95); background: rgba(77, 208, 225, 0.3); }
 .question-hint { font-size: 1rem; font-weight: 700; color: #ff6b6b; margin: 8px 0; min-height: 20px; }
+.question-control-hint { font-size: 0.8rem; color: #80cbc4; margin: 4px 0 8px; }
 
 /* Console picker */
 .console-picker { display: none; flex-direction: column; gap: 8px; align-items: center; }
@@ -201,5 +206,5 @@ body { overscroll-behavior: none; }
 #emulator .ejs_menu_toggle { display: none !important; }
 #emulator .ejs_menu_bar { display: none; }
 /* Fullscreen mode */
-.fullscreen .top-bar { display: none; }
+.fullscreen .top-bar { display: flex; }
 .fullscreen .virtual-controls { bottom: 60px; }
