@@ -587,30 +587,37 @@ KM.App = (function () {
 
   function openEmulatorMenu() {
     var emu = window.EJS_emulator;
-    if (!emu) return;
+    if (!emu || !emu.frontend) return;
     try {
-      if (emu.frontend && emu.frontend.menu && typeof emu.frontend.menu.open === 'function') {
+      if (emu.frontend.menu && typeof emu.frontend.menu.open === 'function') {
         emu.frontend.menu.open(true);
       }
-    } catch (e) { /* ignore */ }
-    try {
-      var settings = emu.frontend && emu.frontend.elements && emu.frontend.elements.bottomBar
+      // Keep only the EmulatorJS settings entry visible; hide play/pause,
+      // restart, fullscreen, save-state and other default bottom-bar buttons.
+      var menu = emu.frontend.elements && emu.frontend.elements.menu;
+      var settingParent = emu.frontend.settingParent;
+      if (menu && settingParent) {
+        for (var i = 0; i < menu.children.length; i++) {
+          var child = menu.children[i];
+          if (child !== settingParent) child.style.display = 'none';
+        }
+        settingParent.style.display = '';
+        settingParent.style.marginLeft = 'auto';
+        settingParent.style.marginRight = '10px';
+      }
+      var settings = emu.frontend.elements && emu.frontend.elements.bottomBar
         ? emu.frontend.elements.bottomBar.settings : null;
       var button = settings && (settings[0] || settings[2]);
-      if (button) {
-        if (!emu.frontend.settingsMenuOpen) button.click();
-        return;
+      if (button && !emu.frontend.settingsMenuOpen) {
+        button.click();
       }
+      return;
     } catch (e) { /* ignore */ }
     try {
-      if (emu.frontend && emu.frontend.settingsMenu) {
+      if (emu.frontend.settingsMenu) {
         emu.frontend.settingsMenuOpen = true;
         emu.frontend.settingsMenu.style.display = '';
-        return;
       }
-    } catch (e) { /* ignore */ }
-    try {
-      if (emu.elements && emu.elements.menuToggle) emu.elements.menuToggle.click();
     } catch (e) { /* ignore */ }
   }
 
