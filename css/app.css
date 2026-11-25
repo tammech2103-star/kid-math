@@ -27,7 +27,7 @@ html, body { height: 100%; overflow: hidden; background: #0a0a1a; color: #e0f7fa
 .game-screen { flex-direction: column; }
 .top-bar {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 8px 12px; background: rgba(0,0,0,0.7); z-index: 10;
+  padding: 8px 12px; background: rgba(0,0,0,0.7); z-index: 10002;
 }
 .top-bar-actions { display: flex; align-items: center; gap: 6px; }
 .top-bar .icon-btn { background: none; border: none; color: #4dd0e1; font-size: 1.2rem; cursor: pointer; min-width: 44px; min-height: 44px; }
@@ -36,7 +36,7 @@ html, body { height: 100%; overflow: hidden; background: #0a0a1a; color: #e0f7fa
 .top-bar .level { font-weight: 700; color: #80cbc4; }
 
 .loading-overlay {
-  position: absolute; inset: 0; z-index: 20;
+  position: absolute; inset: 0; z-index: 10002;
   display: flex; align-items: center; justify-content: center;
   background: #050510; color: #4dd0e1; font-size: 1.1rem;
 }
@@ -50,7 +50,7 @@ html, body { height: 100%; overflow: hidden; background: #0a0a1a; color: #e0f7fa
 .virtual-controls {
   position: absolute; bottom: 60px; left: 0; right: 0;
   display: flex; justify-content: space-between; align-items: flex-end;
-  padding: 0 24px; z-index: 10; pointer-events: none;
+  padding: 0 24px; z-index: 10002; pointer-events: none;
   min-height: 180px;
 }
 /* D-pad circle (left) */
@@ -128,7 +128,7 @@ html, body { height: 100%; overflow: hidden; background: #0a0a1a; color: #e0f7fa
 .question-modal {
   position: absolute; inset: 0;
   display: none; align-items: center; justify-content: center;
-  background: rgba(0,0,0,0.8); z-index: 30; padding: 16px;
+  background: rgba(0,0,0,0.8); z-index: 10003; padding: 16px;
 }
 .modal-card {
   background: rgba(20, 30, 40, 0.97);
